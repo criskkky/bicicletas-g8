@@ -1,5 +1,6 @@
 "use strict";
 import User from "../entity/user.entity.js";
+import Inventory from "../entity/inventory.entity.js";
 import { AppDataSource } from "./configDb.js";
 import { encryptPassword } from "../helpers/bcrypt.helper.js";
 
@@ -81,4 +82,68 @@ async function createUsers() {
   }
 }
 
-export { createUsers };
+// Crear inventario de Taller de Bicicletas
+async function createInv() {
+  try {
+    const invRepository = AppDataSource.getRepository(Inventory);
+
+    const count = await invRepository.count();
+    if (count > 0) return;
+
+    await Promise.all([
+      invRepository.save(
+        invRepository.create({
+          name: "Bicicleta de Montaña",
+          type: "bicicleta",
+          quantity: 10,
+          price: 500000,
+        }),
+      ),
+      invRepository.save(
+        invRepository.create({
+          name: "Manguera de Freno",
+          type: "repuesto",
+          quantity: 50,
+          price: 5000,
+        }),
+      ),
+      invRepository.save(
+        invRepository.create({
+          name: "Neumático 26",
+          type: "repuesto",
+          quantity: 30,
+          price: 10000,
+        }),
+      ),
+      invRepository.save(
+        invRepository.create({
+          name: "Neumático 29",
+          type: "repuesto",
+          quantity: 20,
+          price: 15000,
+        }),
+      ),
+      invRepository.save(
+        invRepository.create({
+          name: "Neumático 700",
+          type: "repuesto",
+          quantity: 20,
+          price: 15000,
+        }),
+      ),
+      invRepository.save(
+        invRepository.create({
+          name: "Cadena",
+          type: "repuesto",
+          quantity: 30,
+          price: 10000,
+        }),
+      ),
+    ]);
+    console.log("* => Inventario creado exitosamente");
+  } catch (error) {
+    console.error("Error al crear inventario:", error);
+  }
+}
+
+export { createUsers, createInv };
