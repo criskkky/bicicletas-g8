@@ -1,6 +1,7 @@
 "use strict";
 import User from "../entity/user.entity.js";
 import Inventory from "../entity/inventory.entity.js";
+import Sale from "../entity/sale.entity.js";
 import { AppDataSource } from "./configDb.js";
 import { encryptPassword } from "../helpers/bcrypt.helper.js";
 
@@ -146,4 +147,34 @@ async function createInv() {
   }
 }
 
-export { createUsers, createInv };
+// Crear ventas
+async function createSales() {
+  try {
+    const saleRepository = AppDataSource.getRepository(Sale);
+
+    const count = await saleRepository.count();
+    if (count > 0) return;
+
+    const salesData = [
+      {
+        inventoryItemId: 1,
+        quantity: 1,
+        totalPrice: 500000,
+      },
+      {
+        inventoryItemId: 2,
+        quantity: 2,
+        totalPrice: 10000,
+      },
+    ];
+
+    await Promise.all(
+      salesData.map(sale => saleRepository.save(saleRepository.create(sale)))
+    );
+
+    console.log("* => Ventas creadas exitosamente");
+  } catch (error) {
+    console.error("Error al crear ventas:", error);
+  }
+}
+export { createUsers, createInv, createSales };

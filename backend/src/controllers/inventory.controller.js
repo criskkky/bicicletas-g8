@@ -1,10 +1,10 @@
 "use strict";
 import {
-  getInventoryItemService,
-  getAllInventoryItemsService,
   createInventoryItemService,
+  deleteInventoryItemService,
+  getAllInventoryItemsService,
+  getInventoryItemService,
   updateInventoryItemService,
-  deleteInventoryItemService
 } from "../services/inventory.service.js";
 
 export async function getInventoryItem(req, res) {
@@ -51,7 +51,7 @@ export async function updateInventoryItem(req, res) {
     console.error("Error al actualizar el ítem del inventario:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
-}
+} 
 
 export async function deleteInventoryItem(req, res) {
   try {
