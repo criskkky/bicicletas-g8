@@ -1,12 +1,12 @@
 "use strict";
 
-import { AppDataSource } from "../config/configDb";
-import Sale from "../entity/sale.entity";
-import InventoryItem from "../entity/inventory.entity"; // Asegúrate de importar tu entidad de inventario
+import { AppDataSource } from "../config/configDb.js";
+import SaleEntity from "../entity/sale.entity.js";
+import InventoryItem from "../entity/inventory.entity.js"; 
 
 
 export async function createSaleService(saleData) {
-    const saleRepository = AppDataSource.getRepository(Sale);
+    const saleRepository = AppDataSource.getRepository(SaleEntity);
     const inventoryCheck = await verificarInventarioService(saleData.inventoryItemId, saleData.quantity);
     
     if (!inventoryCheck[0]) {
@@ -59,7 +59,7 @@ export async function restarInventarioService(inventoryItemId, quantity) {
 }
 
 export async function getAllSalesService() {
-    const saleRepository = AppDataSource.getRepository(Sale);
+    const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
         const sales = await saleRepository.find();
         return [sales, null];
@@ -70,7 +70,7 @@ export async function getAllSalesService() {
 }
 
 export async function getSaleByIdService(id) {
-    const saleRepository = AppDataSource.getRepository(Sale);
+    const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
         const sale = await saleRepository.findOne(id);
         if (!sale) {
@@ -84,7 +84,7 @@ export async function getSaleByIdService(id) {
 }
 
 export async function updateSaleService(id, saleData) {
-    const saleRepository = AppDataSource.getRepository(Sale);
+    const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
         const sale = await saleRepository.findOne(id);
         if (!sale) {
@@ -102,7 +102,7 @@ export async function updateSaleService(id, saleData) {
 }
 
 export async function deleteSaleService(id) {
-    const saleRepository = AppDataSource.getRepository(Sale);
+    const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
         const sale = await saleRepository.findOne(id);
         if (!sale) {
