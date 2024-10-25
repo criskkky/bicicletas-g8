@@ -23,3 +23,7 @@ CMD ["postgres"]
 # VER LOS CONTENEDORES EN EJECUCIÓN ->              docker ps
 # VER TODOS LOS CONTENEDORES ->                     docker ps -a
 # VER LAS IMÁGENES DE DOCKER ->                     docker images
+
+# OPCIONAL:
+# rm: Elimina el contenedor al detenerlo.
+# EJECUTAR UN CONTENEDOR CON PARAMETRO RM ->        docker run -d --name backend -p 5432:5432 --rm backend
