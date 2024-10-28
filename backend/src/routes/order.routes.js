@@ -1,12 +1,23 @@
+"use strict";
+import { Router } from "express";
+import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import {
+    createOrder,
+    deleteOrder,
+    getAllOrders,
+    getOrder,
+    updateOrder
+    } from "../controllers/order.controller.js";
 
-const express = require('express');
-const router = express.Router();
-const orderController = require('../controllers/orderController');
+const router = Router();
 
-router.post('/orders', orderController.createOrder);     
-router.get('/orders', orderController.getAllOrders);      
-router.get('/orders/:id', orderController.getOrder);      
-router.patch('/orders/:id', orderController.updateOrder);  
-router.delete('/orders/:id', orderController.deleteOrder); 
+router.use(authenticateJwt);
 
-module.exports = router;
+router // http://localhost:5000/api/orders
+    .get("/", getAllOrders)
+    .get("/view/:id", getOrder)
+    .post("/add", createOrder)
+    .patch("/edit/:id", updateOrder)
+    .delete("/delete/:id", deleteOrder);
+
+export default router;
