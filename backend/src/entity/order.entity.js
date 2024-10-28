@@ -54,28 +54,6 @@ const OrderSchema = new EntitySchema({
       nullable: false,
     },
   },
-  relations: {
-    
-    usedProducts: {
-      target: "inventory", 
-      property: "id", 
-      type: "many-to-many",
-     
-      joinTable: {
-        name: "order_used_products", // Tabla intermedia
-        joinColumn: {
-          name: "orderId",
-          referencedColumnName: "id",
-        },
-        inverseJoinColumn: {
-          name: "productId",
-          referencedColumnName: "id",
-        },
-      },
-    },
-  },
-
-
 
   indices: [
     {
