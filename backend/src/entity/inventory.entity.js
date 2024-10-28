@@ -41,6 +41,13 @@ const InventorySchema = new EntitySchema({
       nullable: false,
     },
   },
+  relations: {
+    sales: { // Agregar relación con Sale
+      target: "Sale",
+      property: "sales",
+      type: "one-to-many", // O "many-to-one" dependiendo de la lógica
+    },
+  },
   indices: [
     {
       name: "IDX_INVENTORY",
