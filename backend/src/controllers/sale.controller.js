@@ -12,11 +12,9 @@ import {
 
 export async function createSale(req, res) {
     try {
-        // Validar entrada
         if (!req.body.inventoryItemId || !req.body.quantity || !req.body.totalPrice) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
-        // Verificar si hay suficiente inventario
         const [hayInventario, errorInventario] = await verificarInventarioService(
             req.body.inventoryItemId, 
             req.body.quantity
@@ -27,7 +25,6 @@ export async function createSale(req, res) {
             });
         }
 
-        // Restar del inventario
         await restarInventarioService(req.body.inventoryItemId, req.body.quantity);
 
         const [sale, error] = await createSaleService(req.body);
@@ -80,10 +77,18 @@ export async function updateSale(req, res) {
 }
 
 export async function deleteSale(req, res) {
+
+    const { id } = req.params;
+    if (!id){
+        return res.status(400).json({ error: "ID de venta necesario" });
+    }
+
     try {
-        const { id } = req.params;
         const [sale, error] = await deleteSaleService(id);
-        if (error) return res.status(404).json({ error });
+
+        if (error){
+            return res.status(404).json({ error: "Venta no encontrada" })
+        }
         res.status(200).json({ message: "Venta eliminada exitosamente", sale });
     } catch (error) {
         console.error("Error al eliminar la venta", error);
