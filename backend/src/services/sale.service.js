@@ -7,6 +7,8 @@ import InventoryItem from "../entity/inventory.entity.js";
 
 export async function createSaleService(saleData) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
+
+    // Llamar a la función para verificar el inventario
     const inventoryCheck = await verificarInventarioService(saleData.inventoryItemId, saleData.quantity);
     
     if (!inventoryCheck[0]) {
@@ -30,9 +32,14 @@ export async function createSaleService(saleData) {
 export async function verificarInventarioService(inventoryItemId, quantity) {
     const inventoryRepository = AppDataSource.getRepository(InventoryItem);
     try {
-        const item = await inventoryRepository.findOne(inventoryItemId);
-        if (!item || item.quantity < quantity) {
-            return [false, "Inventario insuficiente"];
+        const item = await inventoryRepository.findOne({ where: { id: inventoryItemId } });
+        console.log("Artículo encontrado:", item);
+        if (!item) {
+            return [null, "Artículo no encontrado"];
+        }
+        console.log("Cantidad disponible:", item.quantity);
+        if (item.quantity < quantity) {
+            return [null, "Inventario insuficiente"];
         }
         return [true, null];
     } catch (error) {
@@ -45,7 +52,7 @@ export async function verificarInventarioService(inventoryItemId, quantity) {
 export async function restarInventarioService(inventoryItemId, quantity) {
     const inventoryRepository = AppDataSource.getRepository(InventoryItem);
     try {
-        const item = await inventoryRepository.findOne(inventoryItemId);
+        const item = await inventoryRepository.findOne({ where: { id: inventoryItemId } });
         if (!item) {
             return [null, "Artículo no encontrado"];
         }
@@ -72,7 +79,7 @@ export async function getAllSalesService() {
 export async function getSaleByIdService(id) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
-        const sale = await saleRepository.findOne(id);
+        const sale = await saleRepository.findOne({ where: { id } });
         if (!sale) {
             return [null, "Venta no encontrada"];
         }
@@ -85,14 +92,24 @@ export async function getSaleByIdService(id) {
 
 export async function updateSaleService(id, saleData) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
+    const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+
     try {
-        const sale = await saleRepository.findOne(id);
+        const sale = await saleRepository.findOne({ where: { id } });
         if (!sale) {
             return [null, "Venta no encontrada"];
         }
-        // Actualizar los campos de la venta
+
+        if(saleData.quantity && saleData.quantity !== sale.quantity){
+            const quantityChange = saleData.quantity - sale.quantity;
+            const inventoryCheck = await verificarInventarioService(sale.inventoryItemId, quantityChange);
+            if(!inventoryCheck[0]){
+                return [null, inventoryCheck[1]];
+            }
+        }
+
         Object.assign(sale, saleData);
-        sale.updatedAt = new Date(); // Actualizar la fecha de modificación
+        sale.updatedAt = new Date(); 
         await saleRepository.save(sale);
         return [sale, null];
     } catch (error) {
@@ -104,7 +121,7 @@ export async function updateSaleService(id, saleData) {
 export async function deleteSaleService(id) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
-        const sale = await saleRepository.findOne(id);
+        const sale = await saleRepository.findOne({ where: { id } });
         if (!sale) {
             return [null, "Venta no encontrada"];
         }

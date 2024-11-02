@@ -30,10 +30,9 @@ const SaleSchema = new EntitySchema({
     },
   },
   relations: {
-    inventoryItem: { // Agregar relación con Inventory
+    inventoryItem: {
       target: "Inventory",
-      property: "inventoryItemId",
-      type: "many-to-one", // O "one-to-many" dependiendo de la lógica
+      type: "many-to-one",
       joinColumn: {
         name: "inventoryItemId",
         referencedColumnName: "id",

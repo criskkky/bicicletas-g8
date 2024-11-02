@@ -5,7 +5,7 @@ import authRoutes from "./auth.routes.js";
 import inventoryRoutes from "./inventory.routes.js";
 import saleRoutes from "./sale.routes.js";
 import orderRoutes from "./order.routes.js";
-import pagosRoutes from "./pagos.routes.js";
+//import pagosRoutes from "./pagos.routes.js";
 const router = Router();
 
 router
@@ -14,6 +14,6 @@ router
     .use("/inventory", inventoryRoutes)
     .use("/sale", saleRoutes)
     .use("/orders", orderRoutes)
-    .use("/pagos", pagosRoutes);
+   // .use("/pagos", pagosRoutes);
 
 export default router;
