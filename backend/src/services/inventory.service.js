@@ -17,7 +17,7 @@ export async function getAllInventoryItemsService() {
   try {
     const inventoryRepository = AppDataSource.getRepository(Inventory);
     const items = await inventoryRepository.find();
-    if (!items || items.length === 0) return [null, "No hay ítems en el inventario"];
+    if (items.length === 0) return [null, "No hay ítems en el inventario"];
     return [items, null];
   } catch (error) {
     console.error("Error al obtener los ítems del inventario:", error);
@@ -43,9 +43,10 @@ export async function updateInventoryItemService(id, itemData) {
     const item = await inventoryRepository.findOne({ where: { id } });
     if (!item) return [null, "Ítem no encontrado"];
     
-    await inventoryRepository.update({ id }, { ...itemData, updatedAt: new Date() });
-    const updatedItem = await inventoryRepository.findOne({ where: { id } });
-    return [updatedItem, null];
+    const updatedData = { ...itemData, updatedAt: new Date() };
+    await inventoryRepository.update({ id }, updatedData);
+
+    return [{ ...item, ...updatedData }, null];  // Retorna el objeto actualizado
   } catch (error) {
     console.error("Error al actualizar el ítem del inventario:", error);
     return [null, "Error interno del servidor"];
