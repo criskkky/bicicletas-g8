@@ -57,12 +57,28 @@ export async function deleteInventoryItemService(id) {
   try {
     const inventoryRepository = AppDataSource.getRepository(Inventory);
     const item = await inventoryRepository.findOne({ where: { id } });
-    if (!item) return [null, "Ítem no encontrado"];
     
+    if (!item) {
+      // Si no se encuentra el ítem, se retorna con un mensaje específico
+      return [null, { type: "not_found", message: "Ítem no encontrado" }];
+    }
+
     await inventoryRepository.remove(item);
     return [item, null];
+
   } catch (error) {
     console.error("Error al eliminar el ítem del inventario:", error);
-    return [null, "Error interno del servidor"];
+    
+    // Detectar violación de clave foránea
+    if (error.code === "23503") {
+      return [null, {
+        type: "foreign_key_violation",
+        message: `No se puede eliminar el ítem con ID ${id} porque está referenciado en otra tabla.`,
+        detail: error.detail,
+        constraint: error.constraint // ID de la restricción de clave foránea
+      }];
+    }
+
+    return [null, { type: "server_error", message: "Error interno del servidor" }];
   }
 }
