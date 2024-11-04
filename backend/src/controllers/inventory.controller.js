@@ -36,8 +36,8 @@ export async function getAllInventoryItems(req, res) {
 
 export async function createInventoryItem(req, res) {
   try {
-    const { name, quantity, price } = req.body;
-    if (!name || !quantity || !price) {
+    const { name, quantity, price, type } = req.body;
+    if (!name || !quantity || !price || !type) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -55,8 +55,8 @@ export async function createInventoryItem(req, res) {
 export async function updateInventoryItem(req, res) {
   try {
     const { id } = req.params;
-    const { name, quantity, price } = req.body;
-    if (!name && !quantity && !price) {
+    const { name, quantity, price, type } = req.body;
+    if (!name && !quantity && !price && !type) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
@@ -64,8 +64,10 @@ export async function updateInventoryItem(req, res) {
     if (error) {
       return res.status(404).json({ error: "Ítem no encontrado" });
     }
+
     return res.json(item);
-  } catch (error) {
+
+  } catch (error) { // Error de servidor
     console.error("Error al actualizar el ítem del inventario:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
