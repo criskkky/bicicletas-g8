@@ -1,36 +1,58 @@
-class Technician {
-  constructor(id, name, ratePerHour, workLogs = []) {
-      this.id = id;
-      this.name = name;
-      this.ratePerHour = ratePerHour; // Tarifa base por hora
-      this.workLogs = workLogs; // Registro de horas trabajadas
-  }
-}
+import { EntitySchema } from "typeorm";
 
-class WorkLog {
-  constructor(date, hours, type, productsUsed = []) {
-      this.date = date;
-      this.hours = hours; // Horas trabajadas
-      this.type = type; // Tipos: 'venta', 'mantenimiento', 'reparación'
-      this.productsUsed = productsUsed; // Productos del inventario usados
-  }
-}
+const PagosSchema = new EntitySchema({
+  name: "Pagos",
+  tableName: "pagos",
+  columns: {
+    id: {
+      type: "int",
+      primary: true,
+      generated: true,
+    },
+    idCliente: {
+      type: "int",
+      nullable: false,
+    },
+    idTecnico: {
+      type: "int",
+      nullable: false,
+    },
+    monto: {
+      type: "int",
+      nullable: false,
+    },
+    createdAt: {
+      type: "timestamp with time zone",
+      default: () => "CURRENT_TIMESTAMP",
+      nullable: false,
+    },
+    updatedAt: {
+      type: "timestamp with time zone",
+      default: () => "CURRENT_TIMESTAMP",
+      nullable: false,
+    },
+  },
+  // relations: {
+  //   cliente: {
+  //     target: "Cliente",
+  //     type: "many-to-one",
+  //     joinColumn: true,
+  //     eager: true,
+  //   },
+  //   tecnico: {
+  //     target: "Tecnico",
+  //     type: "many-to-one",
+  //     joinColumn: true,
+  //     eager: true,
+  //   },
+  // },
+  indices: [
+    {
+      name: "IDX_PAGOS",
+      columns: ["id"],
+      unique: true,
+    },
+  ],
+});
 
-class Product {
-  constructor(id, name, cost) {
-      this.id = id;
-      this.name = name;
-      this.cost = cost;
-  }
-}
-
-class PaymentReport {
-  constructor(technicianId, period, totalPayment) {
-      this.technicianId = technicianId;
-      this.period = period;
-      this.totalPayment = totalPayment;
-  }
-}
-
-// Exportar usando la sintaxis de ES Modules
-export { Technician, WorkLog, Product, PaymentReport };
+export default PagosSchema;
