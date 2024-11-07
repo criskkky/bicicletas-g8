@@ -17,12 +17,6 @@ const SaleSchema = new EntitySchema({
       type: "int",
       nullable: false,
     },
-    totalPrice: {
-      type: "decimal",
-      precision: 10,
-      scale: 2,
-      nullable: false,
-    },
     createdAt: {
       type: "timestamp with time zone",
       default: () => "CURRENT_TIMESTAMP",

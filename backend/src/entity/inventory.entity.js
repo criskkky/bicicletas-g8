@@ -42,10 +42,11 @@ const InventorySchema = new EntitySchema({
     },
   },
   relations: {
-    sales: { // Agregar relación con Sale
+    sales: { 
       target: "Sale",
-      property: "sales",
-      type: "one-to-many", // O "many-to-one" dependiendo de la lógica
+      property: "inventoryItem",
+      type: "one-to-many", 
+      inverseSide: "InventoryItem",
     },
   },
   indices: [

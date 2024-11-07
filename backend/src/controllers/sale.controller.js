@@ -12,7 +12,7 @@ import {
 
 export async function createSale(req, res) {
     try {
-        if (!req.body.inventoryItemId || !req.body.quantity || !req.body.totalPrice) {
+        if (!req.body.inventoryItemId || !req.body.quantity) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
         const [hayInventario, errorInventario] = await verificarInventarioService(
@@ -62,8 +62,7 @@ export async function getSaleById(req, res) {
 export async function updateSale(req, res) {
     try {
         const { id } = req.params;
-        // Validar entrada
-        if (!req.body.inventoryItemId || !req.body.quantity || !req.body.totalPrice) {
+        if (!req.body.inventoryItemId || !req.body.quantity) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
 
