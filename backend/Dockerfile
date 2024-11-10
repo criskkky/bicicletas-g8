@@ -1,8 +1,9 @@
-# Archivo de configuración para crear la imagen de Docker del backend, solo para desarrollo y pruebas.
+# Archivo de configuración para crear la imagen de Docker del PostgreSQL, solo para desarrollo y pruebas.
 
 # Usa la imagen oficial de PostgreSQL
 FROM postgres:latest
 
+# OJO: .ENV
 # Variables de entorno para configurar la base de datos (editar según sea necesario).
 ENV POSTGRES_DB=mydb
 ENV POSTGRES_USER=admin
@@ -15,15 +16,15 @@ EXPOSE 5432
 CMD ["postgres"]
 
 # DOCUMENTACIÓN:
-# CREAR UNA IMAGEN DE DOCKER PARA EL BACKEND ->     docker build -t backend .
-# EJECUTAR UN CONTENEDOR CON LA IMAGEN CREADA ->    docker run -d --name backend -p 5432:5432 backend
-# DETENER EL CONTENEDOR ->                          docker stop backend
-# ELIMINAR EL CONTENEDOR ->                         docker rm backend
-# ELIMINAR LA IMAGEN ->                             docker rmi backend
+# CREAR UNA IMAGEN DE DOCKER PARA EL POSTGRES ->    docker build -t postgres .
+# EJECUTAR UN CONTENEDOR CON LA IMAGEN CREADA ->    docker run -d --name postgres -p 5432:5432 postgres
+# DETENER EL CONTENEDOR ->                          docker stop postgres
+# ELIMINAR EL CONTENEDOR ->                         docker rm postgres
+# ELIMINAR LA IMAGEN ->                             docker rmi postgres
 # VER LOS CONTENEDORES EN EJECUCIÓN ->              docker ps
 # VER TODOS LOS CONTENEDORES ->                     docker ps -a
 # VER LAS IMÁGENES DE DOCKER ->                     docker images
 
 # OPCIONAL:
 # rm: Elimina el contenedor al detenerlo.
-# EJECUTAR UN CONTENEDOR CON PARAMETRO RM ->        docker run -d --name backend -p 5432:5432 --rm backend
+# EJECUTAR UN CONTENEDOR CON PARAMETRO RM ->        docker run -d --name postgres -p 5432:5432 --rm postgres
