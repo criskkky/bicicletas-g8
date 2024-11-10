@@ -159,12 +159,10 @@ async function createSales() {
       {
         inventoryItemId: 1,
         quantity: 1,
-        totalPrice: 500000,
       },
       {
         inventoryItemId: 2,
         quantity: 2,
-        totalPrice: 10000,
       },
     ];
 
