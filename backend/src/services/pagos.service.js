@@ -1,49 +1,69 @@
-// service.js
-const { Technician, WorkLog, PaymentReport } = require('./entity');
+"use strict";
 
-class TechnicianService {
-  constructor() {
-    this.technicians = []; // Lista de técnicos
-  }
+import { AppDataSource } from "../config/configDb.js";
+import PagosEntity from "../entity/pagos.entity.js";
 
-  addTechnician(technician) {
-    this.technicians.push(technician);
-  }
-
-  recordWork(technicianId, workLog) {
-    const technician = this.technicians.find(t => t.id === technicianId);
-    if (technician) technician.workLogs.push(workLog);
-    else throw new Error('Técnico no encontrado');
-  }
-
-  calculatePayment(technicianId, period) {
-    const technician = this.technicians.find(t => t.id === technicianId);
-    if (!technician) throw new Error('Técnico no encontrado');
-
-    const workLogsInPeriod = technician.workLogs.filter(log => log.date.includes(period));
-    let totalPayment = 0;
-
-    workLogsInPeriod.forEach(log => {
-      let rate = technician.ratePerHour;
-
-      // Personalización de tarifas según el tipo de trabajo
-      if (log.type === 'venta') rate *= 1.5;
-      if (log.type === 'mantenimiento') rate *= 1.2;
-
-      totalPayment += rate * log.hours;
-
-      // Impacto de inventarios utilizados
-      log.productsUsed.forEach(product => {
-        totalPayment += product.cost * 0.1; // Ejemplo: 10% del costo de productos usados
-      });
-    });
-
-    return new PaymentReport(technicianId, period, totalPayment);
-  }
-
-  generatePaymentReports(period) {
-    return this.technicians.map(tech => this.calculatePayment(tech.id, period));
+export async function getPagoService(id) {
+  try {
+    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const pago = await pagosRepository.findOne({ where: { id } });
+    if (!pago) return [null, "Pago no encontrado"];
+    return [pago, null];
+  } catch (error) {
+    console.error("Error al obtener el pago:", error);
+    return [null, "Error interno del servidor"];
   }
 }
 
-module.exports = new TechnicianService();
+export async function getAllPagosService() {
+  try {
+    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const pagos = await pagosRepository.find();
+    if (!pagos || pagos.length === 0) return [null, "No hay pagos registrados"];
+    return [pagos, null];
+  } catch (error) {
+    console.error("Error al obtener los pagos:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
+export async function createPagoService(pagoData) {
+  try {
+    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const newPago = pagosRepository.create(pagoData);
+    await pagosRepository.save(newPago);
+    return [newPago, null];
+  } catch (error) {
+    console.error("Error al crear el pago:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
+export async function updatePagoService(id, pagoData) {
+  try {
+    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const pago = await pagosRepository.findOne({ where: { id } });
+    if (!pago) return [null, "Pago no encontrado"];
+    
+    await pagosRepository.update({ id }, { ...pagoData, updatedAt: new Date() });
+    const updatedPago = await pagosRepository.findOne({ where: { id } });
+    return [updatedPago, null];
+  } catch (error) {
+    console.error("Error al actualizar el pago:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
+export async function deletePagoService(id) {
+  try {
+    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const pago = await pagosRepository.findOne({ where: { id } });
+    if (!pago) return [null, "Pago no encontrado"];
+    
+    await pagosRepository.delete({ id });
+    return [pago, null];
+  } catch (error) {
+    console.error("Error al eliminar el pago:", error);
+    return [null, "Error interno del servidor"];
+  }
+}

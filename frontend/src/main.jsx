@@ -9,6 +9,7 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
+import Maintenance from '@pages/Maintenance';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,16 @@ const router = createBrowserRouter([
           <Users />
         </ProtectedRoute>
         ),
+      },
+      {
+        path: '/maintenance',
+        element: (
+          // admin y tecnico pueden acceder
+        <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+          <Maintenance />
+        </ProtectedRoute>
+        ),
+      }
     },
     {
       path: '/sales',
