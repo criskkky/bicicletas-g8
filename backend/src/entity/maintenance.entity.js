@@ -35,10 +35,6 @@ const MaintenanceSchema = new EntitySchema({
       type: "date",
       nullable: false,
     },
-    idItemUsed: { // id del artículo de inventario usado
-      type: "int",
-      nullable: false,
-    },
     quantityUsed: {
       type: "int",
       nullable: false,
@@ -57,8 +53,8 @@ const MaintenanceSchema = new EntitySchema({
   },
   relations: {
     // Relación con el artículo de inventario
-    inventoryItems: { // Nota el cambio a plural
-      target: "Inventory",
+    inventoryItems: { // Relación de muchos a muchos
+      target: "Inventory", // El modelo de inventario debe coincidir con este nombre
       type: "many-to-many", // Relación muchos a muchos
       joinTable: { // Define la tabla de unión explícitamente
         name: "maintenance_inventory", // Nombre de la tabla de unión
@@ -67,7 +63,7 @@ const MaintenanceSchema = new EntitySchema({
           referencedColumnName: "id",
         },
         inverseJoinColumn: {
-          name: "inventory_id", // Columna de la tabla `Inventory`
+          name: "inventory_id", // Columna de la tabla `InventoryItem`
           referencedColumnName: "id",
         },
       },

@@ -102,18 +102,24 @@ export async function updateMaintenanceService(id, maintenanceData) {
 export async function deleteMaintenanceService(id) {
   try {
     const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-    const maintenance = await maintenanceRepository.findOne({ where: { id } });
+    const maintenance = await maintenanceRepository.findOne({
+      where: { id },
+      relations: ["inventoryItems"], // Incluir los items de inventario relacionados
+    });
 
     if (!maintenance) {
       return [null, { type: "not_found", message: "Mantenimiento no encontrado" }];
     }
 
-    // Revertir el inventario al eliminar el mantenimiento
-    const inventoryAdjustment = await ajustarInventario(maintenance.inventoryItemId, maintenance.quantityUsed);
-    if (!inventoryAdjustment[0]) {
-      return [null, inventoryAdjustment[1]];
+    // Revertir el inventario para cada artículo relacionado con el mantenimiento
+    for (const item of maintenance.inventoryItems) {
+      const inventoryAdjustment = await ajustarInventario(item.id, item.quantityUsed);
+      if (!inventoryAdjustment[0]) {
+        return [null, inventoryAdjustment[1]];
+      }
     }
 
+    // Eliminar el mantenimiento
     await maintenanceRepository.remove(maintenance);
     return [maintenance, null];
   } catch (error) {
