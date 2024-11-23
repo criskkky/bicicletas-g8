@@ -1,13 +1,13 @@
 import axios from './root.service.js';
 
-// Función para obtener todas las ventas
+// Obtener todas las ventas
 export async function getSales() {
     try {
         const response = await axios.get('/sale/');
         console.log('Respuesta de la API:', response);
 
         if (!response || !response.data) {
-            throw new Error("La respuesta de la API no tiene la estructura esperada.");
+            throw new Error("Respuesta de la API no válida.");
         }
 
         return response.data;
@@ -20,10 +20,10 @@ export async function getSales() {
     }
 }
 
-// Función para obtener una venta específica por su ID
+// Obtener una venta por ID
 export async function getSale(saleId) {
     try {
-        const { data } = await axios.get(`/sales/view/${saleId}`);
+        const { data } = await axios.get(`/sale/${saleId}`);
         return data;
     } catch (error) {
         console.error("Error al obtener la venta:", error);
@@ -31,10 +31,10 @@ export async function getSale(saleId) {
     }
 }
 
-// Función para crear una nueva venta
+// Crear una nueva venta
 export async function createSale(saleData) {
     try {
-        const response = await axios.post('/sales/add', saleData);
+        const response = await axios.post('/sale/', saleData);
         return response.data;
     } catch (error) {
         console.error("Error al crear la venta:", error);
@@ -42,10 +42,10 @@ export async function createSale(saleData) {
     }
 }
 
-// Función para actualizar una venta existente
+// Actualizar una venta
 export async function updateSale(saleId, saleData) {
     try {
-        const response = await axios.patch(`/sales/edit/${saleId}`, saleData);
+        const response = await axios.patch(`/sale/${saleId}`, saleData);
         return response.data;
     } catch (error) {
         console.error("Error al actualizar la venta:", error);
@@ -53,10 +53,10 @@ export async function updateSale(saleId, saleData) {
     }
 }
 
-// Función para eliminar una venta
+// Eliminar una venta
 export async function deleteSale(saleId) {
     try {
-        const response = await axios.delete(`/sales/delete/${saleId}`);
+        const response = await axios.delete(`/sale/${saleId}`);
         return response.data;
     } catch (error) {
         console.error("Error al eliminar la venta:", error);
