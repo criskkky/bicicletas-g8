@@ -37,12 +37,16 @@ const router = createBrowserRouter([
           <Maintenance />
         </ProtectedRoute>
         ),
-      }
-    },
-    {
-      path: '/sales',
-      element: <Sales />,
-    }
+      },
+      {
+        path: '/sales',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'user']}>
+            <Sales />
+          </ProtectedRoute>
+        ),
+      }      
+      
     ]
   },
   {

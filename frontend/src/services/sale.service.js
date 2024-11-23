@@ -1,40 +1,58 @@
-import axios from './root.service.js';  
+import axios from './root.service.js';
 
+// Función para obtener todas las ventas
 export async function getSales() {
     try {
-        const { data } = await axios.get('/sale');  
-        return data;
-    } catch (error) {
-        return error.response?.data || error.message;  
-    }
-}
+        const response = await axios.get('/sales/');
+        console.log('Respuesta de la API:', response);
 
-// Obtener una venta por ID
-export async function getSaleById(id) {
-    try {
-        const { data } = await axios.get(`/sale/${id}`);
-        return data;
-    } catch (error) {
-        return error.response?.data || error.message;
-    }
-}
+        if (!response || !response.data) {
+            throw new Error("La respuesta de la API no tiene la estructura esperada.");
+        }
 
-// Actualizar una venta
-export async function updateSale(id, data) {
-    try {
-        const response = await axios.put(`/sale/${id}`, data);
         return response.data;
     } catch (error) {
-        return error.response?.data || error.message;
+        console.error("Error al obtener ventas:", error);
+        return { error: error.message || 'Error al obtener las ventas' };
     }
 }
 
-// Eliminar una venta
-export async function deleteSale(id) {
+// Función para obtener una venta específica por su ID
+export async function getSale(saleId) {
     try {
-        const response = await axios.delete(`/sale/${id}`);
+        const { data } = await axios.get(`/sales/view/${saleId}`);
+        return data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+// Función para crear una nueva venta
+export async function createSale(saleData) {
+    try {
+        const response = await axios.post('/sales/add', saleData);
         return response.data;
     } catch (error) {
-        return error.response?.data || error.message;
+        return error.response.data;
+    }
+}
+
+// Función para actualizar una venta existente
+export async function updateSale(saleId, saleData) {
+    try {
+        const response = await axios.patch(`/sales/edit/${saleId}`, saleData);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+// Función para eliminar una venta
+export async function deleteSale(saleId) {
+    try {
+        const response = await axios.delete(`/sales/delete/${saleId}`);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
     }
 }
