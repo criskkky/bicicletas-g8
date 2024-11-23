@@ -92,9 +92,9 @@ const Maintenance = () => {
         <Table
           data={maintenances}
           columns={columns}
-          filter={filterId} // El filtro sigue funcionando correctamente
-          dataToFilter="description" // Filtra por descripción
-          onSelectionChange={handleSelectionChange} // Actualiza la selección
+          filter={filterId}
+          dataToFilter="id"
+          onSelectionChange={handleSelectionChange} // Actualiza la selección según selección en la tabla
         />
       </div>
 

@@ -1,4 +1,4 @@
-import axios from './root.service.js'; // Asegúrate de que root.service.js esté correctamente configurado
+import axios from './root.service.js';
 import { formatDataMaintenance } from '@helpers/formatDataMaintenance.js'; // Importa el helper para formatear los datos
 
 // Función para obtener todos los mantenimientos
