@@ -1,11 +1,5 @@
 import { EntitySchema } from "typeorm";
 
-const MaintenanceStatus = {
-  PENDING: "pendiente",
-  IN_PROCESS: "en_proceso",
-  COMPLETED: "completado",
-};
-
 const MaintenanceSchema = new EntitySchema({
   name: "Maintenance",
   tableName: "maintenance",
@@ -26,17 +20,13 @@ const MaintenanceSchema = new EntitySchema({
       nullable: false,
     },
     status: {
-      type: "enum",
-      enum: MaintenanceStatus,
-      default: MaintenanceStatus.PENDING,
+      type: "varchar",
+      length: 50,
       nullable: false,
+      default: "pendiente",
     },
     date: {
-      type: "date",
-      nullable: false,
-    },
-    quantityUsed: {
-      type: "int",
+      type: "timestamp with time zone",
       nullable: false,
     },
     createdAt: {
@@ -52,35 +42,13 @@ const MaintenanceSchema = new EntitySchema({
     },
   },
   relations: {
-    // Relación con el artículo de inventario
-    inventoryItems: { // Relación de muchos a muchos
-      target: "Inventory", // El modelo de inventario debe coincidir con este nombre
-      type: "many-to-many", // Relación muchos a muchos
-      joinTable: { // Define la tabla de unión explícitamente
-        name: "maintenance_inventory", // Nombre de la tabla de unión
-        joinColumn: {
-          name: "maintenance_id", // Columna de la tabla `Maintenance`
-          referencedColumnName: "id",
-        },
-        inverseJoinColumn: {
-          name: "inventory_id", // Columna de la tabla `InventoryItem`
-          referencedColumnName: "id",
-        },
-      },
-    },
-    invoice: {
-      target: "Invoice",
-      type: "one-to-one",
-      joinColumn: true,
+    inventoryItems: {
+      target: "MaintenanceInventory",
+      type: "one-to-many",
+      inverseSide: "maintenance",
+      cascade: true,
     },
   },
-  indices: [
-    {
-      name: "IDX_MAINTENANCE",
-      columns: ["id"],
-      unique: true,
-    },
-  ],
 });
 
 export default MaintenanceSchema;
