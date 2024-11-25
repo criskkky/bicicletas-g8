@@ -59,18 +59,32 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     {userRole === 'administrador' && (
-                    <li>
-                        <NavLink 
-                            to="/users" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
-                            activeClassName="active"
-                        >
-                            Usuarios
-                        </NavLink>
-                    </li>
+                    <>
+                        <li>
+                            <NavLink 
+                                to="/users" 
+                                onClick={() => { 
+                                    setMenuOpen(false); 
+                                    addActiveClass();
+                                }} 
+                                activeClassName="active"
+                            >
+                                Usuarios
+                            </NavLink>
+                        </li>
+                            <li>
+                                    <NavLink 
+                                        to="/inventory" 
+                                        onClick={() => { 
+                                            setMenuOpen(false); 
+                                            addActiveClass();
+                                        }} 
+                                        className={({ isActive }) => (isActive ? 'active' : '')}
+                                        >
+                                        Inventario
+                                    </NavLink>
+                            </li>
+                        </>
                     )}
                     {(userRole === 'administrador' || userRole === 'tecnico') && (
                     <li>
@@ -98,6 +112,7 @@ const Navbar = () => {
                             Ventas
                         </NavLink>
                     </li>
+
                     <li>
                         <NavLink 
                             to="/auth" 

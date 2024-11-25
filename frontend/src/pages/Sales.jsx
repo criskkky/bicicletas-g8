@@ -9,11 +9,12 @@ import { useCallback, useState } from 'react';
 import useEditSale from '@hooks/sales/useEditSale';
 import useDeleteSale from '@hooks/sales/useDeleteSale';
 import useCreateSale from '@hooks/sales/useCreateSale';
-import Popup from '../components/Popup';
+import PopupSale from '../components/PopupSale';
 
 const Sales = () => {
-  const { sales, fetchSales, setSales } = useSales(); // Hook para obtener ventas
+  const { sales, fetchSales, setSales } = useSales();
   const [filterId, setFilterId] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
 
   const {
     handleUpdate,
@@ -21,9 +22,9 @@ const Sales = () => {
     setDataSale,
   } = useEditSale(setSales);
 
+
   const { handleDelete } = useDeleteSale(fetchSales, setDataSale);
-  const { handleCreate } = useCreateSale(setSales); // Manejo de creación de venta
-  const [showPopup, setShowPopup] = useState(false);
+  const { handleCreate } = useCreateSale(setSales); 
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -47,6 +48,14 @@ const Sales = () => {
 ];
 
   const isDataSaleValid = dataSale && dataSale.id;
+
+  const handlePurchase = (purchaseData) => {
+    if (isDataSaleValid) {
+      handleUpdate(purchaseData);
+    } else {
+      handleCreate(purchaseData);
+    }
+  };
 
   return (
     <div className="main-container">
@@ -75,13 +84,13 @@ const Sales = () => {
         />
       </div>
 
-      <Popup
-        show={showPopup}
-        setShow={setShowPopup}
-        data={dataSale}
-        action={isDataSaleValid ? handleUpdate : handleCreate} 
-      />
-    </div>
+  <PopupSale
+    show={showPopup}
+    setShow={setShowPopup}
+    data={dataSale}
+    action={handlePurchase} 
+  />
+</div>
   );
 };
 

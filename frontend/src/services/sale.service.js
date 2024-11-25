@@ -1,6 +1,5 @@
 import axios from './root.service.js';
 
-// Obtener todas las ventas
 export async function getSales() {
     try {
         const response = await axios.get('/sale/');
@@ -20,7 +19,6 @@ export async function getSales() {
     }
 }
 
-// Obtener una venta por ID
 export async function getSale(saleId) {
     try {
         const { data } = await axios.get(`/sale/${saleId}`);
@@ -31,7 +29,6 @@ export async function getSale(saleId) {
     }
 }
 
-// Crear una nueva venta
 export async function createSale(saleData) {
     try {
         const response = await axios.post('/sale/', saleData);
@@ -42,7 +39,6 @@ export async function createSale(saleData) {
     }
 }
 
-// Actualizar una venta
 export async function updateSale(saleId, saleData) {
     try {
         const response = await axios.patch(`/sale/${saleId}`, saleData);
@@ -53,7 +49,6 @@ export async function updateSale(saleId, saleData) {
     }
 }
 
-// Eliminar una venta
 export async function deleteSale(saleId) {
     try {
         const response = await axios.delete(`/sale/${saleId}`);
