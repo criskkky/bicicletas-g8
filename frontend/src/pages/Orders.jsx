@@ -1,7 +1,7 @@
 import Table from '@components/Table';
-import useGetOrder from '@hooks/orders/useGetOrder.jsx';
+import useOrders from '@hooks/orders/useGetOrders.jsx';
 import Search from '../components/Search';
-import PopupOrder from '../components/PopupOrder';
+import Popup from '../components/PopupOrder';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
@@ -12,82 +12,95 @@ import useEditOrder from '@hooks/orders/useEditOrder';
 import useDeleteOrder from '@hooks/orders/useDeleteOrder';
 import useCreateOrder from '@hooks/orders/useCreateOrder';
 
-const Orders = () => {
-  const { orders, isLoading, error } = useGetOrder(); // Obtener órdenes desde el hook
-  const { createNewOrder } = useCreateOrder();
-  const { deleteOrderById } = useDeleteOrder();
-  const { editOrder } = useEditOrder();
-  
-  const [showPopup, setShowPopup] = useState(false); // Controlar la visibilidad del popup
-  const [currentOrder, setCurrentOrder] = useState(null); // Orden seleccionada para editar
-  const [filterId, setFilterId] = useState(''); // Filtro de ID
+const Order = () => {
+  const { orders, fetchOrders, setOrders } = useOrders();
+  const [filterId, setFilterId] = useState('');
 
-  const handleCreateOrder = (orderData) => {
-    createNewOrder(orderData).then(() => {
-      setShowPopup(false); // Cierra el popup al crear
-    });
-  };
+  const {
+    handleUpdate,
+    dataOrder,
+    setDataOrder,
+  } = useEditOrder(setOrders);
 
-  const handleEditOrder = (orderId, updatedData) => {
-    editOrder(orderId, updatedData).then(() => {
-      setShowPopup(false); // Cierra el popup al editar
-    });
-  };
-
-  const handleDeleteOrder = (orderId) => {
-    deleteOrderById(orderId).then(() => {
-      alert("Orden eliminada correctamente.");
-    });
-  };
+  const { handleDelete } = useDeleteOrder(fetchOrders, setDataOrder);
+  const { handleCreate } = useCreateOrder(setOrders); // Manejo de creación
+  const [showPopup, setShowPopup] = useState(false); // Estado para controlar el popup
 
   const handleIdFilterChange = (e) => {
-    setFilterId(e.target.value); // Cambia el filtro según el ID
+    setFilterId(e.target.value);
   };
 
+  // Maneja los pedidos seleccionados desde la tabla
   const handleSelectionChange = useCallback(
     (selectedOrders) => {
-      setCurrentOrder(selectedOrders.length > 0 ? selectedOrders[0] : {}); // Selecciona solo el primero
+      // Asegúrate de que dataOrder siempre tenga una estructura válida
+      setDataOrder(selectedOrders.length > 0 ? selectedOrders[0] : { id: null }); // Selecciona solo el primero
     },
-    []
+    [setDataOrder]
   );
 
   const columns = [
-    { title: 'ID Orden', field: 'id', width: 100, responsive: 0 },
-    { title: 'Cliente', field: 'client', width: 250, responsive: 3 },
-    { title: 'Problema', field: 'problem', width: 350, responsive: 4 },
-    { title: 'Estado', field: 'status', width: 150, responsive: 3 },
-    { title: 'Fecha de Creación', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'ID Pedido', field: 'id', width: 100, responsive: 0 },
+    { title: 'Descripción', field: 'description', width: 350, responsive: 4 },
+    { title: 'Cliente', field: 'customer', width: 300, responsive: 3 },
+    { title: 'Estado', field: 'status', width: 150, responsive: 0 },
+    { title: 'Fecha', field: 'date', width: 200, responsive: 0 },
+    {
+      title: 'ID(s) de artículo(s) usado(s)', 
+      field: 'inventoryItems', 
+      width: 300, 
+      responsive: 3,
+      render: rowData => (
+        rowData.inventoryItems && rowData.inventoryItems.length > 0 ? (
+          rowData.inventoryItems.map(item => (
+            <div key={item.idUsedItem}>
+              {`ID: ${item.idUsedItem}, Cantidad: ${item.quantityUsed}`}
+            </div>
+          ))
+        ) : (
+          <div>No se han utilizado artículos</div> // Mensaje cuando no hay artículos
+        )
+      )
+    },
+    { title: 'Creado', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
 
-  if (isLoading) return <div>Cargando órdenes...</div>;
-  if (error) return <div>Error al cargar las órdenes: {error}</div>;
+  const handleUpdateClick = () => {
+    setShowPopup(true); // Abre el popup en modo edición
+  };
+
+  const handleDeleteClick = () => {
+    if (dataOrder && dataOrder.id) {
+      handleDelete([dataOrder]); // Llama al handler de eliminación solo si 'dataOrder' tiene un ID
+    }
+  };
 
   return (
-    <div className="orders-container">
+    <div className="main-container">
       <div className="table-container">
         <div className="top-table">
-          <h1 className="title-table">Órdenes de Trabajo</h1>
+          <h1 className="title-table">Pedidos</h1>
           <div className="filter-actions">
             <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
             {/* Botón de editar */}
-            <button onClick={() => setShowPopup(true)} disabled={!currentOrder.id}>
-              {currentOrder.id ? (
+            <button onClick={handleUpdateClick} disabled={!dataOrder || !dataOrder.id}>
+              {dataOrder && dataOrder.id ? (
                 <img src={UpdateIcon} alt="edit" />
               ) : (
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
             {/* Botón de eliminar */}
-            <button onClick={() => handleDeleteOrder(currentOrder.id)} disabled={!currentOrder.id}>
-              {currentOrder.id ? (
+            <button className="delete-order-button" onClick={handleDeleteClick} disabled={!dataOrder || !dataOrder.id}>
+              {dataOrder && dataOrder.id ? (
                 <img src={DeleteIcon} alt="delete" />
               ) : (
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
             {/* Botón de crear */}
-            <button onClick={() => { setCurrentOrder(null); setShowPopup(true); }}>
+            <button onClick={() => { setDataOrder({ id: null }); setShowPopup(true); }}>
               +
             </button>
           </div>
@@ -101,16 +114,15 @@ const Orders = () => {
         />
       </div>
 
-      {/* Popup para crear o editar órdenes */}
-      <PopupOrder
+      {/* Popup para crear o editar pedidos */}
+      <Popup
         show={showPopup}
         setShow={setShowPopup}
-        order={currentOrder}
-        onCreate={handleCreateOrder}
-        onEdit={handleEditOrder}
+        data={dataOrder}
+        action={dataOrder && dataOrder.id ? handleUpdate : handleCreate} // Crear o actualizar
       />
     </div>
   );
 };
 
-export default Orders;
+export default Order;
