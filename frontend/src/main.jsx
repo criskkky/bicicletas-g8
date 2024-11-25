@@ -12,6 +12,7 @@ import '@styles/styles.css';
 import Maintenance from '@pages/Maintenance';
 import Orders from '@pages/Orders'; // Importa la nueva página de órdenes
 import Inventory from '@pages/Inventory';
+import Pagos from '@pages/Pagos';
 
 const router = createBrowserRouter([
   {
@@ -62,7 +63,15 @@ const router = createBrowserRouter([
             <Inventory />
           </ProtectedRoute>
         ),
-      },   
+      },
+      {
+        path: '/pagos',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Pagos />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {

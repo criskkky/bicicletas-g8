@@ -1,6 +1,6 @@
 "use strict";
 import { Router } from "express";
-import { isAdmin, isAdminOrTechnician } from "../middlewares/authorization.middleware.js";
+import { isAdminOrTechnician } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
     createOrder,
@@ -14,8 +14,8 @@ const router = Router();
 
 router
 .use(authenticateJwt)
-.use(isAdminOrTechnician)
-.use(isAdmin);
+.use(isAdminOrTechnician);
+
 
 router // http://localhost:5000/api/orders
     .get("/", getAllOrders)

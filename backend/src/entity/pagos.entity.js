@@ -9,10 +9,6 @@ const PagosSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    idCliente: {
-      type: "int",
-      nullable: false,
-    },
     idTecnico: {
       type: "int",
       nullable: false,

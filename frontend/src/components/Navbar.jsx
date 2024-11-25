@@ -114,6 +114,7 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     )}
+                    {(userRole === 'administrador' || userRole === 'tecnico') && (
                     <li>
                         <NavLink 
                             to="/sales"  
@@ -126,7 +127,21 @@ const Navbar = () => {
                             Ventas
                         </NavLink>
                     </li>
-
+                    )}
+                    {(userRole === 'administrador' || userRole === 'tecnico') && (
+                    <li>
+                        <NavLink 
+                            to="/pagos"  
+                            onClick={() => { 
+                                setMenuOpen(false); 
+                                addActiveClass();
+                            }} 
+                            activeClassName="active"
+                        >
+                            Pagos
+                        </NavLink>
+                    </li>
+                    )}
                     <li>
                         <NavLink 
                             to="/auth" 

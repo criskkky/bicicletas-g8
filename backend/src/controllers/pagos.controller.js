@@ -8,11 +8,13 @@ import {
     updatePagoService,
 } from "../services/pagos.service.js";
 
+import { getUserService } from "../services/user.service.js";
+
 export async function createPago(req, res) {
     try {
-        const { idCliente, idTecnico } = req.body;
+        const { idTecnico } = req.body;
 
-        if (!idCliente || !idTecnico) {
+        if (!idTecnico) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
 
@@ -69,8 +71,8 @@ export async function getPagoById(req, res) {
 export async function updatePago(req, res) {
     try {
         const { id } = req.params;
-        const { idCliente, idTecnico, monto } = req.body;
-        if (!idCliente || !idTecnico || !monto) {
+        const { idTecnico, monto } = req.body;
+        if (!idTecnico || !monto) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
 
