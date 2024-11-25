@@ -1,0 +1,117 @@
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    padding: 20px;
+}
+
+.table-container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.top-table {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.title-table {
+    color: #003366;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-actions button {
+    background: rgba(255, 255, 255, 0.87);
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    transition: all 0.3s;
+}
+
+.filter-actions button:hover {
+    background: #003366;
+    color: white;
+}
+
+.filter-actions button:disabled {
+    background: rgba(200, 200, 200, 0.6);
+    cursor: not-allowed;
+}
+
+.filter-actions .add-order-button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 1.5em;
+    padding: 10px 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.filter-actions .add-order-button:hover {
+    background-color: #45a049;
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+@media (max-width: 767px) {
+    .title-table {
+        font-size: 1.4em;
+        margin: 0;
+    }
+
+    .top-table {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .table-container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .popup {
+        width: 350px;
+        height: 600px;
+    }
+
+    .popup .form {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .title-table {
+        font-size: 1.6em;
+        margin-left: 35px;
+    }
+
+    .filter-actions {
+        margin-bottom: 20px;
+    }
+}
