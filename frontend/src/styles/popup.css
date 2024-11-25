@@ -16,6 +16,7 @@
     background: white;
     position: relative;
     border-radius: 12px;
+    z-index: 9999;
 }
 .close{
     position: absolute;

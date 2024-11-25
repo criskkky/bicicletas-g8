@@ -2,6 +2,7 @@
 
 import { Router } from "express";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { isAdmin, isAdminOrTechnician } from "../middlewares/authorization.middleware.js";
 import {
     createSale,
     deleteSale,
@@ -12,7 +13,10 @@ import {
 
 const router = Router();
 
-router.use(authenticateJwt);
+router
+.use(authenticateJwt)
+.use(isAdminOrTechnician)
+.use(isAdmin);
 
 router.post("/", createSale);
 router.get("/", getAllSales);

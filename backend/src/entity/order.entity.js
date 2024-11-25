@@ -9,32 +9,29 @@ const OrderSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    NameClient: {
+    workerRUT: {
       type: "varchar",
-      length: 255,
+      length: 20,
       nullable: false,
     },
-    problemDescription: {
-      type: "text",
+    jobType: {
+      type: "enum",
+      enum: ["Mantenimiento", "Venta"],
       nullable: false,
     },
-    serviceDetails: {
-      type: "text",
-      nullable: true,
-    },
-    assignedTechnician: {
+    jobID: {
       type: "varchar",
-      length: 255,
-      nullable: true,
+      length: 50,
+      nullable: false,
     },
-    timeSpent: {
+    hoursWorked: {
       type: "int",
       nullable: false,
-      default: 0, // en minutos
+      default: 0, // en horas
     },
-    usedProducts: {
-      type: "json", 
-      nullable: true,
+    note: {
+      type: "text",
+      nullable: true, // Mensaje opcional
     },
     status: {
       type: "varchar",
@@ -44,12 +41,12 @@ const OrderSchema = new EntitySchema({
     },
     createdAt: {
       type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP", // resgistro para las horas
+      default: () => "CURRENT_TIMESTAMP", // Registro para la creación
       nullable: false,
     },
     updatedAt: {
       type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP", //ultima actualizacion
+      default: () => "CURRENT_TIMESTAMP", // Última actualización
       onUpdate: "CURRENT_TIMESTAMP",
       nullable: false,
     },
@@ -65,5 +62,3 @@ const OrderSchema = new EntitySchema({
 });
 
 export default OrderSchema;
-
-

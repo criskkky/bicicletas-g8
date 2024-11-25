@@ -42,7 +42,7 @@ export async function updateOrderService(id, orderData) {
     const orderRepository = AppDataSource.getRepository(Order);
     const order = await orderRepository.findOne({ where: { id } });
     if (!order) return [null, "Orden no encontrada"];
-    
+
     await orderRepository.update({ id }, { ...orderData, updatedAt: new Date() });
     const updatedOrder = await orderRepository.findOne({ where: { id } });
     return [updatedOrder, null];
@@ -57,7 +57,7 @@ export async function deleteOrderService(id) {
     const orderRepository = AppDataSource.getRepository(Order);
     const order = await orderRepository.findOne({ where: { id } });
     if (!order) return [null, "Orden no encontrada"];
-    
+
     await orderRepository.remove(order);
     return [order, null];
   } catch (error) {

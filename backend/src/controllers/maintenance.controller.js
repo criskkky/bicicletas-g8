@@ -35,43 +35,43 @@ export async function getAllMaintenance(req, res) {
 }
 
 export async function createMaintenance(req, res) {
-  try {
-    const { description, technician, status, date } = req.body;
-    if (!description || !technician || !date) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
+  const { description, technician, status, date, inventoryItems } = req.body;
 
-    const [maintenance, error] = await createMaintenanceService(req.body);
-    if (error) {
-      return res.status(400).json({ error });
-    }
-    return res.status(201).json(maintenance);
-  } catch (error) {
-    console.error("Error al crear el mantenimiento:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+  // Validación de datos de entrada
+  if (!description || !technician || !date || !Array.isArray(inventoryItems) || inventoryItems.length === 0) {
+    return res.status(400).json({ error: "Datos incompletos o inválidos" });
   }
+
+  // Llamada al servicio de creación de mantenimiento
+  const [maintenance, error] = await createMaintenanceService(req.body);
+
+  if (error) {
+    return res.status(400).json({ error });
+  }
+
+  return res.status(201).json(maintenance);
 }
 
 export async function updateMaintenance(req, res) {
-  try {
-    const { id } = req.params;
-    const { description, technician, status, date } = req.body;
+  const { id } = req.params;
+  const maintenanceData = req.body;
 
-    if (!description && !technician && !status && !date) {
-      return res.status(400).json({ error: "No hay campos para actualizar" });
-    }
-
-    const [maintenance, error] = await updateMaintenanceService(id, req.body);
-    if (error) {
-      return res.status(404).json({ error: "Mantenimiento no encontrado" });
-    }
-
-    return res.json(maintenance);
-
-  } catch (error) {
-    console.error("Error al actualizar el mantenimiento:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+  // Validación de ID y datos
+  if (!id || !maintenanceData) {
+    return res.status(400).json({ error: "Datos incompletos o inválidos" });
   }
+
+  // Llamada al servicio de actualización de mantenimiento
+  const [maintenance, error] = await updateMaintenanceService(id, maintenanceData);
+
+  if (error) {
+    if (error.type === "not_found") {
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(400).json({ error: error.message });
+  }
+
+  return res.json(maintenance);
 }
 
 export async function deleteMaintenance(req, res) {
@@ -94,7 +94,6 @@ export async function deleteMaintenance(req, res) {
     }
 
     return res.json({ message: "Mantenimiento eliminado exitosamente", maintenance });
-
   } catch (error) {
     console.error("Error al eliminar el mantenimiento:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
