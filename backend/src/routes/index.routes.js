@@ -7,7 +7,6 @@ import saleRoutes from "./sale.routes.js";
 import orderRoutes from "./order.routes.js";
 import pagosRoutes from "./pagos.routes.js";
 import maintenanceRoutes from "./maintenance.routes.js";
-import invoiceRoutes from "./invoice.routes.js";
 
 const router = Router();
 
@@ -19,6 +18,5 @@ router
     .use("/orders", orderRoutes)
     .use("/pagos", pagosRoutes)
     .use("/maintenance", maintenanceRoutes)
-    .use("/invoices", invoiceRoutes);
 
 export default router;

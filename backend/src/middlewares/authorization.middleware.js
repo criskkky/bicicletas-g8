@@ -1,40 +1,75 @@
 import User from "../entity/user.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import {
-handleErrorClient,
-handleErrorServer,
+    handleErrorClient,
+    handleErrorServer,
 } from "../handlers/responseHandlers.js";
 
 export async function isAdmin(req, res, next) {
-try {
-    const userRepository = AppDataSource.getRepository(User);
+    try {
+        const userRepository = AppDataSource.getRepository(User);
 
-    const userFound = await userRepository.findOneBy({ email: req.user.email });
+        const userFound = await userRepository.findOneBy({ email: req.user.email });
 
-    if (!userFound) {
-    return handleErrorClient(
-        res,
-        404,
-        "Usuario no encontrado en la base de datos",
-    );
-    }
+        if (!userFound) {
+            return handleErrorClient(
+                res,
+                404,
+                "Usuario no encontrado en la base de datos",
+            );
+        }
 
-    const rolUser = userFound.rol;
+        const rolUser = userFound.rol;
 
-    if (rolUser !== "administrador") {
-        return handleErrorClient(
+        if (rolUser !== "administrador") {
+            return handleErrorClient(
+                res,
+                403,
+                "Error al acceder al recurso",
+                "Se requiere un rol de administrador para realizar esta acción."
+            );
+        }
+        next();
+    } catch (error) {
+        handleErrorServer(
             res,
-            403,
-            "Error al acceder al recurso",
-            "Se requiere un rol de administrador para realizar esta acción."
+            500,
+            error.message,
         );
     }
-    next();
-} catch (error) {
-    handleErrorServer(
-    res,
-    500,
-    error.message,
-    );
 }
-}
+
+export async function isAdminOrTechnician(req, res, next) {
+    try {
+        const userRepository = AppDataSource.getRepository(User);
+
+        const userFound = await userRepository.findOneBy({ email: req.user.email });
+
+        if (!userFound) {
+            return handleErrorClient(
+                res,
+                404,
+                "Usuario no encontrado en la base de datos"
+            );
+        }
+
+        const rolUser = userFound.rol;
+
+        if (rolUser !== "administrador" && rolUser !== "tecnico") {
+            return handleErrorClient(
+                res,
+                403,
+                "Error al acceder al recurso",
+                "Se requiere un rol de administrador o técnico para realizar esta acción."
+            );
+        }
+
+        next();
+    } catch (error) {
+        handleErrorServer(
+            res,
+            500,
+            error.message
+        );
+    }
+}  
