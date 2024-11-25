@@ -44,8 +44,21 @@ const Maintenance = () => {
     { title: 'Técnico Asignado', field: 'technician', width: 300, responsive: 3 },
     { title: 'Estado', field: 'status', width: 150, responsive: 0 },
     { title: 'Fecha', field: 'date', width: 200, responsive: 0 },
-    { title: 'ID(s) de articulo(s) usado(s)', field: 'idItemUsed', width: 300, responsive: 3 },
-    { title: 'Cantidad usada', field: 'quantityUsed', width: 200, responsive: 3 },
+    {
+      title: 'ID(s) de artículo(s) usado(s)', 
+      field: 'inventoryItems', 
+      width: 300, 
+      responsive: 3,
+      render: rowData => (
+        rowData.inventoryItems && rowData.inventoryItems.length > 0 && (
+          rowData.inventoryItems.map(item => (
+            <div key={item.idUsedItem}>
+              {`ID: ${item.idUsedItem}, Cantidad: ${item.quantityUsed}`}
+            </div>
+          ))
+        )
+      )
+    },
     { title: 'Creado', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
@@ -55,8 +68,8 @@ const Maintenance = () => {
   };
 
   const handleDeleteClick = () => {
-    if (dataMaintenance) {
-      handleDelete([dataMaintenance]); // Llama al handler de eliminación
+    if (dataMaintenance && dataMaintenance.id) {
+      handleDelete([dataMaintenance]); // Llama al handler de eliminación solo si 'dataMaintenance' tiene un ID
     }
   };
 

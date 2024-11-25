@@ -27,6 +27,7 @@ const MaintenanceSchema = new EntitySchema({
     },
     date: {
       type: "timestamp with time zone",
+      default: () => "CURRENT_TIMESTAMP",
       nullable: false,
     },
     createdAt: {
