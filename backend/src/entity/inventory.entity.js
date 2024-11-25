@@ -42,10 +42,18 @@ const InventorySchema = new EntitySchema({
     },
   },
   relations: {
+    // Relación con MaintenanceInventory (tabla intermedia)
+    maintenanceItems: {
+      target: "MaintenanceInventory",
+      type: "one-to-many",
+      inverseSide: "inventoryItem",
+    },
+    // Relación con Sale (ventas)
     sales: { // Agregar relación con Sale
       target: "Sale",
       property: "sales",
-      type: "one-to-many", // O "many-to-one" dependiendo de la lógica
+      type: "one-to-many", // Uno a muchos
+      inverseSide: "inventory", // Lado inverso (revisar)
     },
   },
   indices: [
