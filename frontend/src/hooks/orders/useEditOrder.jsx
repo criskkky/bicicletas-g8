@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateOrder } from "@services/order.service"; // Asegúrate de que la función updateOrder esté correctamente exportada desde el servicio
+import { updateOrder } from "@services/order.service.js"; // Asegúrate de que la función updateOrder esté correctamente exportada desde el servicio
 
 export const useEditOrder = () => {
   const [isLoading, setIsLoading] = useState(false);

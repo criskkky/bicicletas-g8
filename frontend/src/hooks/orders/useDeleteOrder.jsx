@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteOrder } from "@services/order.service"; // Asegúrate de que la función deleteOrder esté correctamente exportada desde el servicio
+import { deleteOrder } from "@services/order.service.js"; // Asegúrate de que la función deleteOrder esté correctamente exportada desde el servicio
 
 export const useDeleteOrder = () => {
   const [isLoading, setIsLoading] = useState(false);

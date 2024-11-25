@@ -1,4 +1,4 @@
-// /src/helpers/formatDataOrder.js
+import { format as formatTempo } from "@formkit/tempo";
 
 export function formatDataOrder(order) {
   return {
@@ -7,8 +7,19 @@ export function formatDataOrder(order) {
       customer: order.customer,
       technician: order.technician,
       status: order.status,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      // Otros campos según tu estructura de datos
+      createdAt: formatTempo(order.createdAt),
+      updatedAt: formatTempo(order.updatedAt),
   };
+}
+
+export function formatOrderPostUpdate(id){
+  return {
+    id: order.id,
+    description: order.description,
+    customer: order.customer,
+    technician: order.technician,
+    status: order.status,
+    createdAt: formatTempo(order.createdAt),
+    updatedAt: formatTempo(order.updatedAt),
+  }
 }

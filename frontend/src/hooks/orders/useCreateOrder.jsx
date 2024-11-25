@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { createOrder } from "@services/order.service"; // Asegúrate de que la función createOrder esté correctamente exportada desde el servicio
+import { createOrder } from "@services/order.service.js"; // Asegúrate de que la función createOrder esté correctamente exportada desde el servicio
 
 export const useCreateOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const createNewOrder = async (orderData) => {
+  const handleCreate = async (orderData) => {
     setIsLoading(true);
     setError(null); // Resetea el error al intentar crear una nueva orden
 
@@ -26,6 +26,6 @@ export const useCreateOrder = () => {
     }
   };
 
-  return { createNewOrder, isLoading, error };
+  return { handleCreate, isLoading, error };
 };
 export default useCreateOrder;

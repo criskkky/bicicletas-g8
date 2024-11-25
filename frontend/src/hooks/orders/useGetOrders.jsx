@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getOrder } from "@services/order.service"; // Asegúrate de que la función getOrder esté correctamente exportada desde el servicio
+import { getOrder } from "@services/order.service.js"; // Asegúrate de que la función getOrder esté correctamente exportada desde el servicio
 
 export const useGetOrder = (orderId) => {
   const [order, setOrder] = useState(null);
