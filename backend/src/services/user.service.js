@@ -24,20 +24,26 @@ export async function getUserService(query) {
   }
 }
 
-export async function getUsersService() {
+export async function getUserService(query) {
   try {
-    const userRepository = AppDataSource.getRepository(User);
+      const { id, rut, email } = query;
 
-    const users = await userRepository.find();
+      const userRepository = AppDataSource.getRepository(User);
 
-    if (!users || users.length === 0) return [null, "No hay usuarios"];
+      // Buscar usuario por ID, rut o email
+      const userFound = await userRepository.findOne({
+          where: [{ id }, { rut }, { email }],
+      });
 
-    const usersData = users.map(({ password, ...user }) => user);
+      if (!userFound) return [null, "Usuario no encontrado"];
 
-    return [usersData, null];
+      // Excluir la contraseña antes de devolver los datos
+      const { password, ...userData } = userFound;
+
+      return [userData, null];
   } catch (error) {
-    console.error("Error al obtener a los usuarios:", error);
-    return [null, "Error interno del servidor"];
+      console.error("Error al obtener el usuario:", error);
+      return [null, "Error interno del servidor"];
   }
 }
 

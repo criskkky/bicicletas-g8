@@ -36,6 +36,17 @@ const UserSchema = new EntitySchema({
       type: "varchar",
       nullable: false,
     },
+    hoursWorked: {
+      type: "int",
+      default: 0,
+      nullable: false,
+    },
+    hourlyRate: {
+      type: "decimal",
+      precision: 10,
+      scale: 2,
+      nullable: false,
+    },
     createdAt: {
       type: "timestamp with time zone",
       default: () => "CURRENT_TIMESTAMP",

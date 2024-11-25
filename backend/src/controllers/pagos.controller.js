@@ -10,19 +10,38 @@ import {
 
 export async function createPago(req, res) {
     try {
-        const { idCliente, idTecnico, monto } = req.body;
-        if (!idCliente || !idTecnico || !monto) {
+        const { idCliente, idTecnico } = req.body;
+
+        if (!idCliente || !idTecnico) {
             return res.status(400).json({ error: "Faltan campos requeridos" });
         }
 
+        const [tecnico, tecnicoError] = await getUserService({ id: idTecnico });
+        if (tecnicoError) {
+            return res.status(404).json({ error: "Técnico no encontrado" });
+        }
+
+        if (!tecnico.hoursWorked || !tecnico.hourlyRate) {
+            return res.status(400).json({
+                error: "Horas trabajadas o tarifa por hora no están definidas para este técnico",
+            });
+        }
+        const monto = tecnico.hoursWorked * tecnico.hourlyRate;
+
+        req.body.monto = monto;
         const [pago, error] = await createPagoService(req.body);
-        if (error) return res.status(400).json({ error });
-        res.status(201).json(pago);
+
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
+        res.status(201).json({ message: "Pago creado con éxito", pago });
     } catch (error) {
         console.error("Error al crear el pago", error);
-        return res.status(500).json({ error: "Error al crear el pago" });
+        return res.status(500).json({ error: "Error interno al crear el pago" });
     }
 }
+
 
 export async function getAllPagos(req, res) {
     try {

@@ -29,15 +29,16 @@ export async function getAllPagosService() {
 
 export async function createPagoService(pagoData) {
   try {
-    const pagosRepository = AppDataSource.getRepository(PagosEntity);
-    const newPago = pagosRepository.create(pagoData);
-    await pagosRepository.save(newPago);
-    return [newPago, null];
+      const pagosRepository = AppDataSource.getRepository(PagosEntity);
+      const newPago = pagosRepository.create(pagoData);
+      await pagosRepository.save(newPago);
+      return [newPago, null];
   } catch (error) {
-    console.error("Error al crear el pago:", error);
-    return [null, "Error interno del servidor"];
+      console.error("Error al crear el pago:", error);
+      return [null, "Error interno del servidor"];
   }
 }
+
 
 export async function updatePagoService(id, pagoData) {
   try {
