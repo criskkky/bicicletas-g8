@@ -18,6 +18,7 @@ export const useCreateOrder = () => {
         return null;
       }
 
+      window.location.reload(); // Recarga la página una vez que la orden se haya creado exitosamente
       return response; // Retorna la respuesta de la creación de la orden
     } catch (err) {
       setIsLoading(false);
