@@ -45,6 +45,7 @@ const Inventory = () => {
     { title: 'Fecha Creación', field: 'createdAt', width: 200 },
   ];
 
+
   const isDataInventoryValid = dataInventory && dataInventory.id;
 
   const handleInventoryAction = (inventoryData) => {
