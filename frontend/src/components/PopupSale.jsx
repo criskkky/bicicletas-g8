@@ -2,14 +2,17 @@ import Form from './Form';
 import '@styles/popup.css';
 import CloseIcon from '@assets/XIcon.svg';
 
-export default function PopupSale({ show, setShow, productData = {}, onPurchase }) {
+export default function PopupSale({ show, setShow, inventoryItems = [], onPurchase }) {
     const handlePurchase = (formData) => {
-        const purchaseData = {
-            inventoryItemId: productData.inventoryItem?.id,
-            quantity: formData.quantity,
-        };
-
-        onPurchase(purchaseData);
+        const selectedProduct = inventoryItems.find(item => item.name === formData.productName);
+        
+        if (selectedProduct) {
+            const purchaseData = {
+                inventoryItemId: selectedProduct.id,
+                quantity: formData.quantity,
+            };
+            onPurchase(purchaseData);
+        }
     };
 
     return (
@@ -24,11 +27,14 @@ export default function PopupSale({ show, setShow, productData = {}, onPurchase 
                         title="Comprar Producto"
                         fields={[
                             {
-                                label: "ID del producto",
+                                label: "Nombre del producto",
                                 name: "productName",
-                                fieldType: 'input',
-                                type: "number",
-                                defaultValue: productData.inventoryItem?.name || "",
+                                fieldType: 'select',
+                                options: inventoryItems.map(item => ({
+                                    value: item.name,
+                                    label: item.name,
+                                })),
+                                defaultValue: "",
                                 required: true,
                             },
                             {

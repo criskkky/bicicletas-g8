@@ -1,5 +1,6 @@
 import Table from '@components/Table';
 import useSales from '@hooks/sales/useGetSales';
+import useInventory from '@hooks/inventory/useGetInventory';
 import Search from '../components/Search';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
@@ -13,6 +14,7 @@ import PopupSale from '../components/PopupSale';
 
 const Sales = () => {
   const { sales, fetchSales, setSales } = useSales();
+  const { inventory } = useInventory();
   const [filterId, setFilterId] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
@@ -87,8 +89,9 @@ const Sales = () => {
       <PopupSale
         show={showPopup}
         setShow={setShowPopup}
+        inventoryItems={inventory}
         data={dataSale}
-        action={handlePurchase} 
+        onPurchase={handlePurchase} 
       />
     </div>
   );
