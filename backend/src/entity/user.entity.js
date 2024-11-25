@@ -45,7 +45,8 @@ const UserSchema = new EntitySchema({
       type: "decimal",
       precision: 10,
       scale: 2,
-      nullable: false,
+      default: "0",
+      nullable: false
     },
     createdAt: {
       type: "timestamp with time zone",

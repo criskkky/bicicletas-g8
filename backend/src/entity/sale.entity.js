@@ -21,6 +21,7 @@ const SaleSchema = new EntitySchema({
       type: "decimal",
       precision: 10,
       scale: 2,
+      default: 0,
       nullable: false,
     },
     createdAt: {
