@@ -1,6 +1,6 @@
 import { AppDataSource } from "../config/configDb.js";
 import Maintenance from "../entity/maintenance.entity.js";
-import MaintenanceInventory from "../entity/maintenanceInventory.entity.js";
+import MaintenanceInventory from "../entity/maintenanceinventory.entity.js";
 import InventoryItem from "../entity/inventory.entity.js";
 
 // Función para ajustar inventario
