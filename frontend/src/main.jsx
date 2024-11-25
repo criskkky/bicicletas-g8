@@ -4,12 +4,14 @@ import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
 import Register from '@pages/Register';
+import Sales from '@pages/Sales';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 import Maintenance from '@pages/Maintenance';
 import Orders from '@pages/Orders'; // Importa la nueva página de órdenes
+import Inventory from '@pages/Inventory';
 
 const router = createBrowserRouter([
   {
@@ -45,7 +47,23 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-    ]
+      {
+        path: '/sales',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Sales />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/inventory',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Inventory />
+          </ProtectedRoute>
+        ),
+      },   
+    ],
   },
   {
     path: '/auth',

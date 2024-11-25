@@ -8,11 +8,11 @@ import InventoryItem from "../entity/inventory.entity.js";
 export async function createSaleService(saleData) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
 
-    // Llamar a la función para verificar el inventario
+
     const inventoryCheck = await verificarInventarioService(saleData.inventoryItemId, saleData.quantity);
     
     if (!inventoryCheck[0]) {
-        return [null, inventoryCheck[1]]; // Retorna error si el inventario es insuficiente
+        return [null, inventoryCheck[1]]; 
     }
 
     try {
@@ -28,7 +28,6 @@ export async function createSaleService(saleData) {
     }
 }
 
-// Nueva función para verificar el inventario
 export async function verificarInventarioService(inventoryItemId, quantity) {
     const inventoryRepository = AppDataSource.getRepository(InventoryItem);
     try {
@@ -48,7 +47,6 @@ export async function verificarInventarioService(inventoryItemId, quantity) {
     }
 }
 
-// Nueva función para restar del inventario
 export async function restarInventarioService(inventoryItemId, quantity) {
     const inventoryRepository = AppDataSource.getRepository(InventoryItem);
     try {
@@ -56,7 +54,7 @@ export async function restarInventarioService(inventoryItemId, quantity) {
         if (!item) {
             return [null, "Artículo no encontrado"];
         }
-        item.quantity -= quantity; // Restar la cantidad
+        item.quantity -= quantity; 
         await inventoryRepository.save(item);
         return [item, null];
     } catch (error) {
@@ -68,8 +66,19 @@ export async function restarInventarioService(inventoryItemId, quantity) {
 export async function getAllSalesService() {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
-        const sales = await saleRepository.find();
-        return [sales, null];
+        const sales = await saleRepository.find({
+            relations: ["inventoryItem"]
+        });
+
+        const salesWhithTotal = sales.map(sale => {
+            const totalPrice = sale.quantity * sale.inventoryItem.price;
+            return {
+                ...sale,
+                totalPrice
+            };
+        });
+
+        return [salesWhithTotal, null];
     } catch (error) {
         console.error("Error al obtener las ventas:", error);
         return [null, "Error al obtener las ventas"];
@@ -79,7 +88,10 @@ export async function getAllSalesService() {
 export async function getSaleByIdService(id) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
     try {
-        const sale = await saleRepository.findOne({ where: { id } });
+        const sale = await saleRepository.findOne({
+            where: { id }, 
+            relations: ["inventoryItem"]
+            });
         if (!sale) {
             return [null, "Venta no encontrada"];
         }
@@ -102,9 +114,17 @@ export async function updateSaleService(id, saleData) {
 
         if(saleData.quantity && saleData.quantity !== sale.quantity){
             const quantityChange = saleData.quantity - sale.quantity;
+
+            if(quantityChange < 0){
+                await restarInventarioService(sale.inventoryItemId, quantityChange * -1);
+            }
+
             const inventoryCheck = await verificarInventarioService(sale.inventoryItemId, quantityChange);
             if(!inventoryCheck[0]){
                 return [null, inventoryCheck[1]];
+            }
+            if(quantityChange > 0){
+                await restarInventarioService(sale.inventoryItemId, quantityChange);
             }
         }
 
@@ -120,11 +140,16 @@ export async function updateSaleService(id, saleData) {
 
 export async function deleteSaleService(id) {
     const saleRepository = AppDataSource.getRepository(SaleEntity);
+    const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+
     try {
         const sale = await saleRepository.findOne({ where: { id } });
         if (!sale) {
             return [null, "Venta no encontrada"];
         }
+
+        await restarInventarioService(sale.inventoryItemId, -sale.quantity);
+
         await saleRepository.remove(sale);
         return [sale, null];
     } catch (error) {
