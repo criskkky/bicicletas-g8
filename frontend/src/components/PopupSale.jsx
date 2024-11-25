@@ -1,12 +1,25 @@
+import  {useState} from 'react';
 import Form from './Form';
 import '@styles/popup.css';
 import CloseIcon from '@assets/XIcon.svg';
 
 export default function PopupSale({ show, setShow, inventoryItems = [], onPurchase }) {
+    const [error, setError] = useState("")
+
     const handlePurchase = (formData) => {
         const selectedProduct = inventoryItems.find(item => item.name === formData.productName);
         
         if (selectedProduct) {
+            const requestQuantity = formData.quantity;
+
+            if (requestQuantity > selectedProduct.quantity) {
+                setError(`La cantidad solicitada supera el inventario disponible.\nActualmente hay ${selectedProduct.quantity} unidades disponibles.`);
+                return;
+            }
+            
+
+            setError("");
+
             const purchaseData = {
                 inventoryItemId: selectedProduct.id,
                 quantity: formData.quantity,
@@ -14,6 +27,8 @@ export default function PopupSale({ show, setShow, inventoryItems = [], onPurcha
             onPurchase(purchaseData);
         }
     };
+
+    const aviableProducts = inventoryItems.filter(item => item.quantity > 0);
 
     return (
         <div>
@@ -30,7 +45,7 @@ export default function PopupSale({ show, setShow, inventoryItems = [], onPurcha
                                 label: "Nombre del producto",
                                 name: "productName",
                                 fieldType: 'select',
-                                options: inventoryItems.map(item => ({
+                                options: aviableProducts.map(item => ({
                                     value: item.name,
                                     label: item.name,
                                 })),
@@ -51,6 +66,11 @@ export default function PopupSale({ show, setShow, inventoryItems = [], onPurcha
                         buttonText="Comprar ahora"
                         backgroundColor={'#fff'}
                     />
+                        {error && (
+                            <div className="error-message">
+                                <span className="error-text">{error}</span>
+                            </div>
+                        )}
                 </div>
             </div>
             )}
