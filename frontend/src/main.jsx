@@ -9,46 +9,54 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 import Maintenance from '@pages/Maintenance';
+import Orders from '@pages/Orders'; // Importa la nueva página de órdenes
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Root/>,
-    errorElement: <Error404/>,
+    element: <Root />,
+    errorElement: <Error404 />,
     children: [
       {
         path: '/home',
-        element: <Home/>
+        element: <Home />
       },
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
-          <Users />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <Users />
+          </ProtectedRoute>
         ),
       },
       {
         path: '/maintenance',
         element: (
-          // admin y tecnico pueden acceder
-        <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
-          <Maintenance />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Maintenance />
+          </ProtectedRoute>
         ),
-      }
+      },
+      {
+        path: '/orders',  // Nueva ruta para las órdenes
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Orders />
+          </ProtectedRoute>
+        ),
+      },
     ]
   },
   {
     path: '/auth',
-    element: <Login/>
+    element: <Login />
   },
   {
     path: '/register',
-    element: <Register/>
+    element: <Register />
   }
-])
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}/>
-)
+  <RouterProvider router={router} />
+);
