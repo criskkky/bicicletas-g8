@@ -13,19 +13,22 @@ export const useEditOrder = () => {
       const response = await updateOrder(orderId, updatedData); // Llama al servicio para actualizar la orden
       setIsLoading(false);
 
-      if (response.error) {
-        setError(response.error); // Maneja el error si hay uno
+      if (response && response.error) {
+        // Si la respuesta tiene un campo 'error', maneja el error
+        setError(response.error);
         return null;
       }
 
       return response; // Retorna la orden actualizada
     } catch (err) {
       setIsLoading(false);
-      setError("Error al editar la orden: " + err.message); // Maneja los errores generados por el servicio
+      // Mejorar el manejo de errores mostrando el mensaje completo
+      setError(`Error al editar la orden: ${err.message || err}`); 
       return null;
     }
   };
 
   return { editOrder, isLoading, error };
 };
+
 export default useEditOrder;

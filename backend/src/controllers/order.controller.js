@@ -12,7 +12,7 @@ export async function getOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await getOrderService(id);
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error });
     }
     return res.json(order);
   } catch (error) {
@@ -25,7 +25,7 @@ export async function getAllOrders(req, res) {
   try {
     const [orders, error] = await getAllOrdersService();
     if (error) {
-      return res.status(404).json({ error: "No se encontraron órdenes" });
+      return res.status(404).json({ error });
     }
     return res.json(orders);
   } catch (error) {
@@ -36,8 +36,8 @@ export async function getAllOrders(req, res) {
 
 export async function createOrder(req, res) {
   try {
-    const { NameClient, problemDescription, timeSpent, status } = req.body;
-    if (!NameClient || !problemDescription || !timeSpent || !status) {
+    const { workerRUT, jobType, jobID, hoursWorked, note } = req.body;
+    if (!workerRUT || !jobType || !jobID || !hoursWorked) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -55,14 +55,14 @@ export async function createOrder(req, res) {
 export async function updateOrder(req, res) {
   try {
     const { id } = req.params;
-    const { NameClient, problemDescription, timeSpent, status } = req.body;
-    if (!NameClient && !problemDescription && !timeSpent && !status) {
+    const { workerRUT, jobType, jobID, hoursWorked, note } = req.body;
+    if (!workerRUT && !jobType && !jobID && !hoursWorked && !note) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
     const [order, error] = await updateOrderService(id, req.body);
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error });
     }
     return res.json(order);
   } catch (error) {
@@ -76,7 +76,7 @@ export async function deleteOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await deleteOrderService(id);
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error });
     }
     return res.json({ message: "Orden eliminada exitosamente", order });
   } catch (error) {

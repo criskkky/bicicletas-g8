@@ -1,7 +1,7 @@
 import Table from '@components/Table';
-import useOrders from '@hooks/orders/useGetOrders.jsx';
+import useOrders from '@hooks/orders/useGetOrders';
 import Search from '../components/Search';
-import PopupOrder from '../components/PopupOrder'; // Cambio aquí
+import PopupOrder from '../components/PopupOrder';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
@@ -9,17 +9,17 @@ import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/orders.css';
 import useEditOrder from '@hooks/orders/useEditOrder';
-import useDeleteOrder from '@hooks/orders/useDeleteOrder';
+import useDeleteOrder from '@hooks/orders/useDeleteOrder';  // Asegúrate de que esté correctamente importado
 import useCreateOrder from '@hooks/orders/useCreateOrder';
 
 const Order = () => {
   const { orders, fetchOrders, setOrders } = useOrders();
   const [filterId, setFilterId] = useState('');
   const [showPopup, setShowPopup] = useState(false);
-  const [dataOrder, setDataOrder] = useState({ id: null }); // Estado de la orden seleccionada
+  const [dataOrder, setDataOrder] = useState({ id: null });
 
   const { handleUpdate } = useEditOrder(setOrders);
-  const { handleDelete } = useDeleteOrder(fetchOrders, setDataOrder);
+  const { deleteOrderById } = useDeleteOrder(fetchOrders, setDataOrder); // Renombramos la función a deleteOrderById
   const { handleCreate } = useCreateOrder(setOrders);
 
   const handleIdFilterChange = (e) => {
@@ -44,36 +44,24 @@ const Order = () => {
 
   const columns = [
     { title: 'ID Orden', field: 'id', width: 100 },
-    { title: 'Cliente', field: 'customer', width: 200 },
-    { title: 'Problema', field: 'description', width: 300 },
-    { title: 'Servicio Solicitado', field: 'service', width: 250 },
-    { title: 'Técnico Asignado', field: 'technician', width: 200 },
-    { title: 'Tiempo Dedicado (hrs)', field: 'hoursWorked', width: 150 },
-    { title: 'Estado', field: 'status', width: 150 },
-    { 
-      title: 'Productos Usados', 
-      field: 'inventoryItems', 
-      render: (rowData) => (
-        rowData.inventoryItems && rowData.inventoryItems.length > 0 ? (
-          <ul>
-            {rowData.inventoryItems.map(item => (
-              <li key={item.idUsedItem}>{`ID: ${item.idUsedItem}, Cantidad: ${item.quantityUsed}`}</li>
-            ))}
-          </ul>
-        ) : 'N/A'
-      )
-    },
+    { title: 'RUT Trabajador', field: 'workerRUT', width: 150 },
+    { title: 'Tipo de Trabajo', field: 'jobType', width: 150 },
+    { title: 'ID Trabajo', field: 'jobID', width: 150 },
+    { title: 'Horas Trabajadas', field: 'hoursWorked', width: 150 },
+    { title: 'Nota', field: 'note', render: (rowData) => rowData.note || 'N/A', width: 250 },
     { title: 'Creado', field: 'createdAt', width: 200 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200 },
   ];
 
   const handleUpdateClick = () => {
-    setShowPopup(true); // Abre el popup para editar
+    if (dataOrder && dataOrder.id) {
+      setShowPopup(true); // Abre el popup para editar
+    }
   };
 
   const handleDeleteClick = () => {
     if (dataOrder && dataOrder.id) {
-      handleDelete([dataOrder]);
+      deleteOrderById(dataOrder.id); // Llama a la función deleteOrderById
     }
   };
 
@@ -110,7 +98,7 @@ const Order = () => {
         />
       </div>
 
-      <PopupOrder // Cambio aquí
+      <PopupOrder
         show={showPopup}
         setShow={setShowPopup}
         data={dataOrder}

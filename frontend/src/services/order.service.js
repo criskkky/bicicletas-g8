@@ -13,7 +13,7 @@ export async function getOrders() {
         }
 
         // Formatear los datos de las órdenes utilizando el helper
-        const formattedData = response.data.map(formatDataOrder); // Usa directamente response.data
+        const formattedData = response.data.map(formatDataOrder);
         return formattedData;
     } catch (error) {
         console.error("Error al obtener las órdenes:", error);
@@ -25,29 +25,44 @@ export async function getOrders() {
 export async function getOrder(orderId) {
     try {
         const { data } = await axios.get(`/orders/view/${orderId}`);
-        return formatDataOrder(data.data); // Formatear la orden de trabajo específica
+        return formatDataOrder(data); // Formatear la orden de trabajo específica
     } catch (error) {
-        return error.response.data;
+        console.error("Error al obtener la orden:", error);
+        return { error: error.message || 'Error al obtener la orden' }; // Error más descriptivo
     }
 }
 
 // Función para crear una nueva orden de trabajo
 export async function createOrder(orderData) {
     try {
-        const response = await axios.post('/orders/add', orderData); // Ruta para crear una orden
+        const response = await axios.post('/orders/add', {
+            workerRUT: orderData.workerRUT,
+            jobType: orderData.jobType,
+            jobID: orderData.jobID,
+            hoursWorked: orderData.hoursWorked,
+            note: orderData.note || '', // Aseguramos que la nota sea opcional
+        });
         return response.data; // Retorna la orden creada
     } catch (error) {
-        return error.response.data;
+        console.error("Error al crear la orden:", error);
+        return { error: error.message || 'Error al crear la orden' };
     }
 }
 
 // Función para actualizar una orden de trabajo existente
 export async function updateOrder(orderId, orderData) {
     try {
-        const response = await axios.patch(`/orders/edit/${orderId}`, orderData);
+        const response = await axios.patch(`/orders/edit/${orderId}`, {
+            workerRUT: orderData.workerRUT,
+            jobType: orderData.jobType,
+            jobID: orderData.jobID,
+            hoursWorked: orderData.hoursWorked,
+            note: orderData.note || '', // Aseguramos que la nota sea opcional
+        });
         return response.data; // Retorna la orden actualizada
     } catch (error) {
-        return error.response.data;
+        console.error("Error al actualizar la orden:", error);
+        return { error: error.message || 'Error al actualizar la orden' };
     }
 }
 
@@ -57,6 +72,7 @@ export async function deleteOrder(orderId) {
         const response = await axios.delete(`/orders/delete/${orderId}`);
         return response.data; // Retorna la respuesta del servidor
     } catch (error) {
-        return error.response.data;
+        console.error("Error al eliminar la orden:", error);
+        return { error: error.message || 'Error al eliminar la orden' };
     }
 }

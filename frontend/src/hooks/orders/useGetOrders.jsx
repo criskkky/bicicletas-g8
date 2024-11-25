@@ -1,37 +1,53 @@
-import { useState, useEffect } from "react";
-import { getOrder } from "@services/order.service.js"; // Asegúrate de que la función getOrder esté correctamente exportada desde el servicio
+import { useState, useEffect } from 'react';
+import { getOrders } from '@services/order.service.js'; // Suponiendo que existe este servicio
+import { showWarningAlert } from '@helpers/sweetAlert.js';
 
-export const useGetOrder = (orderId) => {
-  const [order, setOrder] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+const useGetOrders = () => {
+    const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      setIsLoading(true);
-      setError(null); // Resetea el error al intentar obtener la orden
+    const fetchOrders = async () => {
+        try {
+            const response = await getOrders();
 
-      try {
-        const response = await getOrder(orderId); // Llama al servicio para obtener la orden
-        setIsLoading(false);
+            // Verifica si la respuesta es un array válido
+            if (!Array.isArray(response)) {
+                return showWarningAlert("¡Advertencia!", "No existen registros de órdenes.");
+            }
 
-        if (response.error) {
-          setError(response.error); // Maneja el error si hay uno
-          return;
+            // Formatear los datos
+            const formattedData = response.map(order => {
+                let orderDetails;
+                if (order.jobType && order.workerRUT) {
+                    // Si jobType y workerRUT existen, los usamos para mostrar detalles clave
+                    orderDetails = `Tipo de trabajo: ${order.jobType} (RUT: ${order.workerRUT})`;
+                } else {
+                    orderDetails = 'N/A';  // Si faltan datos, retorna 'N/A'
+                }
+
+                return {
+                    id: order.id,
+                    jobType: order.jobType,
+                    workerRUT: order.workerRUT,
+                    hoursWorked: order.hoursWorked,
+                    note: order.note || 'Sin notas',  // Mostrar "Sin notas" si no hay
+                    status: order.status,
+                    createdAt: order.createdAt,
+                    updatedAt: order.updatedAt,
+                    orderDetails,  // Detalles del orden formateados
+                };
+            });
+
+            setOrders(formattedData);
+        } catch (error) {
+            console.error("Error: ", error.message);
         }
-
-        setOrder(response); // Guarda la orden obtenida en el estado
-      } catch (err) {
-        setIsLoading(false);
-        setError("Error al obtener la orden: " + err.message); // Maneja los errores generados por el servicio
-      }
     };
 
-    if (orderId) {
-      fetchOrder(); // Llama a la función solo si el orderId está disponible
-    }
-  }, [orderId]); // Vuelve a ejecutar el hook si el orderId cambia
+    useEffect(() => {
+        fetchOrders();
+    }, []);
 
-  return { order, isLoading, error };
+    return { orders, fetchOrders, setOrders };
 };
-export default useGetOrder;
+
+export default useGetOrders;
