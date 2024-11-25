@@ -84,13 +84,13 @@ const Sales = () => {
         />
       </div>
 
-  <PopupSale
-    show={showPopup}
-    setShow={setShowPopup}
-    data={dataSale}
-    action={handlePurchase} 
-  />
-</div>
+      <PopupSale
+        show={showPopup}
+        setShow={setShowPopup}
+        data={dataSale}
+        action={handlePurchase} 
+      />
+    </div>
   );
 };
 

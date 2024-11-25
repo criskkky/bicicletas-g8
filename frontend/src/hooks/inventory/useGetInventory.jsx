@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { getInventory } from '@services/inventory.service.js'
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetInventory = () => {
@@ -11,7 +11,7 @@ const useGetInventory = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/inventory');
+      const response =await getInventory();
       
       if (!response.data || response.data.length === 0) {
         showWarningAlert("¡Advertencia!", "No existen registros de inventario.");

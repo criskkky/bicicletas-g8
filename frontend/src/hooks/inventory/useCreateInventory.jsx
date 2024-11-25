@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { createInventoryItem } from '@services/inventory.service.js';
 
 
 const useCreateInventory = (setInventory) => {
@@ -11,7 +11,7 @@ const useCreateInventory = (setInventory) => {
     setError(null);
 
     try {
-      const response = await axios.post('/api/inventory/add', newItem);
+      const response = await createInventoryItem(newItem);
       if (response && response.data) {
         setInventory(prevInventory => [...prevInventory, response.data]);
       }

@@ -2,7 +2,7 @@ import axios from './root.service.js';
 
 export async function getInventory() {
     try {
-        const response = await axios.get('/inventory');
+        const response = await axios.get('/inventory/');
         console.log('Respuesta de la API:', response);
 
         if (!response || !response.data) {
