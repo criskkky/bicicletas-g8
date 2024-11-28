@@ -3,13 +3,13 @@ import '@styles/popup.css';
 import CloseIcon from '@assets/XIcon.svg';
 
 export default function PopupOrder({ show, setShow, data, action }) {
-    // Determinar si es edición o creación basándonos en la existencia de datos
+    
     const isEdit = data && Object.keys(data).length > 0;
     const orderData = isEdit ? data : {};
 
     const handleSubmit = (formData) => {
-        action(formData); // Llama a la acción (crear o editar)
-        setShow(false);  // Cierra el popup después de guardar
+        action(formData); 
+        setShow(false);  
     };
 
     return (
@@ -31,7 +31,7 @@ export default function PopupOrder({ show, setShow, data, action }) {
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
-                                    pattern: "\\d{7,8}-[0-9kK]", // Validación básica de RUT
+                                    pattern: "\\d{7,8}-[0-9kK]", 
                                 },
                                 {
                                     label: "Tipo de Trabajo Realizado",

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteOrder } from "@services/order.service.js"; // Asegúrate de que la función deleteOrder esté correctamente exportada desde el servicio
+import { deleteOrder } from "@services/order.service.js"; 
 
 export const useDeleteOrder = (fetchOrders, setDataOrder) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -7,25 +7,25 @@ export const useDeleteOrder = (fetchOrders, setDataOrder) => {
 
   const deleteOrderById = async (orderId) => {
     setIsLoading(true);
-    setError(null); // Resetea el error al intentar eliminar una orden
+    setError(null);
 
     try {
-      const response = await deleteOrder(orderId); // Llama al servicio para eliminar la orden
+      const response = await deleteOrder(orderId);
       setIsLoading(false);
 
       if (response.error) {
-        setError(response.error); // Maneja el error si hay uno
+        setError(response.error);
         return false;
       }
 
-      // Vuelve a cargar las órdenes después de eliminar
+      
       fetchOrders();
-      setDataOrder({ id: null }); // Resetea la orden seleccionada
+      setDataOrder({ id: null }); 
 
-      return true; // Si la orden fue eliminada correctamente, retorna true
+      return true; 
     } catch (err) {
       setIsLoading(false);
-      setError("Error al eliminar la orden: " + err.message); // Maneja los errores generados por el servicio
+      setError("Error al eliminar la orden: " + err.message); 
       return false;
     }
   };

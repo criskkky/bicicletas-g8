@@ -9,7 +9,7 @@ import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/orders.css';
 import useEditOrder from '@hooks/orders/useEditOrder';
-import useDeleteOrder from '@hooks/orders/useDeleteOrder';  // Asegúrate de que esté correctamente importado
+import useDeleteOrder from '@hooks/orders/useDeleteOrder';  
 import useCreateOrder from '@hooks/orders/useCreateOrder';
 
 const Order = () => {
@@ -19,7 +19,7 @@ const Order = () => {
   const [dataOrder, setDataOrder] = useState({ id: null });
 
   const { handleUpdate } = useEditOrder(setOrders);
-  const { deleteOrderById } = useDeleteOrder(fetchOrders, setDataOrder); // Renombramos la función a deleteOrderById
+  const { deleteOrderById } = useDeleteOrder(fetchOrders, setDataOrder);
   const { handleCreate } = useCreateOrder(setOrders);
 
   const handleIdFilterChange = (e) => {
@@ -35,9 +35,9 @@ const Order = () => {
 
   const handleCreateOrUpdate = (orderData) => {
     if (orderData.id) {
-      handleUpdate(orderData); // Actualizar orden existente
+      handleUpdate(orderData); 
     } else {
-      handleCreate(orderData); // Crear nueva orden
+      handleCreate(orderData); 
     }
     setShowPopup(false);
   };
@@ -55,13 +55,13 @@ const Order = () => {
 
   const handleUpdateClick = () => {
     if (dataOrder && dataOrder.id) {
-      setShowPopup(true); // Abre el popup para editar
+      setShowPopup(true); 
     }
   };
 
   const handleDeleteClick = () => {
     if (dataOrder && dataOrder.id) {
-      deleteOrderById(dataOrder.id); // Llama a la función deleteOrderById
+      deleteOrderById(dataOrder.id); 
     }
   };
 
@@ -69,7 +69,7 @@ const Order = () => {
     <div className="main-container">
       <div className="table-container">
         <div className="top-table">
-          <h1 className="title-table">Órdenes de Trabajo</h1>
+          <h1 className="title-table">ordenes de Trabajo</h1>
           <div className="filter-actions">
             <Search value={filterId} onChange={handleIdFilterChange} placeholder="Filtrar por ID" />
             <button onClick={handleUpdateClick} disabled={!dataOrder || !dataOrder.id}>

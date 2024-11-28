@@ -4,13 +4,13 @@ export function formatDataOrder(order) {
   return {
     ...order,
     id: order.id,
-    workerRUT: order.workerRUT, // RUT del trabajador
-    jobType: order.jobType, // Tipo de trabajo (MANTENIMIENTO o VENTA)
-    jobID: order.jobID, // ID del trabajo realizado
-    hoursWorked: order.hoursWorked, // Horas trabajadas
-    note: order.note || "Sin notas", // Nota opcional
-    createdAt: formatTempo(order.createdAt, "DD-MM-YYYY HH:mm:ss"), // Fecha de creación formateada
-    updatedAt: formatTempo(order.updatedAt, "DD-MM-YYYY HH:mm:ss"), // Fecha de actualización formateada
+    workerRUT: order.workerRUT, 
+    jobType: order.jobType, 
+    jobID: order.jobID, 
+    hoursWorked: order.hoursWorked,
+    note: order.note || "Sin notas",
+    createdAt: formatTempo(order.createdAt, "DD-MM-YYYY HH:mm:ss"),
+    updatedAt: formatTempo(order.updatedAt, "DD-MM-YYYY HH:mm:ss"),
   };
 }
 
