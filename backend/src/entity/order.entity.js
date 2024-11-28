@@ -27,26 +27,26 @@ const OrderSchema = new EntitySchema({
     hoursWorked: {
       type: "int",
       nullable: false,
-      default: 0, // en horas
+      default: 0, 
     },
     note: {
       type: "text",
-      nullable: true, // Mensaje opcional
+      nullable: true, 
     },
     status: {
       type: "varchar",
       length: 20,
-      default: "pendiente", // Puede ser pendiente, en proceso, completado
+      default: "pendiente", 
       nullable: false,
     },
     createdAt: {
       type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP", // Registro para la creación
+      default: () => "CURRENT_TIMESTAMP",
       nullable: false,
     },
     updatedAt: {
       type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP", // Última actualización
+      default: () => "CURRENT_TIMESTAMP", 
       onUpdate: "CURRENT_TIMESTAMP",
       nullable: false,
     },
