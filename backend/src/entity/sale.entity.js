@@ -2,49 +2,58 @@ import { EntitySchema } from "typeorm";
 
 const SaleSchema = new EntitySchema({
   name: "Sale",
-  tableName: "sales",
+  tableName: "venta",
   columns: {
-    id: {
+    id_venta: {
       type: "int",
       primary: true,
       generated: true,
     },
-    inventoryItemId: {
+    id_cliente: {
       type: "int",
       nullable: false,
     },
-    quantity: {
-      type: "int",
+    fecha_venta: {
+      type: "date",
       nullable: false,
     },
-    totalPrice: {
+    total: {
       type: "decimal",
       precision: 10,
       scale: 2,
-      default: 0,
+      nullable: false,
+    },
+    tipo_venta: {
+      type: "enum",
+      enum: ["venta", "mantenimiento"],
       nullable: false,
     },
     createdAt: {
-      type: "timestamp with time zone",
+      type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
-      nullable: false,
+    },
+    updatedAt: {
+      type: "timestamp",
+      default: () => "CURRENT_TIMESTAMP",
+      onUpdate: "CURRENT_TIMESTAMP",
     },
   },
   relations: {
-    inventoryItem: {
-      target: "Inventory",
-      type: "many-to-one",
+    inventoryItems: {
+      target: "VentaInventario",
+      type: "one-to-many",
+      inverseSide: "venta",
       joinColumn: {
-        name: "inventoryItemId",
-        referencedColumnName: "id",
+        name: "id_venta",
+        referencedColumnName: "id_venta",
       },
     },
-  },
+  },  
   indices: [
     {
-      name: "IDX_SALE",
-      columns: ["id"],
-      unique: true, 
+      name: "IDX_VENTA",
+      columns: ["id_venta"],
+      unique: true,
     },
   ],
 });

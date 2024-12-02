@@ -1,10 +1,10 @@
 import { AppDataSource } from "../config/configDb.js";
 import Order from "../entity/order.entity.js";
 
-export async function getOrderService(id) {
+export async function getOrderService(id_orden) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    const order = await orderRepository.findOne({ where: { id } });
+    const order = await orderRepository.findOne({ where: { id_orden } });
     if (!order) return [null, "Orden no encontrada"];
     return [order, null];
   } catch (error) {
@@ -37,14 +37,14 @@ export async function createOrderService(orderData) {
   }
 }
 
-export async function updateOrderService(id, orderData) {
+export async function updateOrderService(id_orden, orderData) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    const order = await orderRepository.findOne({ where: { id } });
+    const order = await orderRepository.findOne({ where: { id_orden } });
     if (!order) return [null, "Orden no encontrada"];
 
-    await orderRepository.update({ id }, { ...orderData, updatedAt: new Date() });
-    const updatedOrder = await orderRepository.findOne({ where: { id } });
+    await orderRepository.update({ id_orden }, { ...orderData, updatedAt: new Date() });
+    const updatedOrder = await orderRepository.findOne({ where: { id_orden } });
     return [updatedOrder, null];
   } catch (error) {
     console.error("Error al actualizar la orden:", error);
@@ -52,10 +52,10 @@ export async function updateOrderService(id, orderData) {
   }
 }
 
-export async function deleteOrderService(id) {
+export async function deleteOrderService(id_orden) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    const order = await orderRepository.findOne({ where: { id } });
+    const order = await orderRepository.findOne({ where: { id_orden } });
     if (!order) return [null, "Orden no encontrada"];
 
     await orderRepository.remove(order);

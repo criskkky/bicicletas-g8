@@ -1,10 +1,10 @@
 import { AppDataSource } from "../config/configDb.js";
 import Inventory from "../entity/inventory.entity.js";
 
-export async function getInventoryItemService(id) {
+export async function getInventoryItemService(id_item) {
   try {
     const inventoryRepository = AppDataSource.getRepository(Inventory);
-    const item = await inventoryRepository.findOne({ where: { id } });
+    const item = await inventoryRepository.findOne({ where: { id_item } });
     if (!item) return [null, "Ítem no encontrado"];
     return [item, null];
   } catch (error) {
@@ -37,29 +37,28 @@ export async function createInventoryItemService(itemData) {
   }
 }
 
-export async function updateInventoryItemService(id, itemData) {
+export async function updateInventoryItemService(id_item, itemData) {
   try {
     const inventoryRepository = AppDataSource.getRepository(Inventory);
-    const item = await inventoryRepository.findOne({ where: { id } });
+    const item = await inventoryRepository.findOne({ where: { id_item } });
     if (!item) return [null, "Ítem no encontrado"];
     
     const updatedData = { ...itemData, updatedAt: new Date() };
-    await inventoryRepository.update({ id }, updatedData);
+    await inventoryRepository.update({ id_item }, updatedData);
 
-    return [{ ...item, ...updatedData }, null];  // Retorna el objeto actualizado
+    return [{ ...item, ...updatedData }, null];
   } catch (error) {
     console.error("Error al actualizar el ítem del inventario:", error);
     return [null, "Error interno del servidor"];
   }
 }
 
-export async function deleteInventoryItemService(id) {
+export async function deleteInventoryItemService(id_item) {
   try {
     const inventoryRepository = AppDataSource.getRepository(Inventory);
-    const item = await inventoryRepository.findOne({ where: { id } });
+    const item = await inventoryRepository.findOne({ where: { id_item } });
     
     if (!item) {
-      // Si no se encuentra el ítem, se retorna con un mensaje específico
       return [null, { type: "not_found", message: "Ítem no encontrado" }];
     }
 
@@ -68,14 +67,12 @@ export async function deleteInventoryItemService(id) {
 
   } catch (error) {
     console.error("Error al eliminar el ítem del inventario:", error);
-    
-    // Detectar violación de clave foránea
     if (error.code === "23503") {
       return [null, {
         type: "foreign_key_violation",
-        message: `No se puede eliminar el ítem con ID ${id} porque está referenciado en otra tabla.`,
+        message: `No se puede eliminar el ítem con ID ${id_item} porque está referenciado en otra tabla.`,
         detail: error.detail,
-        constraint: error.constraint // ID de la restricción de clave foránea
+        constraint: error.constraint,
       }];
     }
 

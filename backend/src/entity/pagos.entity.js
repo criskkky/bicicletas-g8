@@ -2,50 +2,77 @@ import { EntitySchema } from "typeorm";
 
 const PagosSchema = new EntitySchema({
   name: "Pagos",
-  tableName: "pagos",
+  tableName: "pago",
   columns: {
-    id: {
+    id_pago: {
       type: "int",
       primary: true,
       generated: true,
     },
-    idTecnico: {
+    rut: {
       type: "int",
+      nullable: false,
+    },
+    id_orden: {
+      type: "int",
+      nullable: false,
+    },
+    cantidad_ordenes_realizadas: {
+      type: "int",
+      nullable: false,
+    },
+    fecha_pago: {
+      type: "date",
       nullable: false,
     },
     monto: {
-      type: "int",
+      type: "decimal",
+      precision: 10,
+      scale: 2,
+      nullable: false,
+    },
+    estado: {
+      type: "enum",
+      enum: ["pendiente", "realizado"],
+      nullable: false,
+    },
+    metodo_pago: {
+      type: "enum",
+      enum: ["efectivo", "tarjeta", "transferencia"],
       nullable: false,
     },
     createdAt: {
-      type: "timestamp with time zone",
+      type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
-      nullable: false,
     },
     updatedAt: {
-      type: "timestamp with time zone",
+      type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
-      nullable: false,
+      onUpdate: "CURRENT_TIMESTAMP",
     },
   },
-  // relations: {
-  //   cliente: {
-  //     target: "Cliente",
-  //     type: "many-to-one",
-  //     joinColumn: true,
-  //     eager: true,
-  //   },
-  //   tecnico: {
-  //     target: "Tecnico",
-  //     type: "many-to-one",
-  //     joinColumn: true,
-  //     eager: true,
-  //   },
-  // },
+  relations: {
+    user: {
+      target: "User",
+      type: "many-to-one",
+      joinColumn: {
+        name: "rut",
+        referencedColumnName: "id",
+      },
+    },
+    order: {
+      target: "Order",
+      type: "many-to-one",
+      joinColumn: {
+        name: "id_orden",
+        referencedColumnName: "id_orden",
+      },
+    },
+  },  
   indices: [
     {
-      name: "IDX_PAGOS",
-      columns: ["id"],
+      name: "IDX_PAGO",
+      columns: ["id_pago"],
       unique: true,
     },
   ],

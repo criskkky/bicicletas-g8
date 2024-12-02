@@ -36,8 +36,8 @@ export async function getAllInventoryItems(req, res) {
 
 export async function createInventoryItem(req, res) {
   try {
-    const { name, quantity, price, type } = req.body;
-    if (!name || !quantity || !price || !type) {
+    const { nombre, marca, descripcion, stock, precio } = req.body;
+    if (!nombre || !marca || !descripcion || stock === undefined || precio === undefined) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -55,8 +55,8 @@ export async function createInventoryItem(req, res) {
 export async function updateInventoryItem(req, res) {
   try {
     const { id } = req.params;
-    const { name, quantity, price, type } = req.body;
-    if (!name && !quantity && !price && !type) {
+    const { nombre, marca, descripcion, stock, precio } = req.body;
+    if (!nombre && !marca && !descripcion && stock === undefined && precio === undefined) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
@@ -67,7 +67,7 @@ export async function updateInventoryItem(req, res) {
 
     return res.json(item);
 
-  } catch (error) { // Error de servidor
+  } catch (error) {
     console.error("Error al actualizar el ítem del inventario:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
@@ -79,7 +79,6 @@ export async function deleteInventoryItem(req, res) {
     const [item, error] = await deleteInventoryItemService(id);
     
     if (error) {
-      // Verificar el tipo de error y responder adecuadamente
       if (error.type === "not_found") {
         return res.status(404).json({ error: error.message });
       }

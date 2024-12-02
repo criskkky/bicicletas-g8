@@ -2,64 +2,62 @@ import { EntitySchema } from "typeorm";
 
 const InventorySchema = new EntitySchema({
   name: "Inventory",
-  tableName: "inventory",
+  tableName: "inventario",
   columns: {
-    id: {
+    id_item: {
       type: "int",
       primary: true,
       generated: true,
     },
-    name: {
+    nombre: {
       type: "varchar",
       length: 255,
       nullable: false,
     },
-    type: {
-      type: "varchar",
-      length: 50,
+    marca: {
+      type: "text",
       nullable: false,
     },
-    quantity: {
-      type: "int",
+    descripcion: {
+      type: "text",
       nullable: false,
     },
-    price: {
+    precio: {
       type: "decimal",
       precision: 10,
       scale: 2,
       nullable: false,
     },
-    createdAt: {
-      type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP",
+    stock: {
+      type: "int",
       nullable: false,
     },
+    createdAt: {
+      type: "timestamp",
+      default: () => "CURRENT_TIMESTAMP",
+    },
     updatedAt: {
-      type: "timestamp with time zone",
+      type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
       onUpdate: "CURRENT_TIMESTAMP",
-      nullable: false,
     },
   },
   relations: {
-    // Relación con MaintenanceInventory (tabla intermedia)
     maintenanceItems: {
       target: "MaintenanceInventory",
       type: "one-to-many",
       inverseSide: "inventoryItem",
     },
-    // Relación con Sale (ventas)
-    sales: { // Agregar relación con Sale
+    sales: {
       target: "Sale",
-      property: "sales",
-      type: "one-to-many", // Uno a muchos
-      inverseSide: "inventory", // Lado inverso (revisar)
+      type: "one-to-many",
+      inverseSide: "inventory",
     },
   },
   indices: [
     {
       name: "IDX_INVENTORY",
-      columns: ["id"],
+      columns: ["id_item"],
       unique: true,
     },
   ],

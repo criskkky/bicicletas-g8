@@ -2,60 +2,82 @@ import { EntitySchema } from "typeorm";
 
 const OrderSchema = new EntitySchema({
   name: "Order",
-  tableName: "orders",
+  tableName: "ordenes",
   columns: {
-    id: {
+    id_orden: {
       type: "int",
       primary: true,
       generated: true,
     },
-    workerRUT: {
-      type: "varchar",
-      length: 20,
-      nullable: false,
-    },
-    jobType: {
-      type: "enum",
-      enum: ["Mantenimiento", "Venta"],
-      nullable: false,
-    },
-    jobID: {
-      type: "varchar",
-      length: 50,
-      nullable: false,
-    },
-    hoursWorked: {
+    rut: {
       type: "int",
       nullable: false,
-      default: 0, 
     },
-    note: {
-      type: "text",
-      nullable: true, 
+    id_mantenimiento: {
+      type: "int",
+      nullable: true,
     },
-    status: {
-      type: "varchar",
-      length: 20,
-      default: "pendiente", 
+    id_venta: {
+      type: "int",
+      nullable: true,
+    },
+    fecha_orden: {
+      type: "date",
+      nullable: false,
+    },
+    tipo_orden: {
+      type: "enum",
+      enum: ["venta", "mantenimiento"],
+      nullable: false,
+    },
+    total: {
+      type: "decimal",
+      precision: 10,
+      scale: 2,
       nullable: false,
     },
     createdAt: {
-      type: "timestamp with time zone",
+      type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
-      nullable: false,
     },
     updatedAt: {
-      type: "timestamp with time zone",
-      default: () => "CURRENT_TIMESTAMP", 
+      type: "timestamp",
+      default: () => "CURRENT_TIMESTAMP",
       onUpdate: "CURRENT_TIMESTAMP",
-      nullable: false,
     },
   },
-
+  relations: {
+    user: {
+      target: "User",
+      type: "many-to-one",
+      joinColumn: {
+        name: "rut",
+        referencedColumnName: "id",
+      },
+    },
+    maintenance: {
+      target: "Maintenance",
+      type: "many-to-one",
+      joinColumn: {
+        name: "id_mantenimiento",
+        referencedColumnName: "id_mantenimiento",
+        nullable: true,
+      },
+    },
+    sale: {
+      target: "Sale",
+      type: "many-to-one",
+      joinColumn: {
+        name: "id_venta",
+        referencedColumnName: "id_venta",
+        nullable: true,
+      },
+    },
+  },
   indices: [
     {
-      name: "IDX_ORDER",
-      columns: ["id"],
+      name: "IDX_ORDENES",
+      columns: ["id_orden"],
       unique: true,
     },
   ],
