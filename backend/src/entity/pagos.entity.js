@@ -9,10 +9,6 @@ const PagosSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    rut: {
-      type: "int",
-      nullable: false,
-    },
     id_orden: {
       type: "int",
       nullable: false,

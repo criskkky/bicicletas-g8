@@ -32,18 +32,20 @@ export async function createMaintenance(req, res) {
       return res.status(400).json({ error: maintenanceError });
     }
 
-    // Crear la orden correspondiente al mantenimiento
-    const [order, orderError] = await createOrderService({
-      rut,
-      id_mantenimiento: maintenance.id_mantenimiento,
-      fecha_orden: new Date().toISOString().split("T")[0],
-      tipo_orden: "mantenimiento",
-      total: 0,
-    });
+  // Crear la orden correspondiente al mantenimiento
+  const [order, orderError] = await createOrderService({
+    rut,
+    id_mantenimiento: maintenance.id_mantenimiento,
+    fecha_orden: new Date().toISOString().split("T")[0],
+    tipo_orden: "mantenimiento",
+    total: 0, // Ajustar el total si es necesario
+  });
 
-    if (orderError) {
-      return res.status(500).json({ error: "Error al crear la orden asociada" });
-    }
+  if (orderError) {
+    console.error("Error al crear la orden asociada:", orderError);
+    return res.status(500).json({ error: "Error al crear la orden asociada" });
+  }
+
 
     res.status(201).json({ message: "Mantenimiento y orden creadas con éxito", maintenance, order });
   } catch (error) {

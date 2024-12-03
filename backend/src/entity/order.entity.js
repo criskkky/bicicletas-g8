@@ -9,10 +9,6 @@ const OrderSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    rut: {
-      type: "int",
-      nullable: false,
-    },
     id_mantenimiento: {
       type: "int",
       nullable: true,

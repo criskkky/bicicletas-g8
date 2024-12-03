@@ -66,25 +66,25 @@ export async function createMaintenanceService(data) {
 
     console.log("Mantenimiento guardado correctamente:", maintenance);
 
-    // Gestionar inventario
-    for (const item of data.inventoryItems) {
-      console.log("Procesando ítem de inventario:", item);
-
-      const inventoryItem = await inventoryRepository.findOne({ where: { id_item: item.id_item } });
-      if (!inventoryItem) {
-        console.error("Ítem de inventario no encontrado:", item.id_item);
-        throw new Error(`Ítem de inventario con ID ${item.id_item} no encontrado`);
-      }
-
-      const maintenanceInventory = maintenanceInventoryRepository.create({
-        id_mantenimiento: maintenance.id_mantenimiento,
-        id_item: item.id_item,
-        cantidad: item.cantidad,
-      });
-
-      console.log("Creando relación mantenimiento-inventario:", maintenanceInventory);
-      await maintenanceInventoryRepository.save(maintenanceInventory);
+  // Gestionar inventario
+  for (const item of data.inventoryItems) {
+    const inventoryItem = await inventoryRepository.findOne({ where: { id_item: item.id_item } });
+    if (!inventoryItem) {
+      throw new Error(`Ítem de inventario con ID ${item.id_item} no encontrado`);
     }
+
+    // Calcula el precio_costo basado en el precio del inventario
+    const precioCosto = inventoryItem.precio * item.cantidad;
+
+    const maintenanceInventory = maintenanceInventoryRepository.create({
+      id_mantenimiento: maintenance.id_mantenimiento,
+      id_item: item.id_item,
+      cantidad: item.cantidad,
+      precio_costo: precioCosto, // Asegúrate de llenar este campo
+    });
+
+    await maintenanceInventoryRepository.save(maintenanceInventory);
+  }
 
     return [maintenance, null];
   } catch (error) {
