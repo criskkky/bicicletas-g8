@@ -52,12 +52,11 @@ const PagosSchema = new EntitySchema({
     },
   },
   relations: {
-    user: {
+    usersRut: {
       target: "User",
       type: "many-to-one",
       joinColumn: {
         name: "rut",
-        referencedColumnName: "id",
       },
     },
     order: {
@@ -65,7 +64,6 @@ const PagosSchema = new EntitySchema({
       type: "many-to-one",
       joinColumn: {
         name: "id_orden",
-        referencedColumnName: "id_orden",
       },
     },
   },  

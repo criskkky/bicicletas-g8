@@ -27,7 +27,7 @@ const MaintenanceInventorySchema = new EntitySchema({
     },
   },
   relations: {
-    maintenance: {
+    maintenances: {
       target: "Maintenance",
       type: "many-to-one",
       joinColumn: { name: "id_mantenimiento" },

@@ -47,12 +47,11 @@ const OrderSchema = new EntitySchema({
     },
   },
   relations: {
-    user: {
+    usersRut: {
       target: "User",
       type: "many-to-one",
       joinColumn: {
         name: "rut",
-        referencedColumnName: "id",
       },
     },
     maintenance: {
@@ -60,7 +59,6 @@ const OrderSchema = new EntitySchema({
       type: "many-to-one",
       joinColumn: {
         name: "id_mantenimiento",
-        referencedColumnName: "id_mantenimiento",
         nullable: true,
       },
     },
@@ -69,7 +67,6 @@ const OrderSchema = new EntitySchema({
       type: "many-to-one",
       joinColumn: {
         name: "id_venta",
-        referencedColumnName: "id_venta",
         nullable: true,
       },
     },

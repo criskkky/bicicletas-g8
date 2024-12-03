@@ -105,3 +105,27 @@ export async function deleteSaleService(id_venta) {
     return [null, "Error al eliminar la venta"];
   }
 }
+
+export async function updateSaleService(id_venta, saleData) {
+  const saleRepository = AppDataSource.getRepository(SaleEntity);
+  try {
+    const sale = await saleRepository.findOne({ where: { id_venta } });
+    if (!sale) {
+      return [null, "Venta no encontrada"];
+    }
+
+    await restarInventarioService(sale.id_item, -sale.cantidad);
+
+    sale.id_item = saleData.id_item;
+    sale.cantidad = saleData.cantidad;
+    sale.fecha = saleData.fecha;
+    await saleRepository.save(sale);
+
+    await restarInventarioService(saleData.id_item, saleData.cantidad);
+
+    return [sale, null];
+  } catch (error) {
+    console.error("Error al actualizar la venta:", error);
+    return [null, "Error al actualizar la venta"];
+  }
+}

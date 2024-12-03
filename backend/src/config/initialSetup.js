@@ -1,7 +1,7 @@
 "use strict";
 import User from "../entity/user.entity.js";
-import Inventory from "../entity/inventory.entity.js";
-import Sale from "../entity/sale.entity.js";
+// import Inventory from "../entity/inventory.entity.js";
+// import Sale from "../entity/sale.entity.js";
 import { AppDataSource } from "./configDb.js";
 import { encryptPassword } from "../helpers/bcrypt.helper.js";
 
@@ -83,96 +83,4 @@ async function createUsers() {
   }
 }
 
-// Crear inventario de Taller de Bicicletas
-async function createInv() {
-  try {
-    const invRepository = AppDataSource.getRepository(Inventory);
-
-    const count = await invRepository.count();
-    if (count > 0) return;
-
-    await Promise.all([
-      invRepository.save(
-        invRepository.create({
-          name: "Bicicleta de Montaña",
-          type: "bicicleta",
-          quantity: 10,
-          price: 500000,
-        }),
-      ),
-      invRepository.save(
-        invRepository.create({
-          name: "Manguera de Freno",
-          type: "repuesto",
-          quantity: 50,
-          price: 5000,
-        }),
-      ),
-      invRepository.save(
-        invRepository.create({
-          name: "Neumático 26",
-          type: "repuesto",
-          quantity: 30,
-          price: 10000,
-        }),
-      ),
-      invRepository.save(
-        invRepository.create({
-          name: "Neumático 29",
-          type: "repuesto",
-          quantity: 20,
-          price: 15000,
-        }),
-      ),
-      invRepository.save(
-        invRepository.create({
-          name: "Neumático 700",
-          type: "repuesto",
-          quantity: 20,
-          price: 15000,
-        }),
-      ),
-      invRepository.save(
-        invRepository.create({
-          name: "Cadena",
-          type: "repuesto",
-          quantity: 30,
-          price: 10000,
-        }),
-      ),
-    ]);
-    console.log("* => Inventario creado exitosamente");
-  } catch (error) {
-    console.error("Error al crear inventario:", error);
-  }
-}
-
-// Crear ventas
-async function createSales() {
-  try {
-    const saleRepository = AppDataSource.getRepository(Sale);
-
-    const count = await saleRepository.count();
-    if (count > 0) return;
-
-    const salesData = [
-      {
-        inventoryItemId: 1,
-        quantity: 1,
-      },
-      {
-        inventoryItemId: 2,
-        quantity: 2,
-      },
-    ];
-
-    await Promise.all(
-      salesData.map(sale => saleRepository.save(saleRepository.create(sale)))
-    );
-
-    console.log("* => Ventas creadas exitosamente");
-  } catch (error) {
-    console.error("Error al crear ventas:", error);
-  }
-}
-export { createUsers, createInv, createSales };
+export { createUsers };

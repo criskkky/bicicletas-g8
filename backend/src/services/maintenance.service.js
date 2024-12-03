@@ -36,36 +36,44 @@ async function revertirInventario(maintenance) {
 
 // Crear mantenimiento
 export async function createMaintenanceService(data) {
-  const { descripcion, rut, id_cliente, fecha_mantenimiento, inventoryItems } = data;
   const maintenanceRepository = AppDataSource.getRepository(Maintenance);
   const inventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
 
   try {
+    // Verificar usuario
+    const userExists = await userRepository.findOne({ where: { rut: data.rut } });
+    if (!userExists) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    // Crear mantenimiento
     const maintenance = maintenanceRepository.create({
-      descripcion,
-      rut, // Usar rut en lugar de id_user
-      id_cliente,
-      fecha_mantenimiento,
+      rut: data.rut,
+      id_cliente: data.id_cliente,
+      fecha_mantenimiento: data.fecha_mantenimiento,
+      descripcion: data.descripcion,
     });
     await maintenanceRepository.save(maintenance);
 
-    for (const item of inventoryItems) {
-      const { id_item, cantidad } = item;
-      const inventoryAdjustment = await ajustarInventario(id_item, -cantidad);
-      if (!inventoryAdjustment.success) {
-        throw new Error(inventoryAdjustment.message);
+    // Gestionar inventario
+    for (const item of data.inventoryItems) {
+      const inventoryItem = await inventoryRepository.findOne({ where: { id_item: item.id_item } });
+      if (!inventoryItem) {
+        throw new Error(`Ítem de inventario con ID ${item.id_item} no encontrado`);
       }
 
+      // Relación con mantenimiento
       const maintenanceInventory = inventoryRepository.create({
         id_mantenimiento: maintenance.id_mantenimiento,
-        id_item,
-        cantidad,
+        id_item: item.id_item,
+        cantidad: item.cantidad,
       });
       await inventoryRepository.save(maintenanceInventory);
     }
 
     return [maintenance, null];
   } catch (error) {
+    console.error("Error al crear mantenimiento:", error);
     return [null, error.message];
   }
 }
@@ -139,7 +147,7 @@ export async function deleteMaintenanceService(id_mantenimiento) {
     if (error.code === "23503") {
       return [null, {
         type: "foreign_key_violation",
-        message: `No se puede eliminar el mantenimiento con ID ${id_mantenimiento} porque está referenciado en otra tabla.`,
+        message: `No se puede eliminar el mantenimiento con ID ${id_mantenimiento}, está referenciado en otra tabla.`,
         detail: error.detail,
         constraint: error.constraint,
       }];

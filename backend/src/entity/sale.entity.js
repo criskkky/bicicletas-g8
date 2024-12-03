@@ -39,14 +39,23 @@ const SaleSchema = new EntitySchema({
     },
   },
   relations: {
-    inventoryItems: {
-      target: "VentaInventario",
+    maintenances: {
+      target: "Maintenance",
       type: "one-to-many",
-      inverseSide: "venta",
-      joinColumn: {
-        name: "id_venta",
-        referencedColumnName: "id_venta",
-      },
+      inverseSide: "usersRut", // Este alias debe coincidir con el campo en MaintenanceSchema
+      cascade: false, // No queremos que eliminar un usuario elimine sus mantenimientos
+    },
+    pagos: {
+      target: "Pagos",
+      type: "one-to-many",
+      inverseSide: "user", // Este alias debe coincidir con el campo en PagosSchema
+      cascade: false, // No queremos que eliminar un usuario elimine sus pagos
+    },
+    orders: {
+      target: "Order",
+      type: "one-to-many",
+      inverseSide: "user", // Este alias debe coincidir con el campo en OrderSchema
+      cascade: false, // No eliminar las órdenes si se elimina el usuario
     },
   },  
   indices: [

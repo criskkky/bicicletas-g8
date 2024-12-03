@@ -6,11 +6,11 @@ const VentaInventarioSchema = new EntitySchema({
   columns: {
     id_venta: {
       type: "int",
-      nullable: false,
+      primary: true, // Clave primaria compuesta
     },
     id_item: {
       type: "int",
-      nullable: false,
+      primary: true, // Clave primaria compuesta
     },
     cantidad: {
       type: "int",
@@ -27,18 +27,14 @@ const VentaInventarioSchema = new EntitySchema({
     venta: {
       target: "Sale",
       type: "many-to-one",
-      joinColumn: {
-        name: "id_venta",
-        referencedColumnName: "id_venta",
-      },
+      joinColumn: { name: "id_venta" },
+      onDelete: "CASCADE",
     },
     item: {
       target: "Inventory",
       type: "many-to-one",
-      joinColumn: {
-        name: "id_item",
-        referencedColumnName: "id_item",
-      },
+      joinColumn: { name: "id_item" },
+      onDelete: "CASCADE",
     },
   },
 });

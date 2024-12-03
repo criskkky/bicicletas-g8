@@ -45,7 +45,7 @@ export async function createSale(req, res) {
 
     // Crear la orden asociada
     const [order, orderError] = await createOrderService({
-      rut: req.user?.id, // Usuario responsable de la venta
+      rut: req.user?.rut,
       id_venta: sale.id_venta,
       fecha_orden: new Date().toISOString().split("T")[0],
       tipo_orden: "venta",

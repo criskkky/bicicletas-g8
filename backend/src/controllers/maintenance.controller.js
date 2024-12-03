@@ -12,24 +12,30 @@ export async function createMaintenance(req, res) {
   try {
     const { id_cliente, rut, fecha_mantenimiento, descripcion, inventoryItems } = req.body;
 
+    // Validar campos requeridos
     if (!id_cliente || !rut || !fecha_mantenimiento || !descripcion || !Array.isArray(inventoryItems)) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
+    // Verificar existencia del usuario
+    const userExists = await userRepository.findOne({ where: { rut } });
+    if (!userExists) {
+      return res.status(404).json({ error: "Usuario con ese RUT no encontrado" });
+    }
+
     // Crear el mantenimiento
     const [maintenance, maintenanceError] = await createMaintenanceService(req.body);
-
     if (maintenanceError) {
       return res.status(400).json({ error: maintenanceError });
     }
 
     // Crear la orden correspondiente al mantenimiento
     const [order, orderError] = await createOrderService({
-      rut: rut,
+      rut,
       id_mantenimiento: maintenance.id_mantenimiento,
       fecha_orden: new Date().toISOString().split("T")[0],
       tipo_orden: "mantenimiento",
-      total: 0, // Ajustar el total si es necesario
+      total: 0,
     });
 
     if (orderError) {
@@ -42,7 +48,6 @@ export async function createMaintenance(req, res) {
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 }
-
 
 export async function getMaintenance(req, res) {
   try {

@@ -39,7 +39,7 @@ const MaintenanceSchema = new EntitySchema({
     inventoryItems: {
       target: "MaintenanceInventory",
       type: "one-to-many",
-      inverseSide: "maintenance",
+      inverseSide: "maintenances",
       cascade: true, // el eliminar un mantenimiento, los quita de la tabla intermedia y revierte el stock en backend.
     },
     usersRut: {
