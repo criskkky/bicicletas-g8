@@ -5,7 +5,7 @@ import {
   getAllOrdersService,
   getOrderService,
   updateOrderService,
-} from "../services/order.service.js";
+} from "../services/orden.service.js";
 
 export async function getOrder(req, res) {
   try {
@@ -43,7 +43,6 @@ export async function createOrder(req, res) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    // Validar la relación entre id_venta y id_mantenimiento
     if (tipo_orden === "venta" && !id_venta) {
       return res.status(400).json({ error: "El ID de la venta es obligatorio para una orden de tipo 'venta'" });
     }
@@ -52,7 +51,6 @@ export async function createOrder(req, res) {
       return res.status(400).json({ error: "El ID del mantenimiento es obligatorio para una orden de tipo 'mantenimiento'" });
     }
 
-    // Crear la orden
     const [order, error] = await createOrderService({
       rut,
       id_mantenimiento,

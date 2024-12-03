@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createMaintenance } from '@services/maintenance.service.js'; // Este servicio debe ser creado para manejar la solicitud
+import { createMaintenance } from '@services/mantenimiento.service.js'; // Este servicio debe ser creado para manejar la solicitud
 
 const useCreateMaintenance = (setMaintenances) => {
     const [loading, setLoading] = useState(false);

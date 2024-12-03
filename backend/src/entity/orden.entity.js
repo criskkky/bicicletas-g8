@@ -1,13 +1,18 @@
+"use strict";
 import { EntitySchema } from "typeorm";
 
 const OrderSchema = new EntitySchema({
-  name: "Order",
+  name: "Orden",
   tableName: "ordenes",
   columns: {
     id_orden: {
       type: "int",
       primary: true,
       generated: true,
+    },
+    id_factura: {  // Añadido el ID de factura para cumplir con el MER
+      type: "int",
+      nullable: false,
     },
     id_mantenimiento: {
       type: "int",
@@ -32,6 +37,11 @@ const OrderSchema = new EntitySchema({
       scale: 2,
       nullable: false,
     },
+    estado_orden: { // Añadido para representar el estado de la orden
+      type: "enum",
+      enum: ["pendiente", "en proceso", "completada"],
+      nullable: false,
+    },
     createdAt: {
       type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
@@ -43,23 +53,30 @@ const OrderSchema = new EntitySchema({
     },
   },
   relations: {
-    usersRut: {
+    user: {
       target: "User",
       type: "many-to-one",
       joinColumn: {
         name: "rut",
       },
     },
-    maintenance: {
-      target: "Maintenance",
+    factura: {
+      target: "Factura",
+      type: "one-to-one",
+      joinColumn: {
+        name: "id_factura",
+      },
+    },
+    mantenimiento: {
+      target: "Mantenimiento",
       type: "many-to-one",
       joinColumn: {
         name: "id_mantenimiento",
         nullable: true,
       },
     },
-    sale: {
-      target: "Sale",
+    venta: {
+      target: "Venta",
       type: "many-to-one",
       joinColumn: {
         name: "id_venta",

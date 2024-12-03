@@ -1,4 +1,4 @@
-import { deleteSale } from '@services/sale.service.js';
+import { deleteSale } from '@services/ventas.service.js';
 
 const useDeleteSale = (setSales) => {
     const handleDelete = async (salesToDelete) => {

@@ -8,7 +8,7 @@ import {
   getAllMaintenance,
   getMaintenance,
   updateMaintenance
-} from "../controllers/maintenance.controller.js";
+} from "../controllers/mantenimiento.controller.js";
 
 const router = Router();
 

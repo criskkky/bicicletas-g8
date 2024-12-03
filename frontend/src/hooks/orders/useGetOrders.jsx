@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getOrders } from '@services/order.service.js'; 
+import { getOrders } from '@services/orden.service.js'; 
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetOrders = () => {

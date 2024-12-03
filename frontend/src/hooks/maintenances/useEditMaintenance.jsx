@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updateMaintenance } from '@services/maintenance.service.js';
+import { updateMaintenance } from '@services/mantenimiento.service.js';
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 import { formatMaintenancePostUpdate } from '@helpers/formatDataMaintenance.js';
 

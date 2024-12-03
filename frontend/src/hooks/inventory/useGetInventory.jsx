@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getInventory } from '@services/inventory.service.js'
+import { getInventory } from '@services/inventario.service.js'
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetInventory = () => {

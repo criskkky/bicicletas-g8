@@ -1,4 +1,4 @@
-import { deleteMaintenance } from '@services/maintenance.service.js';
+import { deleteMaintenance } from '@services/mantenimiento.service.js';
 import { deleteDataAlert, showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
 const useDeleteMaintenance = (fetchMaintenances, setDataMaintenance) => {

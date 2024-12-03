@@ -1,7 +1,8 @@
+"use strict";
 import { EntitySchema } from "typeorm";
 
 const PagosSchema = new EntitySchema({
-  name: "Pagos",
+  name: "Pago",
   tableName: "pago",
   columns: {
     id_pago: {
@@ -48,7 +49,7 @@ const PagosSchema = new EntitySchema({
     },
   },
   relations: {
-    usersRut: {
+    user: {  // Corregido para usar el nombre singular y adecuado
       target: "User",
       type: "many-to-one",
       joinColumn: {
@@ -56,13 +57,13 @@ const PagosSchema = new EntitySchema({
       },
     },
     order: {
-      target: "Order",
+      target: "Orden",
       type: "many-to-one",
       joinColumn: {
         name: "id_orden",
       },
     },
-  },  
+  },
   indices: [
     {
       name: "IDX_PAGO",

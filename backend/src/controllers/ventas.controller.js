@@ -8,9 +8,9 @@ import {
   restarInventarioService,
   updateSaleService,
   verificarInventarioService,
-} from "../services/sale.service.js";
+} from "../services/ventas.service.js";
 
-import { createOrderService } from "../services/order.service.js";
+import { createOrderService } from "../services/orden.service.js";
 
 export async function createSale(req, res) {
   try {
@@ -66,7 +66,9 @@ export async function createSale(req, res) {
 export async function getAllSales(req, res) {
   try {
     const [sales, error] = await getAllSalesService();
-    if (error) return res.status(400).json({ error });
+    if (error) {
+      return res.status(400).json({ error });
+    }
     res.status(200).json(sales);
   } catch (error) {
     console.error("Error al obtener las ventas:", error);
@@ -78,7 +80,9 @@ export async function getSaleById(req, res) {
   try {
     const { id } = req.params;
     const [sale, error] = await getSaleByIdService(id);
-    if (error) return res.status(404).json({ error });
+    if (error) {
+      return res.status(404).json({ error });
+    }
     res.status(200).json(sale);
   } catch (error) {
     console.error("Error al obtener la venta:", error);
@@ -104,7 +108,9 @@ export async function updateSale(req, res) {
 
     // Actualizar la venta
     const [sale, error] = await updateSaleService(id, { ...updateData, inventoryItems });
-    if (error) return res.status(404).json({ error: "Venta no encontrada" });
+    if (error) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
     res.status(200).json(sale);
   } catch (error) {
     console.error("Error al actualizar la venta:", error);
@@ -116,10 +122,6 @@ export async function deleteSale(req, res) {
   try {
     const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({ error: "ID de venta necesario" });
-    }
-
     const [sale, error] = await deleteSaleService(id);
     if (error) {
       return res.status(404).json({ error: "Venta no encontrada" });
@@ -128,6 +130,6 @@ export async function deleteSale(req, res) {
     res.status(200).json({ message: "Venta eliminada exitosamente", sale });
   } catch (error) {
     console.error("Error al eliminar la venta:", error);
-    return res.status(500).json({ error: "Error al eliminar la venta" });
+    return res.status(500).json({ error: "Error interno al eliminar la venta" });
   }
 }

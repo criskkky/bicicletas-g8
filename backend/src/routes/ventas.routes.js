@@ -9,7 +9,7 @@ import {
     getAllSales,
     getSaleById,
     updateSale
-} from "../controllers/sale.controller.js";
+} from "../controllers/ventas.controller.js";
 
 const router = Router();
 

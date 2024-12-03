@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteOrder } from "@services/order.service.js"; 
+import { deleteOrder } from "@services/orden.service.js"; 
 
 export const useDeleteOrder = (fetchOrders, setDataOrder) => {
   const [isLoading, setIsLoading] = useState(false);

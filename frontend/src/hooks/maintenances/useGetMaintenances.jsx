@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMaintenances } from '@services/maintenance.service.js';
+import { getMaintenances } from '@services/mantenimiento.service.js';
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetMaintenances = () => {

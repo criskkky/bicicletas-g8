@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createInventoryItem } from '@services/inventory.service.js';
+import { createInventoryItem } from '@services/inventario.service.js';
 
 
 const useCreateInventory = (setInventory) => {

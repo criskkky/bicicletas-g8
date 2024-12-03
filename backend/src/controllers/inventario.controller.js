@@ -5,7 +5,7 @@ import {
   getAllInventoryItemsService,
   getInventoryItemService,
   updateInventoryItemService,
-} from "../services/inventory.service.js";
+} from "../services/inventario.service.js";
 
 export async function getInventoryItem(req, res) {
   try {
@@ -39,6 +39,14 @@ export async function createInventoryItem(req, res) {
     const { nombre, marca, descripcion, stock, precio } = req.body;
     if (!nombre || !marca || !descripcion || stock === undefined || precio === undefined) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    // Validaciones adicionales
+    if (stock < 0) {
+      return res.status(400).json({ error: "El stock no puede ser negativo" });
+    }
+    if (precio <= 0) {
+      return res.status(400).json({ error: "El precio debe ser mayor que cero" });
     }
 
     const [item, error] = await createInventoryItemService(req.body);

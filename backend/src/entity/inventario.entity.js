@@ -1,7 +1,8 @@
+"use strict";
 import { EntitySchema } from "typeorm";
 
 const InventorySchema = new EntitySchema({
-  name: "Inventory",
+  name: "Inventario",
   tableName: "inventario",
   columns: {
     id_item: {
@@ -15,7 +16,8 @@ const InventorySchema = new EntitySchema({
       nullable: false,
     },
     marca: {
-      type: "text",
+      type: "varchar", // Ajustado de 'text' a 'varchar' para alinearse con el MER
+      length: 255,     // Añadida la longitud para alinearse con el MER
       nullable: false,
     },
     descripcion: {
@@ -43,24 +45,17 @@ const InventorySchema = new EntitySchema({
     },
   },
   relations: {
-    maintenanceItems: {
-      target: "MaintenanceInventory",
+    mantenimientoInventario: {
+      target: "MantenimientoInventario",
       type: "one-to-many",
-      inverseSide: "inventoryItem",
+      inverseSide: "item",
     },
-    sales: {
-      target: "Sale",
+    ventaInventario: {
+      target: "VentaInventario",
       type: "one-to-many",
-      inverseSide: "inventory",
+      inverseSide: "item",
     },
   },
-  indices: [
-    {
-      name: "IDX_INVENTORY",
-      columns: ["id_item"],
-      unique: true,
-    },
-  ],
 });
 
 export default InventorySchema;

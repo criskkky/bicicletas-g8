@@ -8,7 +8,7 @@ import {
     getAllOrders,
     getOrder,
     updateOrder
-    } from "../controllers/order.controller.js";
+    } from "../controllers/orden.controller.js";
 
 const router = Router();
 

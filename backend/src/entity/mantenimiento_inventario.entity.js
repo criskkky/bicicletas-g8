@@ -1,7 +1,8 @@
+"use strict";
 import { EntitySchema } from "typeorm";
 
 const MaintenanceInventorySchema = new EntitySchema({
-  name: "MaintenanceInventory",
+  name: "MantenimientoInventario",
   tableName: "mantenimiento_inventario",
   columns: {
     id: {
@@ -27,17 +28,17 @@ const MaintenanceInventorySchema = new EntitySchema({
     },
   },
   relations: {
-    maintenances: {
-      target: "Maintenance",
+    mantenimiento: {
+      target: "Mantenimiento",
       type: "many-to-one",
       joinColumn: { name: "id_mantenimiento" },
-      onDelete: "CASCADE",
+      onDelete: "CASCADE", // Manteniendo la opción de eliminar en cascada como estaba definido
     },
-    inventoryItem: {
-      target: "Inventory",
+    item: {
+      target: "Inventario",
       type: "many-to-one",
       joinColumn: { name: "id_item" },
-      onDelete: "CASCADE",
+      onDelete: "CASCADE", // Manteniendo la opción de eliminar en cascada como estaba definido
     },
   },
 });

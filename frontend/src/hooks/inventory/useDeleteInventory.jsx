@@ -1,4 +1,4 @@
-import { deleteInventoryItem } from '@services/inventory.service.js';
+import { deleteInventoryItem } from '@services/inventario.service.js';
 import { deleteDataAlert, showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
 const useDeleteInventory = (fetchInventory, setDataInventory) => {

@@ -8,25 +8,14 @@ import {
   updatePagoService,
 } from "../services/pagos.service.js";
 
-import { getOrderService } from "../services/order.service.js";
-
 export async function createPago(req, res) {
   try {
     const { rut, id_orden, cantidad_ordenes_realizadas, fecha_pago, metodo_pago } = req.body;
 
     // Validar campos obligatorios
-    if (!rut || !id_orden || !cantidad_ordenes_realizadas || !fecha_pago || !metodo_pago) {
-      return res.status(400).json({ error: "Faltan campos requeridos" });
+    if (!rut || !id_orden || cantidad_ordenes_realizadas <= 0 || !fecha_pago || !metodo_pago) {
+      return res.status(400).json({ error: "Faltan campos requeridos o son inválidos" });
     }
-
-    // Verificar la existencia de la orden
-    const [order, orderError] = await getOrderService(id_orden);
-    if (orderError) {
-      return res.status(404).json({ error: "Orden no encontrada" });
-    }
-
-    // Calcular el monto total
-    const monto = order.total * cantidad_ordenes_realizadas;
 
     // Crear el pago
     const [pago, error] = await createPagoService({
@@ -35,11 +24,10 @@ export async function createPago(req, res) {
       cantidad_ordenes_realizadas,
       fecha_pago,
       metodo_pago,
-      monto,
     });
 
     if (error) {
-      return res.status(400).json({ error });
+      return res.status(400).json({ error: error.message });
     }
 
     res.status(201).json({ message: "Pago creado con éxito", pago });
@@ -85,7 +73,14 @@ export async function updatePago(req, res) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
-    const [pago, error] = await updatePagoService(id, req.body);
+    const [pago, error] = await updatePagoService(id, {
+      rut,
+      id_orden,
+      cantidad_ordenes_realizadas,
+      fecha_pago,
+      metodo_pago,
+    });
+
     if (error) {
       return res.status(404).json({ error: "Pago no encontrado" });
     }

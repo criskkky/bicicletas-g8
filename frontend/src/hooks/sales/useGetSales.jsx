@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getSales } from '@services/sale.service.js';
+import { getSales } from '@services/ventas.service.js';
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetSales = () => {

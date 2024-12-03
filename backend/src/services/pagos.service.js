@@ -40,17 +40,29 @@ export async function createPagoService(pagoData) {
 }
 
 export async function updatePagoService(id_pago, pagoData) {
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
   try {
-    const pagosRepository = AppDataSource.getRepository(PagosEntity);
+    const pagosRepository = queryRunner.manager.getRepository(PagosEntity);
     const pago = await pagosRepository.findOne({ where: { id_pago } });
-    if (!pago) return [null, "Pago no encontrado"];
-    
-    await pagosRepository.update({ id_pago }, { ...pagoData, updatedAt: new Date() });
-    const updatedPago = await pagosRepository.findOne({ where: { id_pago } });
-    return [updatedPago, null];
+    if (!pago) {
+      await queryRunner.rollbackTransaction();
+      return [null, "Pago no encontrado"];
+    }
+
+    pagosRepository.merge(pago, pagoData);
+    await pagosRepository.save(pago);
+
+    await queryRunner.commitTransaction();
+    return [pago, null];
   } catch (error) {
+    await queryRunner.rollbackTransaction();
     console.error("Error al actualizar el pago:", error);
     return [null, "Error interno del servidor"];
+  } finally {
+    await queryRunner.release();
   }
 }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createSale } from '@services/sale.service.js';
+import { createSale } from '@services/ventas.service.js';
 
 const useCreateSale = (setSales) => {
     const [loading, setLoading] = useState(false);

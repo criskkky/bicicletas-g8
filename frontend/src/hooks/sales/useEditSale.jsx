@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updateSale } from '@services/sale.service.js'; 
+import { updateSale } from '@services/ventas.service.js'; 
 
 const useEditSale = (setSales) => {
     const [dataSale, setDataSale] = useState(null);

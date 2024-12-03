@@ -1,7 +1,8 @@
+"use strict";
 import { EntitySchema } from "typeorm";
 
 const MaintenanceSchema = new EntitySchema({
-  name: "Maintenance",
+  name: "Mantenimiento",
   tableName: "mantenimiento",
   columns: {
     id_mantenimiento: {
@@ -9,8 +10,8 @@ const MaintenanceSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    id_cliente: {
-      type: "int",
+    rut_cliente: {
+      type: "varchar",
       nullable: false,
     },
     fecha_mantenimiento: {
@@ -33,17 +34,15 @@ const MaintenanceSchema = new EntitySchema({
   },
   relations: {
     inventoryItems: {
-      target: "MaintenanceInventory",
+      target: "MantenimientoInventario",
       type: "one-to-many",
-      inverseSide: "maintenances",
-      cascade: true, // el eliminar un mantenimiento, los quita de la tabla intermedia y revierte el stock en backend.
+      inverseSide: "mantenimiento",
     },
-    usersRut: {
+    user: {
       target: "User",
       type: "many-to-one",
       joinColumn: { name: "rut" },
       inverseSide: "maintenances",
-      cascade: false, // el eliminar un mantenimiento no elimina al usuario.
     },
   },
 });

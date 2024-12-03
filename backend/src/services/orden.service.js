@@ -1,5 +1,5 @@
 import { AppDataSource } from "../config/configDb.js";
-import Order from "../entity/order.entity.js";
+import Order from "../entity/orden.entity.js";
 
 export async function getOrderService(id_orden) {
   try {
@@ -38,30 +38,54 @@ export async function createOrderService(orderData) {
 }
 
 export async function updateOrderService(id_orden, orderData) {
-  try {
-    const orderRepository = AppDataSource.getRepository(Order);
-    const order = await orderRepository.findOne({ where: { id_orden } });
-    if (!order) return [null, "Orden no encontrada"];
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
 
-    await orderRepository.update({ id_orden }, { ...orderData, updatedAt: new Date() });
-    const updatedOrder = await orderRepository.findOne({ where: { id_orden } });
-    return [updatedOrder, null];
+  try {
+    const orderRepository = queryRunner.manager.getRepository(Order);
+    const order = await orderRepository.findOne({ where: { id_orden } });
+    if (!order) {
+      await queryRunner.rollbackTransaction();
+      return [null, "Orden no encontrada"];
+    }
+
+    orderRepository.merge(order, orderData);
+    await orderRepository.save(order);
+
+    await queryRunner.commitTransaction();
+    return [order, null];
   } catch (error) {
+    await queryRunner.rollbackTransaction();
     console.error("Error al actualizar la orden:", error);
     return [null, "Error interno del servidor"];
+  } finally {
+    await queryRunner.release();
   }
 }
 
 export async function deleteOrderService(id_orden) {
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
   try {
-    const orderRepository = AppDataSource.getRepository(Order);
+    const orderRepository = queryRunner.manager.getRepository(Order);
     const order = await orderRepository.findOne({ where: { id_orden } });
-    if (!order) return [null, "Orden no encontrada"];
+    if (!order) {
+      await queryRunner.rollbackTransaction();
+      return [null, "Orden no encontrada"];
+    }
 
     await orderRepository.remove(order);
+
+    await queryRunner.commitTransaction();
     return [order, null];
   } catch (error) {
+    await queryRunner.rollbackTransaction();
     console.error("Error al eliminar la orden:", error);
     return [null, "Error interno del servidor"];
+  } finally {
+    await queryRunner.release();
   }
 }

@@ -1,7 +1,7 @@
 "use strict";
 import User from "../entity/user.entity.js";
-// import Inventory from "../entity/inventory.entity.js";
-// import Sale from "../entity/sale.entity.js";
+// import Inventory from "../entity/inventario.entity.js";
+// import Sale from "../entity/ventas.entity.js";
 import { AppDataSource } from "./configDb.js";
 import { encryptPassword } from "../helpers/bcrypt.helper.js";
 
