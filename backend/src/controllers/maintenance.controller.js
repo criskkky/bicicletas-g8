@@ -7,9 +7,12 @@ import {
   updateMaintenanceService,
 } from "../services/maintenance.service.js";
 import { createOrderService } from "../services/order.service.js";
+import { AppDataSource } from "../config/configDb.js";
+import User from "../entity/user.entity.js";
 
 export async function createMaintenance(req, res) {
   try {
+    const userRepository = AppDataSource.getRepository(User);
     const { id_cliente, rut, fecha_mantenimiento, descripcion, inventoryItems } = req.body;
 
     // Validar campos requeridos

@@ -2,6 +2,8 @@ import { AppDataSource } from "../config/configDb.js";
 import Maintenance from "../entity/maintenance.entity.js";
 import MaintenanceInventory from "../entity/maintenance_inventory.entity.js";
 import InventoryItem from "../entity/inventory.entity.js";
+import User from "../entity/user.entity.js";
+
 
 // Ajustar inventario
 async function ajustarInventario(inventoryItemId, quantityChange) {
@@ -37,43 +39,56 @@ async function revertirInventario(maintenance) {
 // Crear mantenimiento
 export async function createMaintenanceService(data) {
   const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-  const inventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
+  const maintenanceInventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
+  const inventoryRepository = AppDataSource.getRepository(InventoryItem); // Define el repositorio InventoryItem
+  const userRepository = AppDataSource.getRepository(User); // Define el repositorio User
 
   try {
-    // Verificar usuario
+    console.log("Iniciando creación de mantenimiento:", data);
+
+    // Verifica si el usuario existe
     const userExists = await userRepository.findOne({ where: { rut: data.rut } });
     if (!userExists) {
+      console.error("Usuario no encontrado:", data.rut);
       throw new Error("Usuario no encontrado");
     }
 
-    // Crear mantenimiento
+    // Crear el mantenimiento
     const maintenance = maintenanceRepository.create({
       rut: data.rut,
       id_cliente: data.id_cliente,
       fecha_mantenimiento: data.fecha_mantenimiento,
       descripcion: data.descripcion,
     });
+
+    console.log("Guardando mantenimiento en la base de datos:", maintenance);
     await maintenanceRepository.save(maintenance);
+
+    console.log("Mantenimiento guardado correctamente:", maintenance);
 
     // Gestionar inventario
     for (const item of data.inventoryItems) {
+      console.log("Procesando ítem de inventario:", item);
+
       const inventoryItem = await inventoryRepository.findOne({ where: { id_item: item.id_item } });
       if (!inventoryItem) {
+        console.error("Ítem de inventario no encontrado:", item.id_item);
         throw new Error(`Ítem de inventario con ID ${item.id_item} no encontrado`);
       }
 
-      // Relación con mantenimiento
-      const maintenanceInventory = inventoryRepository.create({
+      const maintenanceInventory = maintenanceInventoryRepository.create({
         id_mantenimiento: maintenance.id_mantenimiento,
         id_item: item.id_item,
         cantidad: item.cantidad,
       });
-      await inventoryRepository.save(maintenanceInventory);
+
+      console.log("Creando relación mantenimiento-inventario:", maintenanceInventory);
+      await maintenanceInventoryRepository.save(maintenanceInventory);
     }
 
     return [maintenance, null];
   } catch (error) {
-    console.error("Error al crear mantenimiento:", error);
+    console.error("Error en createMaintenanceService:", error);
     return [null, error.message];
   }
 }

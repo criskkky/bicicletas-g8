@@ -13,10 +13,6 @@ const MaintenanceSchema = new EntitySchema({
       type: "int",
       nullable: false,
     },
-    rut: { // del trabajador
-      type: "int",
-      nullable: false,
-    },
     fecha_mantenimiento: {
       type: "date",
       nullable: false,
