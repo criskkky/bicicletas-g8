@@ -10,19 +10,19 @@ const PagosSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    id_orden: {
+    cantidad_ordenes_realizadas: { // Calculado en service.
       type: "int",
       nullable: false,
     },
-    cantidad_ordenes_realizadas: {
+    horas_trabajadas: { // Calculado en service. Gracias a la relación con Ordenes.
       type: "int",
       nullable: false,
     },
-    fecha_pago: {
+    fecha_pago: { // Establecer fecha de pago
       type: "date",
       nullable: false,
     },
-    monto: {
+    monto: { // Calculado en service.
       type: "decimal",
       precision: 10,
       scale: 2,
