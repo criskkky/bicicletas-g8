@@ -1,4 +1,4 @@
-import { deletePayment } from '@services/payment.service.js'; // Servicio adaptado para pagos
+import { deletePayment } from '@services/pagos.service.js'; // Servicio adaptado para pagos
 import { deleteDataAlert, showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
 const useDeletePayment = (fetchPayments, setDataPayment) => {

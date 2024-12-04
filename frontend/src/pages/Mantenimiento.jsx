@@ -1,5 +1,5 @@
 import Table from '@components/Table';
-import useMaintenances from '@hooks/maintenances/useGetMaintenances.jsx';
+import useMaintenances from '@hooks/mantenimiento/useGetMaintenances.jsx';
 import Search from '../components/Search';
 import Popup from '../components/PopupMaintenance';
 import DeleteIcon from '../assets/deleteIcon.svg';
@@ -8,9 +8,9 @@ import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/maintenances.css';
-import useEditMaintenance from '@hooks/maintenances/useEditMaintenance';
-import useDeleteMaintenance from '@hooks/maintenances/useDeleteMaintenance';
-import useCreateMaintenance from '@hooks/maintenances/useCreateMaintenance';
+import useEditMaintenance from '@hooks/mantenimiento/useEditMaintenance';
+import useDeleteMaintenance from '@hooks/mantenimiento/useDeleteMaintenance';
+import useCreateMaintenance from '@hooks/mantenimiento/useCreateMaintenance';
 
 const Maintenance = () => {
   const { maintenances, fetchMaintenances, setMaintenances } = useMaintenances();
@@ -23,37 +23,36 @@ const Maintenance = () => {
   } = useEditMaintenance(setMaintenances);
 
   const { handleDelete } = useDeleteMaintenance(fetchMaintenances, setDataMaintenance);
-  const { handleCreate } = useCreateMaintenance(setMaintenances); // Manejo de creación
-  const [showPopup, setShowPopup] = useState(false); // Estado para controlar el popup
+  const { handleCreate } = useCreateMaintenance(setMaintenances);
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
   };
 
-  // Maneja los mantenimientos seleccionados desde la tabla
   const handleSelectionChange = useCallback(
     (selectedMaintenances) => {
-      setDataMaintenance(selectedMaintenances.length > 0 ? selectedMaintenances[0] : {}); // Selecciona solo el primero
+      setDataMaintenance(selectedMaintenances.length > 0 ? selectedMaintenances[0] : {});
     },
     [setDataMaintenance]
   );
 
   const columns = [
-    { title: 'ID MNT', field: 'id', width: 100, responsive: 0 },
-    { title: 'Descripción', field: 'description', width: 350, responsive: 4 },
-    { title: 'Técnico Asignado', field: 'technician', width: 300, responsive: 3 },
-    { title: 'Estado', field: 'status', width: 150, responsive: 0 },
-    { title: 'Fecha', field: 'date', width: 200, responsive: 0 },
+    { title: 'ID Mantenimiento', field: 'id_mantenimiento', width: 100, responsive: 0 },
+    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 300, responsive: 1 },
+    { title: 'Cliente (RUT)', field: 'rut_cliente', width: 300, responsive: 1 },
+    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 4 },
+    { title: 'Fecha Mantenimiento', field: 'fecha_mantenimiento', width: 200, responsive: 1 },
     {
-      title: 'ID(s) de artículo(s) usado(s)', 
-      field: 'inventoryItems', 
-      width: 300, 
+      title: 'Artículos Usados',
+      field: 'items', // Ajuste para reflejar el campo correcto
+      width: 300,
       responsive: 3,
       render: rowData => (
-        rowData.inventoryItems && rowData.inventoryItems.length > 0 && (
-          rowData.inventoryItems.map(item => (
-            <div key={item.idUsedItem}>
-              {`ID: ${item.idUsedItem}, Cantidad: ${item.quantityUsed}`}
+        rowData.items && rowData.items.length > 0 && (
+          rowData.items.map(item => (
+            <div key={item.id_item}>
+              {`ID Artículo: ${item.id_item}, Cantidad: ${item.cantidad}`}
             </div>
           ))
         )
@@ -64,12 +63,12 @@ const Maintenance = () => {
   ];
 
   const handleUpdateClick = () => {
-    setShowPopup(true); // Abre el popup en modo edición
+    setShowPopup(true);
   };
 
   const handleDeleteClick = () => {
-    if (dataMaintenance && dataMaintenance.id) {
-      handleDelete([dataMaintenance]); // Llama al handler de eliminación solo si 'dataMaintenance' tiene un ID
+    if (dataMaintenance && dataMaintenance.id_mantenimiento) {
+      handleDelete([dataMaintenance]);
     }
   };
 
@@ -79,18 +78,18 @@ const Maintenance = () => {
         <div className="top-table">
           <h1 className="title-table">Mantenimientos</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID de Mantenimiento'} />
             {/* Botón de editar */}
-            <button onClick={handleUpdateClick} disabled={!dataMaintenance.id}>
-              {dataMaintenance.id ? (
+            <button onClick={handleUpdateClick} disabled={!dataMaintenance.id_mantenimiento}>
+              {dataMaintenance.id_mantenimiento ? (
                 <img src={UpdateIcon} alt="edit" />
               ) : (
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
             {/* Botón de eliminar */}
-            <button className="delete-maintenance-button" onClick={handleDeleteClick} disabled={!dataMaintenance.id}>
-              {dataMaintenance.id ? (
+            <button className="delete-maintenance-button" onClick={handleDeleteClick} disabled={!dataMaintenance.id_mantenimiento}>
+              {dataMaintenance.id_mantenimiento ? (
                 <img src={DeleteIcon} alt="delete" />
               ) : (
                 <img src={DeleteIconDisable} alt="delete-disabled" />
@@ -106,8 +105,8 @@ const Maintenance = () => {
           data={maintenances}
           columns={columns}
           filter={filterId}
-          dataToFilter="id"
-          onSelectionChange={handleSelectionChange} // Actualiza la selección según selección en la tabla
+          dataToFilter="id_mantenimiento"
+          onSelectionChange={handleSelectionChange}
         />
       </div>
 
@@ -116,7 +115,7 @@ const Maintenance = () => {
         show={showPopup}
         setShow={setShowPopup}
         data={dataMaintenance}
-        action={dataMaintenance.id ? handleUpdate : handleCreate} // Crear o actualizar
+        action={dataMaintenance.id_mantenimiento ? handleUpdate : handleCreate}
       />
     </div>
   );

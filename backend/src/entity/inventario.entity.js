@@ -48,12 +48,12 @@ const InventorySchema = new EntitySchema({
     mantenimientoInventario: {
       target: "MantenimientoInventario",
       type: "one-to-many",
-      inverseSide: "item",
+      inverseSide: "items",
     },
     ventaInventario: {
       target: "VentaInventario",
       type: "one-to-many",
-      inverseSide: "item",
+      inverseSide: "items",
     },
   },
 });

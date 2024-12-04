@@ -1,14 +1,14 @@
 import Table from '@components/Table';
-import useInventory from '@hooks/inventory/useGetInventory';
+import useInventory from '@hooks/inventario/useGetInventory';
 import Search from '../components/Search';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
-import useEditInventory from '@hooks/inventory/useEditInventory';
-import useDeleteInventory from '@hooks/inventory/useDeleteInventory';
-import useCreateInventory from '@hooks/inventory/useCreateInventory';
+import useEditInventory from '@hooks/inventario/useEditInventory';
+import useDeleteInventory from '@hooks/inventario/useDeleteInventory';
+import useCreateInventory from '@hooks/inventario/useCreateInventory';
 import PopupInventory from '../components/PopupInventory';
 
 const Inventory = () => {

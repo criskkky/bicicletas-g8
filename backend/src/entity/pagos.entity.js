@@ -10,19 +10,24 @@ const PagosSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    cantidad_ordenes_realizadas: { // Calculado en service.
+    rut_trabajador: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
+    cantidad_ordenes_realizadas: {
       type: "int",
       nullable: false,
     },
-    horas_trabajadas: { // Calculado en service. Gracias a la relación con Ordenes.
+    horas_trabajadas: {
       type: "int",
       nullable: false,
     },
-    fecha_pago: { // Establecer fecha de pago
+    fecha_pago: {
       type: "date",
       nullable: false,
     },
-    monto: { // Calculado en service.
+    monto: {
       type: "decimal",
       precision: 10,
       scale: 2,
@@ -49,19 +54,11 @@ const PagosSchema = new EntitySchema({
     },
   },
   relations: {
-    user: {  // Corregido para usar el nombre singular y adecuado
-      target: "User",
-      type: "many-to-one",
-      joinColumn: {
-        name: "rut",
-      },
-    },
-    order: {
+    ordenes: {
       target: "Orden",
-      type: "many-to-one",
-      joinColumn: {
-        name: "id_orden",
-      },
+      type: "one-to-many",
+      inverseSide: "pago",
+      cascade: true,
     },
   },
   indices: [

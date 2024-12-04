@@ -1,15 +1,15 @@
 import Table from '@components/Table';
-import useSales from '@hooks/sales/useGetSales';
-import useInventory from '@hooks/inventory/useGetInventory';
+import useSales from '@hooks/ventas/useGetSales';
+import useInventory from '@hooks/inventario/useGetInventory';
 import Search from '../components/Search';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
-import useEditSale from '@hooks/sales/useEditSale';
-import useDeleteSale from '@hooks/sales/useDeleteSale';
-import useCreateSale from '@hooks/sales/useCreateSale';
+import useEditSale from '@hooks/ventas/useEditSale';
+import useDeleteSale from '@hooks/ventas/useDeleteSale';
+import useCreateSale from '@hooks/ventas/useCreateSale';
 import PopupSale from '../components/PopupSale';
 
 const Sales = () => {

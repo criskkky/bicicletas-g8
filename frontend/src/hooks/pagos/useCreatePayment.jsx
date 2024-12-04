@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createPayment } from '@services/payment.service.js'; // Servicio adaptado para manejar la creación de pagos
+import { createPayment } from '@services/pagos.service.js'; // Servicio adaptado para manejar la creación de pagos
 
 const useCreatePayment = (setPayments) => {
     const [loading, setLoading] = useState(false);

@@ -34,11 +34,11 @@ const MaintenanceInventorySchema = new EntitySchema({
       joinColumn: { name: "id_mantenimiento" },
       onDelete: "CASCADE", // Manteniendo la opción de eliminar en cascada como estaba definido
     },
-    item: {
+    items: {
       target: "Inventario",
       type: "many-to-one",
       joinColumn: { name: "id_item" },
-      onDelete: "CASCADE", // Manteniendo la opción de eliminar en cascada como estaba definido
+      onDelete: "SET NULL", // Esto hace que si se elimina un item, la venta no se elimine.
     },
   },
 });

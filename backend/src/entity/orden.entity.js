@@ -5,16 +5,17 @@ const OrdenesSchema = new EntitySchema({
   name: "Orden",
   tableName: "ordenes",
   columns: {
+    rut_trabajador: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
     id_orden: {
       type: "int",
       primary: true,
       generated: true,
     },
     id_factura: {
-      type: "int",
-      nullable: false,
-    },
-    rut: {
       type: "int",
       nullable: false,
     },
@@ -68,18 +69,31 @@ const OrdenesSchema = new EntitySchema({
     factura: {
       target: "Factura",
       type: "many-to-one",
-      joinColumn: {
-        name: "id_factura",
-      },
+      joinColumn: { name: "id_factura" },
+      inverseSide: "ordenes",
     },
-    user: {
-      target: "User",
+    mantenimiento: {
+      target: "Mantenimiento",
       type: "many-to-one",
-      joinColumn: {
-        name: "rut",
-      },
+      joinColumn: { name: "id_mantenimiento" },
+      inverseSide: "ordenes",
+      nullable: true,
     },
-  },
+    venta: {
+      target: "Venta",
+      type: "many-to-one",
+      joinColumn: { name: "id_venta" },
+      inverseSide: "ordenes",
+      nullable: true,
+    },
+    pago: {
+      target: "Pago",
+      type: "many-to-one",
+      joinColumn: { name: "id_pago" }, // Asegúrate de que exista `id_pago` en la tabla `ordenes`
+      inverseSide: "ordenes",
+      nullable: true,
+    },
+  },  
 });
 
 export default OrdenesSchema;

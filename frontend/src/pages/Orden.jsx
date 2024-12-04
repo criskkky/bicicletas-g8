@@ -1,5 +1,5 @@
 import Table from '@components/Table';
-import useOrders from '@hooks/orders/useGetOrders';
+import useOrders from '@hooks/orden/useGetOrders';
 import Search from '../components/Search';
 import PopupOrder from '../components/PopupOrder';
 import DeleteIcon from '../assets/deleteIcon.svg';
@@ -8,9 +8,9 @@ import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/orders.css';
-import useEditOrder from '@hooks/orders/useEditOrder';
-import useDeleteOrder from '@hooks/orders/useDeleteOrder';  
-import useCreateOrder from '@hooks/orders/useCreateOrder';
+import useEditOrder from '@hooks/orden/useEditOrder';
+import useDeleteOrder from '@hooks/orden/useDeleteOrder';  
+import useCreateOrder from '@hooks/orden/useCreateOrder';
 
 const Order = () => {
   const { orders, fetchOrders, setOrders } = useOrders();

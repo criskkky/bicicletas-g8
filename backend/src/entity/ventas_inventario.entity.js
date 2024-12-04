@@ -36,7 +36,7 @@ const VentaInventarioSchema = new EntitySchema({
       joinColumn: { name: "id_venta" },
       onDelete: "CASCADE", // Si se elimina una venta, se eliminen todos los registros de venta_inventario asociados.
     },
-    item: {
+    items: {
       target: "Inventario",
       type: "many-to-one",
       joinColumn: { name: "id_item" },

@@ -16,23 +16,18 @@ const useGetMaintenances = () => {
 
             // Formatear los datos
             const formattedData = response.map(maintenance => {
-                let inventoryDetails;
-                if (maintenance.inventoryItems && maintenance.inventoryItems.length > 0) {
-                    // Si inventoryItems existe, extraemos los ids y las cantidades
-                    inventoryDetails = maintenance.inventoryItems.map(item => {
-                        return `ID: ${item.inventory_id} (Cantidad: ${item.quantityUsed})`;  // Cambiado a claves correctas
-                    }).join(', ');  // Unir los elementos con una coma
-                } else {
-                    inventoryDetails = 'N/A';  // Si no existen items, retorna 'N/A'
-                }
+                const items = maintenance.inventoryItems?.map(item => ({
+                    id_item: item.inventory_id,
+                    cantidad: item.quantityUsed,
+                })) || []; // Asegura que sea un array incluso si no hay items
 
                 return {
-                    id: maintenance.id,
-                    description: maintenance.description,
-                    technician: maintenance.technician,
-                    status: maintenance.status,
-                    date: maintenance.date,
-                    inventoryItems: inventoryDetails,  // Muestra los detalles como un string
+                    id_mantenimiento: maintenance.id,
+                    descripcion: maintenance.description,
+                    rut_trabajador: maintenance.technician, // Se espera que sea el RUT
+                    rut_cliente: maintenance.client, // Se espera que sea el RUT
+                    fecha_mantenimiento: maintenance.date,
+                    items, // Mantiene el array de objetos
                     createdAt: maintenance.createdAt,
                     updatedAt: maintenance.updatedAt,
                 };

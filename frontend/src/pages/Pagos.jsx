@@ -1,5 +1,5 @@
 import Table from '@components/Table';
-import usePayments from '@hooks/payments/useGetPayments.jsx';
+import usePayments from '@hooks/pagos/useGetPayments.jsx';
 import Search from '../components/Search';
 import Popup from '../components/PopupPayment';
 import DeleteIcon from '../assets/deleteIcon.svg';
@@ -8,9 +8,9 @@ import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/payments.css';
-import useEditPayment from '@hooks/payments/useEditPayment';
-import useDeletePayment from '@hooks/payments/useDeletePayment';
-import useCreatePayment from '@hooks/payments/useCreatePayment';
+import useEditPayment from '@hooks/pagos/useEditPayment';
+import useDeletePayment from '@hooks/pagos/useDeletePayment';
+import useCreatePayment from '@hooks/pagos/useCreatePayment';
 
 const Payment = () => {
   const { payments, fetchPayments, setPayments } = usePayments();

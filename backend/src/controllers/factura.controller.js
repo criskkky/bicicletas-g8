@@ -10,17 +10,17 @@ import {
 
 export async function createFactura(req, res) {
   try {
-    const { rut, rut_cliente, fecha_factura, metodo_pago, total, tipo_factura } = req.body;
+    const { rut_cliente, rut_trabajador, fecha_factura, metodo_pago, total, tipo_factura } = req.body;
 
     // Validar campos obligatorios
-    if (!rut || !rut_cliente || !fecha_factura || !metodo_pago || total === undefined || !tipo_factura) {
+    if (!rut_cliente || !rut_trabajador || !fecha_factura || !metodo_pago || total === undefined || !tipo_factura) {
       return res.status(400).json({ error: "Faltan campos requeridos" });
     }
 
     // Crear la factura
     const [factura, error] = await createFacturaService({
-      rut,
       rut_cliente,
+      rut_trabajador,
       fecha_factura,
       metodo_pago,
       total,
@@ -68,15 +68,23 @@ export async function getFacturaById(req, res) {
 export async function updateFactura(req, res) {
   try {
     const { id } = req.params;
-    const { rut, rut_cliente, fecha_factura, metodo_pago, total, tipo_factura } = req.body;
+    const { rut_cliente, rut_trabajador, fecha_factura, metodo_pago, total, tipo_factura } = req.body;
 
-    if (!rut && !rut_cliente && !fecha_factura && !metodo_pago && total === undefined && !tipo_factura) {
+    // Validar que al menos un campo se haya proporcionado para actualizar
+    if (
+      !rut_cliente
+      && !rut_trabajador
+      && !fecha_factura
+      && !metodo_pago
+      && total === undefined
+      && !tipo_factura
+    ) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
     const [factura, error] = await updateFacturaService(id, {
-      rut,
       rut_cliente,
+      rut_trabajador,
       fecha_factura,
       metodo_pago,
       total,

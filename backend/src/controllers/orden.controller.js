@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 "use strict";
 import {
   createOrderService,
@@ -36,10 +37,19 @@ export async function getAllOrders(req, res) {
 
 export async function createOrder(req, res) {
   try {
-    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total, hora_inicio, hora_fin } = req.body;
+    const {
+      id_mantenimiento,
+      id_venta,
+      fecha_orden,
+      tipo_orden,
+      total,
+      hora_inicio,
+      hora_fin,
+      rut_trabajador,
+    } = req.body;
 
     // Validación de campos obligatorios según el tipo de orden
-    if (!rut || !tipo_orden || !fecha_orden || total === undefined) {
+    if (!tipo_orden || !fecha_orden || total === undefined || !rut_trabajador) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -52,7 +62,6 @@ export async function createOrder(req, res) {
     }
 
     const [order, error] = await createOrderService({
-      rut,
       id_mantenimiento,
       id_venta,
       fecha_orden,
@@ -60,6 +69,7 @@ export async function createOrder(req, res) {
       total,
       hora_inicio,
       hora_fin,
+      rut_trabajador,
     });
 
     if (error) {
@@ -76,15 +86,7 @@ export async function createOrder(req, res) {
 export async function updateOrder(req, res) {
   try {
     const { id } = req.params;
-    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total, hora_inicio, hora_fin } = req.body;
-
-    // Validar que al menos un campo se haya proporcionado para actualizar
-    if (!rut && !id_mantenimiento && !id_venta && !fecha_orden && !tipo_orden && total === undefined && !hora_inicio && !hora_fin) {
-      return res.status(400).json({ error: "No hay campos para actualizar" });
-    }
-
-    const [order, error] = await updateOrderService(id, {
-      rut,
+    const {
       id_mantenimiento,
       id_venta,
       fecha_orden,
@@ -92,6 +94,35 @@ export async function updateOrder(req, res) {
       total,
       hora_inicio,
       hora_fin,
+      estado_orden,
+      rut_trabajador,
+    } = req.body;
+
+    // Validar que al menos un campo se haya proporcionado para actualizar
+    if (
+      !id_mantenimiento &&
+      !id_venta &&
+      !fecha_orden &&
+      !tipo_orden &&
+      total === undefined &&
+      !hora_inicio &&
+      !hora_fin &&
+      !estado_orden &&
+      !rut_trabajador
+    ) {
+      return res.status(400).json({ error: "No hay campos para actualizar" });
+    }
+
+    const [order, error] = await updateOrderService(id, {
+      id_mantenimiento,
+      id_venta,
+      fecha_orden,
+      tipo_orden,
+      total,
+      hora_inicio,
+      hora_fin,
+      estado_orden,
+      rut_trabajador,
     });
 
     if (error) {

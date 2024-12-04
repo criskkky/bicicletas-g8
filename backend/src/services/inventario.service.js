@@ -1,10 +1,10 @@
 "use strict";
 
 import { AppDataSource } from "../config/configDb.js";
-import InventoryItem from "../entity/inventario.entity.js";
+import Inventario from "../entity/inventario.entity.js";
 
 export async function createInventoryItemService(itemData) {
-  const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+  const inventoryRepository = AppDataSource.getRepository(Inventario);
   try {
     const newItem = inventoryRepository.create(itemData);
     await inventoryRepository.save(newItem);
@@ -16,7 +16,7 @@ export async function createInventoryItemService(itemData) {
 }
 
 export async function getAllInventoryItemsService() {
-  const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+  const inventoryRepository = AppDataSource.getRepository(Inventario);
   try {
     const items = await inventoryRepository.find();
     if (items.length === 0) return [null, "No hay ítems en el inventario"];
@@ -28,7 +28,7 @@ export async function getAllInventoryItemsService() {
 }
 
 export async function getInventoryItemService(id_item) {
-  const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+  const inventoryRepository = AppDataSource.getRepository(Inventario);
   try {
     const item = await inventoryRepository.findOne({ where: { id_item } });
     if (!item) return [null, "Ítem no encontrado"];
@@ -40,7 +40,7 @@ export async function getInventoryItemService(id_item) {
 }
 
 export async function updateInventoryItemService(id_item, itemData) {
-  const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+  const inventoryRepository = AppDataSource.getRepository(Inventario);
   try {
     const item = await inventoryRepository.findOne({ where: { id_item } });
     if (!item) return [null, "Ítem no encontrado"];
@@ -55,7 +55,7 @@ export async function updateInventoryItemService(id_item, itemData) {
 }
 
 export async function deleteInventoryItemService(id_item) {
-  const inventoryRepository = AppDataSource.getRepository(InventoryItem);
+  const inventoryRepository = AppDataSource.getRepository(Inventario);
   try {
     const item = await inventoryRepository.findOne({ where: { id_item } });
     if (!item) {

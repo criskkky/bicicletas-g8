@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updatePayment } from '@services/payment.service.js'; // Servicio adaptado para pagos
+import { updatePayment } from '@services/pagos.service.js'; // Servicio adaptado para pagos
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 import { formatPaymentPostUpdate } from '@helpers/formatDataPayment.js'; // Helper para formatear los datos de pagos
 

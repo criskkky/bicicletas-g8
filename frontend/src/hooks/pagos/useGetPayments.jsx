@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPayments } from '@services/payment.service.js'; // Servicio adaptado para pagos
+import { getPayments } from '@services/pagos.service.js'; // Servicio adaptado para pagos
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetPayments = () => {

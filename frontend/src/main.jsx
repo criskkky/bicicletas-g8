@@ -4,14 +4,14 @@ import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
 import Register from '@pages/Register';
-import Sales from '@pages/Sales';
+import Ventas from '@pages/Ventas';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
-import Maintenance from '@pages/Maintenance';
-import Orders from '@pages/Orders'; // Importa la nueva página de órdenes
-import Inventory from '@pages/Inventory';
+import Mantenimiento from '@pages/Mantenimiento';
+import Orden from '@pages/Orden'; // Importa la nueva página de órdenes
+import Inventario from '@pages/Inventario';
 import Pagos from '@pages/Pagos';
 
 const router = createBrowserRouter([
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
         path: '/maintenance',
         element: (
           <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
-            <Maintenance />
+            <Mantenimiento />
           </ProtectedRoute>
         ),
       },
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
         path: '/orders',  // Nueva ruta para las órdenes
         element: (
           <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
-            <Orders />
+            <Orden />
           </ProtectedRoute>
         ),
       },
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         path: '/sales',
         element: (
           <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
-            <Sales />
+            <Ventas />
           </ProtectedRoute>
         ),
       },
@@ -60,7 +60,7 @@ const router = createBrowserRouter([
         path: '/inventory',
         element: (
           <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
-            <Inventory />
+            <Inventario />
           </ProtectedRoute>
         ),
       },
