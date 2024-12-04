@@ -12,7 +12,7 @@ export async function getOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await getOrderService(id);
     if (error) {
-      return res.status(404).json({ error: error });
+      return res.status(404).json({ error });
     }
     return res.status(200).json(order);
   } catch (error) {
@@ -25,7 +25,7 @@ export async function getAllOrders(req, res) {
   try {
     const [orders, error] = await getAllOrdersService();
     if (error) {
-      return res.status(404).json({ error: error });
+      return res.status(404).json({ error });
     }
     return res.status(200).json(orders);
   } catch (error) {
@@ -36,7 +36,7 @@ export async function getAllOrders(req, res) {
 
 export async function createOrder(req, res) {
   try {
-    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total } = req.body;
+    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total, hora_inicio, hora_fin } = req.body;
 
     // Validación de campos obligatorios según el tipo de orden
     if (!rut || !tipo_orden || !fecha_orden || total === undefined) {
@@ -58,10 +58,12 @@ export async function createOrder(req, res) {
       fecha_orden,
       tipo_orden,
       total,
+      hora_inicio,
+      hora_fin,
     });
 
     if (error) {
-      return res.status(400).json({ error: error });
+      return res.status(400).json({ error });
     }
 
     return res.status(201).json({ message: "Orden creada con éxito", order });
@@ -74,10 +76,10 @@ export async function createOrder(req, res) {
 export async function updateOrder(req, res) {
   try {
     const { id } = req.params;
-    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total } = req.body;
+    const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total, hora_inicio, hora_fin } = req.body;
 
     // Validar que al menos un campo se haya proporcionado para actualizar
-    if (!rut && !id_mantenimiento && !id_venta && !fecha_orden && !tipo_orden && total === undefined) {
+    if (!rut && !id_mantenimiento && !id_venta && !fecha_orden && !tipo_orden && total === undefined && !hora_inicio && !hora_fin) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
 
@@ -88,10 +90,12 @@ export async function updateOrder(req, res) {
       fecha_orden,
       tipo_orden,
       total,
+      hora_inicio,
+      hora_fin,
     });
 
     if (error) {
-      return res.status(404).json({ error: error });
+      return res.status(404).json({ error });
     }
 
     return res.status(200).json({ message: "Orden actualizada con éxito", order });
@@ -106,7 +110,7 @@ export async function deleteOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await deleteOrderService(id);
     if (error) {
-      return res.status(404).json({ error: error });
+      return res.status(404).json({ error });
     }
     return res.status(200).json({ message: "Orden eliminada exitosamente", order });
   } catch (error) {

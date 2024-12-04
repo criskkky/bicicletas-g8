@@ -1,7 +1,7 @@
 "use strict";
 import { EntitySchema } from "typeorm";
 
-const OrderSchema = new EntitySchema({
+const OrdenesSchema = new EntitySchema({
   name: "Orden",
   tableName: "ordenes",
   columns: {
@@ -10,7 +10,11 @@ const OrderSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
-    id_factura: {  // Añadido el ID de factura para cumplir con el MER
+    id_factura: {
+      type: "int",
+      nullable: false,
+    },
+    rut: {
       type: "int",
       nullable: false,
     },
@@ -37,10 +41,18 @@ const OrderSchema = new EntitySchema({
       scale: 2,
       nullable: false,
     },
-    estado_orden: { // Añadido para representar el estado de la orden
+    estado_orden: {
       type: "enum",
       enum: ["pendiente", "en proceso", "completada"],
       nullable: false,
+    },
+    hora_inicio: {
+      type: "timestamp",
+      nullable: true,
+    },
+    hora_fin: {
+      type: "timestamp",
+      nullable: true,
     },
     createdAt: {
       type: "timestamp",
@@ -53,6 +65,13 @@ const OrderSchema = new EntitySchema({
     },
   },
   relations: {
+    factura: {
+      target: "Factura",
+      type: "many-to-one",
+      joinColumn: {
+        name: "id_factura",
+      },
+    },
     user: {
       target: "User",
       type: "many-to-one",
@@ -60,37 +79,7 @@ const OrderSchema = new EntitySchema({
         name: "rut",
       },
     },
-    factura: {
-      target: "Factura",
-      type: "one-to-one",
-      joinColumn: {
-        name: "id_factura",
-      },
-    },
-    mantenimiento: {
-      target: "Mantenimiento",
-      type: "many-to-one",
-      joinColumn: {
-        name: "id_mantenimiento",
-        nullable: true,
-      },
-    },
-    venta: {
-      target: "Venta",
-      type: "many-to-one",
-      joinColumn: {
-        name: "id_venta",
-        nullable: true,
-      },
-    },
   },
-  indices: [
-    {
-      name: "IDX_ORDENES",
-      columns: ["id_orden"],
-      unique: true,
-    },
-  ],
 });
 
-export default OrderSchema;
+export default OrdenesSchema;

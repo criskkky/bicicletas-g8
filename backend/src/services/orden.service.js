@@ -31,7 +31,14 @@ export async function getAllOrdersService() {
 export async function createOrderService(orderData) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    const newOrder = orderRepository.create(orderData);
+    
+    // Creación de la orden, incluyendo hora_inicio y hora_fin si se proporcionan
+    const newOrder = orderRepository.create({
+      ...orderData,
+      hora_inicio: orderData.hora_inicio ? new Date(orderData.hora_inicio) : null,
+      hora_fin: orderData.hora_fin ? new Date(orderData.hora_fin) : null,
+    });
+
     await orderRepository.save(newOrder);
     return [newOrder, null];
   } catch (error) {
@@ -47,6 +54,14 @@ export async function updateOrderService(id_orden, orderData) {
     const order = await orderRepository.findOne({ where: { id_orden } });
     if (!order) {
       return [null, "Orden no encontrada"];
+    }
+
+    // Actualizar hora_inicio y hora_fin si se proporcionan
+    if (orderData.hora_inicio) {
+      order.hora_inicio = new Date(orderData.hora_inicio);
+    }
+    if (orderData.hora_fin) {
+      order.hora_fin = new Date(orderData.hora_fin);
     }
 
     orderRepository.merge(order, orderData);
