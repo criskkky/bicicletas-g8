@@ -9,21 +9,20 @@ import {
 
 export async function createMaintenance(req, res) {
   try {
-    const { rut_cliente, rut, fecha_mantenimiento, descripcion, inventoryItems } = req.body;
-    console.log("Inicio de creación de mantenimiento, RUT del trabajador:", rut);
+    const { rut_cliente, rut_trabajador, fecha_mantenimiento, descripcion, items } = req.body;
 
-    // Validación de campos obligatorios, `inventoryItems` es opcional
-    if (!rut_cliente || !rut || !fecha_mantenimiento || !descripcion) {
+    // Validación de campos obligatorios, `items` es opcional
+    if (!rut_cliente || !rut_trabajador || !fecha_mantenimiento || !descripcion) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
     // Llamada al servicio para crear mantenimiento
     const [maintenance, invoice, order, error] = await createMaintenanceService({
       rut_cliente,
-      rut,
+      rut_trabajador,
       fecha_mantenimiento,
       descripcion,
-      inventoryItems, // Puede ser nulo
+      items, // Puede ser nulo
     });
 
     if (error) {
@@ -31,7 +30,6 @@ export async function createMaintenance(req, res) {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
 
-    console.log("Mantenimiento creado con éxito");
     res.status(201).json({ message: "Mantenimiento creado con éxito", maintenance, invoice, order });
   } catch (error) {
     console.error("Error al crear el mantenimiento:", error);
@@ -84,10 +82,10 @@ export async function updateMaintenance(req, res) {
     // Mezcla los valores existentes con los nuevos valores proporcionados
     const updatedData = {
       rut_cliente: req.body.rut_cliente ?? currentMaintenance.rut_cliente,
-      rut: req.body.rut ?? currentMaintenance.rut,
+      rut_trabajador: req.body.rut_trabajador ?? currentMaintenance.rut_trabajador,
       fecha_mantenimiento: req.body.fecha_mantenimiento ?? currentMaintenance.fecha_mantenimiento,
       descripcion: req.body.descripcion ?? currentMaintenance.descripcion,
-      inventoryItems: req.body.inventoryItems ?? currentMaintenance.inventoryItems, // Si no se proporciona, se mantiene el actual
+      items: req.body.items ?? currentMaintenance.items, // Si no se proporciona, se mantiene el actual
     };
 
     const { success, maintenance, message } = await updateMaintenanceService(id, updatedData);

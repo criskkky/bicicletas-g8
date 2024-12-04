@@ -3,8 +3,13 @@ import { EntitySchema } from "typeorm";
 
 const MaintenanceSchema = new EntitySchema({
   name: "Mantenimiento",
-  tableName: "mantenimiento",
+  tableName: "mantenimientos",
   columns: {
+    rut_trabajador: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
     id_mantenimiento: {
       type: "int",
       primary: true,
@@ -33,16 +38,18 @@ const MaintenanceSchema = new EntitySchema({
     },
   },
   relations: {
-    inventoryItems: {
-      target: "MantenimientoInventario",
-      type: "one-to-many",
-      inverseSide: "mantenimiento",
-    },
     user: {
       target: "User",
       type: "many-to-one",
-      joinColumn: { name: "rut" },
-      inverseSide: "maintenances",
+      joinColumn: { name: "rut_trabajador", referencedColumnName: "rut" },
+      inverseSide: "mantenimientos", // En plural para indicar que un trabajador puede tener múltiples mantenimientos
+      onDelete: "RESTRICT", // No se puede eliminar un trabajador si tiene mantenimientos asociados
+    },
+    items: {
+      target: "MantenimientoInventario",
+      type: "one-to-many",
+      inverseSide: "mantenimiento",
+      onDelete: "CASCADE", // Si se elimina un mantenimiento también todos los registros de MantenimientoInventario
     },
   },
 });

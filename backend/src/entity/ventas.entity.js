@@ -5,13 +5,18 @@ const SaleSchema = new EntitySchema({
   name: "Venta",
   tableName: "venta",
   columns: {
+    rut_trabajador: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
     id_venta: {
       type: "int",
       primary: true,
       generated: true,
     },
     rut_cliente: {
-      type: "int",
+      type: "varchar",
       nullable: false,
     },
     fecha_venta: {
@@ -35,13 +40,14 @@ const SaleSchema = new EntitySchema({
     },
   },
   relations: {
-    usuario: {  // Relación con el trabajador que realiza la venta
+    user: {
       target: "User",
       type: "many-to-one",
-      joinColumn: { name: "rut" },
-      onDelete: "RESTRICT", // No se puede eliminar un trabajador si tiene ventas asociadas.
+      joinColumn: { name: "rut_trabajador", referencedColumnName: "rut" },
+      inverseSide: "ordenes",
+      onDelete: "RESTRICT", // No se puede eliminar un trabajador si tiene mantenimientos asociados
     },
-    ventaInventario: {  // Relación con VentaInventario
+    items: {  // Relación con VentaInventario
       target: "VentaInventario",
       type: "one-to-many",
       inverseSide: "venta",

@@ -3,6 +3,7 @@
 import { AppDataSource } from "../config/configDb.js";
 import PagosEntity from "../entity/pagos.entity.js";
 import Order from "../entity/orden.entity.js";
+import { In } from "typeorm";
 
 // Servicio para crear un nuevo pago
 export async function createPagoService(pagoData) {
@@ -10,34 +11,35 @@ export async function createPagoService(pagoData) {
     const pagosRepository = AppDataSource.getRepository(PagosEntity);
     const orderRepository = AppDataSource.getRepository(Order);
 
-    // Obtener órdenes completadas por el trabajador
-    const completedOrders = await orderRepository.find({
+    // Obtener las órdenes por sus IDs usando `In` para múltiples valores
+    const orders = await orderRepository.find({
       where: {
-        rut: pagoData.rut,
-        estado_orden: "completada",
+        id_orden: In(pagoData.id_ordenes),
       },
     });
 
+    if (orders.length === 0) {
+      return [null, "No se encontraron órdenes para los IDs proporcionados"];
+    }
+
     // Calcular horas trabajadas y cantidad de órdenes realizadas
     let totalHorasTrabajadas = 0;
-    let cantidadOrdenesRealizadas = completedOrders.length;
+    let cantidadOrdenesRealizadas = orders.length;
 
-    for (const order of completedOrders) {
+    for (const order of orders) {
       if (order.hora_inicio && order.hora_fin) {
-        // Calcular la diferencia entre hora_inicio y hora_fin en horas
         const horasTrabajadas = (new Date(order.hora_fin) - new Date(order.hora_inicio)) / (1000 * 60 * 60);
         totalHorasTrabajadas += horasTrabajadas;
       }
     }
 
     // Calcular el monto basado en una tarifa fija
-    const tarifaPorHora = 10; // Tarifa por hora, puede ser ajustada según la lógica del negocio
+    const tarifaPorHora = 10;
     const monto = totalHorasTrabajadas * tarifaPorHora;
 
     // Crear el nuevo pago
     const newPago = pagosRepository.create({
-      rut: pagoData.rut,
-      id_orden: pagoData.id_orden,
+      rut_trabajador: pagoData.rut_trabajador,
       cantidad_ordenes_realizadas: cantidadOrdenesRealizadas,
       horas_trabajadas: totalHorasTrabajadas,
       fecha_pago: pagoData.fecha_pago,
@@ -46,7 +48,15 @@ export async function createPagoService(pagoData) {
       estado: pagoData.estado,
     });
 
+    // Guardar el pago
     await pagosRepository.save(newPago);
+
+    // Actualizar cada orden con el id del pago creado
+    for (const order of orders) {
+      order.pago = newPago;
+      await orderRepository.save(order);
+    }
+
     return [newPago, null];
   } catch (error) {
     console.error("Error al crear el pago:", error);
@@ -58,9 +68,32 @@ export async function createPagoService(pagoData) {
 export async function updatePagoService(id_pago, pagoData) {
   try {
     const pagosRepository = AppDataSource.getRepository(PagosEntity);
-    const pago = await pagosRepository.findOne({ where: { id_pago } });
+    const orderRepository = AppDataSource.getRepository(Order);
+    const pago = await pagosRepository.findOne({ where: { id_pago }, relations: ["ordenes"] });
     if (!pago) {
       return [null, "Pago no encontrado"];
+    }
+
+    if (pagoData.id_ordenes) {
+      const orders = await orderRepository.findBy({
+        id: In(pagoData.id_ordenes)
+      });      
+      
+      if (orders.length === 0) {
+        return [null, "No se encontraron órdenes para los IDs proporcionados"];
+      }
+
+      // Desasociar las órdenes previas
+      for (const order of pago.ordenes) {
+        order.pago = null;
+        await orderRepository.save(order);
+      }
+
+      // Asociar las nuevas órdenes al pago
+      for (const order of orders) {
+        order.pago = pago;
+        await orderRepository.save(order);
+      }
     }
 
     pagosRepository.merge(pago, pagoData);
@@ -77,7 +110,7 @@ export async function updatePagoService(id_pago, pagoData) {
 export async function getPagoService(id_pago) {
   try {
     const pagosRepository = AppDataSource.getRepository(PagosEntity);
-    const pago = await pagosRepository.findOne({ where: { id_pago } });
+    const pago = await pagosRepository.findOne({ where: { id_pago }, relations: ["ordenes"] });
     if (!pago) return [null, "Pago no encontrado"];
     return [pago, null];
   } catch (error) {
@@ -90,7 +123,7 @@ export async function getPagoService(id_pago) {
 export async function getAllPagosService() {
   try {
     const pagosRepository = AppDataSource.getRepository(PagosEntity);
-    const pagos = await pagosRepository.find();
+    const pagos = await pagosRepository.find({ relations: ["ordenes"] });
     if (!pagos || pagos.length === 0) return [null, "No hay pagos registrados"];
     return [pagos, null];
   } catch (error) {
@@ -103,8 +136,14 @@ export async function getAllPagosService() {
 export async function deletePagoService(id_pago) {
   try {
     const pagosRepository = AppDataSource.getRepository(PagosEntity);
-    const pago = await pagosRepository.findOne({ where: { id_pago } });
+    const pago = await pagosRepository.findOne({ where: { id_pago }, relations: ["ordenes"] });
     if (!pago) return [null, "Pago no encontrado"];
+
+    // Desasociar las órdenes antes de eliminar el pago
+    for (const order of pago.ordenes) {
+      order.pago = null;
+      await AppDataSource.getRepository(Order).save(order);
+    }
 
     await pagosRepository.remove(pago);
     return [pago, null];

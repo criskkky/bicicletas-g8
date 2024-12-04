@@ -10,6 +10,19 @@ const FacturaSchema = new EntitySchema({
       primary: true,
       generated: true,
     },
+    id_venta: {
+      type: "int",
+      nullable: true,
+    },
+    id_mantenimiento: {
+      type: "int",
+      nullable: true,
+    },
+    rut_trabajador: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
     rut_cliente: {
       type: "varchar",
       nullable: false,
@@ -45,11 +58,17 @@ const FacturaSchema = new EntitySchema({
     },
   },
   relations: {
-    user: {
-      target: "User",
-      type: "one-to-one",
-      joinColumn: { name: "rut" },
-      inverseSide: "facturas",
+    venta: {
+      target: "Venta",
+      type: "many-to-one",
+      joinColumn: { name: "id_venta", referencedColumnName: "id_venta" },
+      onDelete: "CASCADE", // Si se elimina una venta también se elimina la factura asociada.
+    },
+    mantenimiento: {
+      target: "Mantenimiento",
+      type: "many-to-one",
+      joinColumn: { name: "id_mantenimiento", referencedColumnName: "id_mantenimiento" },
+      onDelete: "CASCADE", // Si se elimina un mantenimiento también se elimina la factura asociada.
     },
   },
 });

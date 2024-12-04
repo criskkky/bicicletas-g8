@@ -10,15 +10,21 @@ import {
 
 export async function createSale(req, res) {
   try {
-    const { rut_cliente, fecha_venta, items, rut } = req.body;
+    const { rut_cliente, fecha_venta, items, rut_trabajador } = req.body;
 
     // Validar campos obligatorios
-    if (!rut_cliente || !fecha_venta || !Array.isArray(items) || items.length === 0 || !rut) {
+    if (!rut_cliente || !fecha_venta || !Array.isArray(items) || items.length === 0 || !rut_trabajador) {
       return res.status(400).json({ error: "Faltan campos requeridos o los ítems están vacíos" });
     }
 
     // Crear la venta
-    const [sale, saleError] = await createSaleService(req.body);
+    const [sale, saleError] = await createSaleService({
+      rut_cliente,
+      fecha_venta,
+      items,
+      rut_trabajador,
+    });
+
     if (saleError) {
       return res.status(400).json({ error: saleError });
     }
@@ -80,15 +86,21 @@ export async function getSaleById(req, res) {
 export async function updateSale(req, res) {
   try {
     const { id } = req.params;
-    const { rut_cliente, fecha_venta, items } = req.body;
+    const { rut_cliente, fecha_venta, items, rut_trabajador } = req.body;
 
     // Validar que al menos un campo se haya proporcionado
-    if (!rut_cliente && !fecha_venta && (!items || items.length === 0)) {
+    if (!rut_cliente && !fecha_venta && (!items || items.length === 0) && !rut_trabajador) {
       return res.status(400).json({ error: "No se proporcionaron datos para actualizar" });
     }
 
     // Actualizar la venta
-    const [sale, error] = await updateSaleService(id, req.body);
+    const [sale, error] = await updateSaleService(id, {
+      rut_cliente,
+      fecha_venta,
+      items,
+      rut_trabajador,
+    });
+
     if (error) {
       return res.status(404).json({ error });
     }
