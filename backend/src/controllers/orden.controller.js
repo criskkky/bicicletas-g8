@@ -12,9 +12,9 @@ export async function getOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await getOrderService(id);
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error: error });
     }
-    return res.json(order);
+    return res.status(200).json(order);
   } catch (error) {
     console.error("Error al obtener la orden:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
@@ -25,9 +25,9 @@ export async function getAllOrders(req, res) {
   try {
     const [orders, error] = await getAllOrdersService();
     if (error) {
-      return res.status(404).json({ error: "No se encontraron órdenes" });
+      return res.status(404).json({ error: error });
     }
-    return res.json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
     console.error("Error al obtener las órdenes:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
@@ -61,10 +61,10 @@ export async function createOrder(req, res) {
     });
 
     if (error) {
-      return res.status(400).json({ error });
+      return res.status(400).json({ error: error });
     }
 
-    return res.status(201).json(order);
+    return res.status(201).json({ message: "Orden creada con éxito", order });
   } catch (error) {
     console.error("Error al crear la orden:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
@@ -76,6 +76,7 @@ export async function updateOrder(req, res) {
     const { id } = req.params;
     const { rut, id_mantenimiento, id_venta, fecha_orden, tipo_orden, total } = req.body;
 
+    // Validar que al menos un campo se haya proporcionado para actualizar
     if (!rut && !id_mantenimiento && !id_venta && !fecha_orden && !tipo_orden && total === undefined) {
       return res.status(400).json({ error: "No hay campos para actualizar" });
     }
@@ -90,10 +91,10 @@ export async function updateOrder(req, res) {
     });
 
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error: error });
     }
 
-    return res.json(order);
+    return res.status(200).json({ message: "Orden actualizada con éxito", order });
   } catch (error) {
     console.error("Error al actualizar la orden:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
@@ -105,9 +106,9 @@ export async function deleteOrder(req, res) {
     const { id } = req.params;
     const [order, error] = await deleteOrderService(id);
     if (error) {
-      return res.status(404).json({ error: "Orden no encontrada" });
+      return res.status(404).json({ error: error });
     }
-    return res.json({ message: "Orden eliminada exitosamente", order });
+    return res.status(200).json({ message: "Orden eliminada exitosamente", order });
   } catch (error) {
     console.error("Error al eliminar la orden:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
