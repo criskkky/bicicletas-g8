@@ -4,6 +4,7 @@ import MaintenanceInventory from "../entity/mantenimiento_inventario.entity.js";
 import InventoryItem from "../entity/inventario.entity.js";
 import User from "../entity/user.entity.js";
 import Invoice from "../entity/factura.entity.js";
+import Order from "../entity/orden.entity.js";
 
 // Ajustar inventario para los ítems de mantenimiento
 async function ajustarInventario(inventoryItemId, quantityChange) {
@@ -18,190 +19,213 @@ async function ajustarInventario(inventoryItemId, quantityChange) {
   return { success: true, item };
 }
 
-// Función para revertir inventario en caso de error o eliminación
-async function revertirInventario(maintenance) {
-  const inventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
-  const inventoryItems = await inventoryRepository.find({
-    where: { id_mantenimiento: maintenance.id_mantenimiento },
-    relations: ["inventoryItem"],
-  });
-
-  for (const item of inventoryItems) {
-    const inventoryAdjustment = await ajustarInventario(item.inventoryItem.id_item, item.cantidad);
-    if (!inventoryAdjustment.success) {
-      return { success: false, message: inventoryAdjustment.message };
-    }
-  }
-
-  return { success: true };
-}
-
+// Crear mantenimiento sin transacciones
 export async function createMaintenanceService(data) {
-  const queryRunner = AppDataSource.createQueryRunner();
-  await queryRunner.connect();
-  await queryRunner.startTransaction();
-
   try {
-    const userRepository = queryRunner.manager.getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { rut: data.rut } });
     if (!user) throw new Error("Usuario no encontrado");
 
-    const maintenanceRepository = queryRunner.manager.getRepository(Maintenance);
+    const maintenanceRepository = AppDataSource.getRepository(Maintenance);
     const maintenance = maintenanceRepository.create({
-      rut: user.rut, // Asignar el rut del usuario
+      rut: user.rut,
       rut_cliente: data.rut_cliente,
       fecha_mantenimiento: data.fecha_mantenimiento,
       descripcion: data.descripcion,
     });
 
-    for (const itemData of data.inventoryItems) {
-      const item = await queryRunner.manager.findOne(InventoryItem, { where: { id_item: itemData.id_item } });
-      if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
+    await maintenanceRepository.save(maintenance); // Guardar el mantenimiento antes de asociar otros elementos
 
-      const maintenanceInventoryItem = queryRunner.manager.getRepository(MaintenanceInventory).create({
-        maintenance: maintenance,
-        item: item,
-        cantidad: itemData.cantidad,
-        precio_costo: item.precio * itemData.cantidad
-      });
+    let total = 0;
 
-      if (!maintenance.inventoryItems) {
-        maintenance.inventoryItems = [];
+    if (data.inventoryItems && Array.isArray(data.inventoryItems)) {
+      const maintenanceInventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
+      for (const itemData of data.inventoryItems) {
+        const item = await AppDataSource.getRepository(InventoryItem).findOne({ where: { id_item: itemData.id_item } });
+        if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
+
+        const maintenanceInventoryItem = maintenanceInventoryRepository.create({
+          id_mantenimiento: maintenance.id_mantenimiento,
+          id_item: item.id_item,
+          cantidad: itemData.cantidad,
+          precio_costo: item.precio * itemData.cantidad,
+        });
+
+        await maintenanceInventoryRepository.save(maintenanceInventoryItem);
+
+        // Sumar el costo de este ítem al total
+        total += item.precio * itemData.cantidad;
       }
-      maintenance.inventoryItems.push(maintenanceInventoryItem);
-      await queryRunner.manager.save(maintenanceInventoryItem);
     }
 
-    const invoiceRepository = queryRunner.manager.getRepository(Invoice);
+    // Crear una factura con el total calculado
+    const invoiceRepository = AppDataSource.getRepository(Invoice);
     const invoice = invoiceRepository.create({
       rut_cliente: data.rut_cliente,
-      total: calculateTotal(maintenance.inventoryItems),
+      total: total, // Utiliza el total calculado
       fecha_factura: new Date(),
-      metodo_pago: "pendiente",
-      tipo_factura: "mantenimiento"
+      metodo_pago: "efectivo",
+      tipo_factura: "mantenimiento",
     });
 
-    maintenance.invoice = invoice;
+    await invoiceRepository.save(invoice);
 
-    await queryRunner.manager.save(maintenance);
-    await queryRunner.manager.save(invoice);
-
-    // Crear la orden correspondiente
-    const orderRepository = queryRunner.manager.getRepository(Order);  // Asegúrate de tener esta entidad definida
+    // Crear una orden correspondiente
+    const orderRepository = AppDataSource.getRepository(Order);
     const order = orderRepository.create({
-      maintenance: maintenance,
-      invoice: invoice,
+      id_mantenimiento: maintenance.id_mantenimiento,
+      id_factura: invoice.id_factura,
+      rut: user.rut,
       fecha_orden: new Date(),
       estado_orden: "pendiente",
-      total: invoice.total
+      total: invoice.total,
+      tipo_orden: "mantenimiento",
     });
 
-    await queryRunner.manager.save(order);
+    await orderRepository.save(order);
 
-    await queryRunner.commitTransaction();
     return [maintenance, invoice, order, null];
   } catch (error) {
-    console.error("Error en la transacción:", error);
-    await queryRunner.rollbackTransaction();
+    console.error("Error en la creación del mantenimiento:", error);
     return [null, null, null, error];
-  } finally {
-    await queryRunner.release();
   }
 }
 
-function calculateTotal(items) {
-  return items.reduce((acc, item) => acc + item.precio_costo * item.cantidad, 0);
-
-}
-
+// Obtener todos los mantenimientos
 export async function getAllMaintenanceService() {
   const maintenanceRepository = AppDataSource.getRepository(Maintenance);
   return await maintenanceRepository.find({ relations: ["inventoryItems"] });
 }
 
+// Obtener un mantenimiento específico
 export async function getMaintenanceService(id) {
   const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-  return await maintenanceRepository.findOne(id, { relations: ["inventoryItems"] });
+  return await maintenanceRepository.findOne({ where: { id_mantenimiento: id }, relations: ["inventoryItems"] });
 }
 
+// Actualizar mantenimiento sin transacciones
 export async function updateMaintenanceService(id, data) {
-  const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-  const maintenance = await maintenanceRepository.findOne(id, { relations: ["inventoryItems"] });
-
-  if (!maintenance) return { success: false, message: "Mantenimiento no encontrado" };
-
-  const queryRunner = AppDataSource.createQueryRunner();
-  await queryRunner.connect();
-  await queryRunner.startTransaction();
-
   try {
-    maintenance.fecha_mantenimiento = data.fecha_mantenimiento;
-    maintenance.descripcion = data.descripcion;
+    const maintenanceRepository = AppDataSource.getRepository(Maintenance);
+    const maintenance = await maintenanceRepository.findOne({ 
+      where: { id_mantenimiento: id }, 
+      relations: ["inventoryItems", "invoice"] // Asegurarse de cargar también la factura
+    });
 
-    for (const itemData of data.inventoryItems) {
-      const item = await queryRunner.manager.findOne(InventoryItem, { where: { id_item: itemData.id_item } });
-      if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
+    if (!maintenance) {
+      return { success: false, message: "Mantenimiento no encontrado" };
+    }
 
-      const maintenanceInventoryItem = maintenance.inventoryItems.find((item) => item.id_item === itemData.id_item);
+    // Actualizar solo los campos que hayan sido proporcionados
+    maintenance.rut_cliente = data.rut_cliente ?? maintenance.rut_cliente;
+    maintenance.rut = data.rut ?? maintenance.rut;
+    maintenance.fecha_mantenimiento = data.fecha_mantenimiento ?? maintenance.fecha_mantenimiento;
+    maintenance.descripcion = data.descripcion ?? maintenance.descripcion;
 
-      if (maintenanceInventoryItem) {
-        maintenanceInventoryItem.cantidad = itemData.cantidad;
-        maintenanceInventoryItem.precio_costo = item.precio * itemData.cantidad;
-        await queryRunner.manager.save(maintenanceInventoryItem);
-      } else {
-        const newMaintenanceInventoryItem = queryRunner.manager.getRepository(MaintenanceInventory).create({
-          maintenance: maintenance,
-          item: item,
-          cantidad: itemData.cantidad,
-          precio_costo: item.precio * itemData.cantidad
-        });
+    let total = 0;
 
-        maintenance.inventoryItems.push(newMaintenanceInventoryItem);
-        await queryRunner.manager.save(newMaintenanceInventoryItem);
+    if (data.inventoryItems && Array.isArray(data.inventoryItems)) {
+      const maintenanceInventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
+
+      // Primero, eliminar los items existentes que no estén en la nueva lista
+      const itemsActuales = maintenance.inventoryItems.map((item) => item.id_item);
+      const nuevosItems = data.inventoryItems.map((item) => item.id_item);
+      const itemsAEliminar = itemsActuales.filter((itemId) => !nuevosItems.includes(itemId));
+
+      for (const itemId of itemsAEliminar) {
+        await maintenanceInventoryRepository.delete({ id_mantenimiento: maintenance.id_mantenimiento, id_item: itemId });
+      }
+
+      // Luego, actualizar los items existentes o agregar los nuevos
+      for (const itemData of data.inventoryItems) {
+        const item = await AppDataSource.getRepository(InventoryItem).findOne({ where: { id_item: itemData.id_item } });
+        if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
+
+        let maintenanceInventoryItem = maintenance.inventoryItems.find((inv) => inv.id_item === itemData.id_item);
+
+        if (maintenanceInventoryItem) {
+          // Actualizar cantidad y costo del ítem existente
+          maintenanceInventoryItem.cantidad = itemData.cantidad;
+          maintenanceInventoryItem.precio_costo = item.precio * itemData.cantidad;
+          await maintenanceInventoryRepository.save(maintenanceInventoryItem);
+        } else {
+          // Crear un nuevo ítem para el mantenimiento
+          maintenanceInventoryItem = maintenanceInventoryRepository.create({
+            id_mantenimiento: maintenance.id_mantenimiento,
+            id_item: item.id_item,
+            cantidad: itemData.cantidad,
+            precio_costo: item.precio * itemData.cantidad,
+          });
+          await maintenanceInventoryRepository.save(maintenanceInventoryItem);
+        }
+
+        // Sumar el costo de este ítem al total
+        total += item.precio * itemData.cantidad;
+      }
+    } else {
+      // Si no se proporcionan nuevos items, mantener el total actual
+      total = maintenance.invoice.total;
+    }
+
+    // Guardar los cambios en el mantenimiento
+    await maintenanceRepository.save(maintenance);
+
+    // Actualizar la factura relacionada con el nuevo total
+    if (maintenance.invoice) {
+      maintenance.invoice.total = total;
+      const invoiceRepository = AppDataSource.getRepository(Invoice);
+      await invoiceRepository.save(maintenance.invoice);
+    }
+
+    return { success: true, maintenance };
+  } catch (error) {
+    console.error("Error en la actualización del mantenimiento:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Eliminar mantenimiento sin transacciones
+export async function deleteMaintenanceService(id) {
+  try {
+    const maintenanceRepository = AppDataSource.getRepository(Maintenance);
+    const maintenance = await maintenanceRepository.findOne({ where: { id_mantenimiento: id }, relations: ["inventoryItems"] });
+
+    if (!maintenance) {
+      return { success: false, message: "Mantenimiento no encontrado" };
+    }
+
+    // Ajustar el inventario al eliminar los ítems utilizados
+    if (maintenance.inventoryItems) {
+      for (const item of maintenance.inventoryItems) {
+        const inventoryAdjustment = await ajustarInventario(item.id_item, item.cantidad);
+        if (!inventoryAdjustment.success) {
+          throw new Error(inventoryAdjustment.message);
+        }
       }
     }
 
-    const invoiceRepository = queryRunner.manager.getRepository(Invoice);
-    const invoice = await invoiceRepository.findOne(maintenance.invoice.id_factura);
-    invoice.total = calculateTotal(maintenance.inventoryItems);
-    await queryRunner.manager.save(invoice);
+    // Eliminar los ítems del inventario relacionados con el mantenimiento
+    const maintenanceInventoryRepository = AppDataSource.getRepository(MaintenanceInventory);
+    await maintenanceInventoryRepository.delete({ id_mantenimiento: maintenance.id_mantenimiento });
 
-    await queryRunner.manager.save(maintenance);
-    await queryRunner.commitTransaction();
-    return { success: true, maintenance };
+    // Eliminar la orden relacionada con el mantenimiento
+    const orderRepository = AppDataSource.getRepository(Order);
+    const order = await orderRepository.findOne({ where: { id_mantenimiento: maintenance.id_mantenimiento } });
+    if (order) {
+      await orderRepository.delete(order.id_orden);
+    }
+
+    // Eliminar el mantenimiento
+    await maintenanceRepository.delete(id);
+
+    return { success: true };
   } catch (error) {
-    console.error("Error en la transacción:", error);
-    await queryRunner.rollbackTransaction();
+    console.error("Error en la eliminación del mantenimiento:", error);
     return { success: false, message: error.message };
-  } finally {
-    await queryRunner.release();
   }
 }
 
-export async function deleteMaintenanceService(id) {
-  const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-  const maintenance = await maintenanceRepository.findOne(id, { relations: ["inventoryItems"] });
 
-  if (!maintenance) return { success: false, message: "Mantenimiento no encontrado" };
-
-  const queryRunner = AppDataSource.createQueryRunner();
-  await queryRunner.connect();
-  await queryRunner.startTransaction();
-
-  try {
-    const inventoryAdjustment = await revertirInventario(maintenance);
-    if (!inventoryAdjustment.success) {
-      throw new Error(inventoryAdjustment.message);
-    }
-
-    await queryRunner.manager.delete(MaintenanceInventory, { id_mantenimiento: maintenance.id_mantenimiento });
-    await queryRunner.manager.delete(Maintenance, id);
-
-    await queryRunner.commitTransaction();
-    return { success: true };
-  } catch (error) {
-    console.error("Error en la transacción:", error);
-    await queryRunner.rollbackTransaction();
-    return { success: false, message: error.message };
-  }
+function calculateTotal(items) {
+  return items.reduce((acc, item) => acc + item.precio_costo * item.cantidad, 0);
 }
