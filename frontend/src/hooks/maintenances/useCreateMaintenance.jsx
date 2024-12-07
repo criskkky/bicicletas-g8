@@ -1,22 +1,33 @@
 import { useState } from 'react';
-import { createMaintenance } from '@services/mantenimiento.service.js'; // Este servicio debe ser creado para manejar la solicitud
+import { createMaintenance } from '@services/mantenimiento.service.js';
 
 const useCreateMaintenance = (setMaintenances) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const handleCreate = async (newMaintenanceData) => {
+        // Validar estructura de los datos
+        if (!newMaintenanceData || !newMaintenanceData.rut_trabajador || !newMaintenanceData.rut_cliente || !newMaintenanceData.fecha_mantenimiento) {
+            setError("Datos incompletos. Verifique que todos los campos obligatorios estén presentes.");
+            return;
+        }
+
         setLoading(true);
         setError(null); // Limpiar errores previos
+
         try {
-            const response = await createMaintenance(newMaintenanceData); // Llamada al servicio para crear el mantenimiento
+            // Llamada al servicio para crear el mantenimiento
+            const response = await createMaintenance(newMaintenanceData);
+
             if (response) {
-                // Al crear el mantenimiento, se obtiene la lista actualizada
-                setMaintenances(prevState => [...prevState, response]); // Agregar el mantenimiento creado a la lista existente
-                window.location.reload();
+                // Agregar el mantenimiento creado a la lista existente
+                setMaintenances(prevState => [
+                    ...prevState,
+                    { ...response, id_mantenimiento: response.id } // Asegurar consistencia con el MER
+                ]);
             }
         } catch (error) {
-            setError(error); // Manejo de errores
+            setError(error?.response?.data?.message || "Error al crear mantenimiento");
             console.error("Error al crear mantenimiento:", error);
         } finally {
             setLoading(false);

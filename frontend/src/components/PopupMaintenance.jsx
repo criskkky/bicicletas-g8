@@ -7,10 +7,10 @@ export default function Popup({ show, setShow, data, action }) {
     const isEdit = data && Object.keys(data).length > 0;
     const maintenanceData = isEdit ? data : {};
 
-    const [items, setItems] = useState(maintenanceData.inventoryItems || [{ idItemUsed: "", quantityUsed: "" }]);
+    const [items, setItems] = useState(maintenanceData.items || [{ id_item: "", cantidad: "" }]);
 
     const handleAddItem = () => {
-        setItems([...items, { idItemUsed: "", quantityUsed: "" }]);
+        setItems([...items, { id_item: "", cantidad: "" }]);
     };
 
     const handleRemoveItem = (index) => {
@@ -27,24 +27,20 @@ export default function Popup({ show, setShow, data, action }) {
     };
 
     const handleSubmit = (formData) => {
-        // Transformar los datos del inventario
-        const inventoryItems = items.map(item => ({
-            inventory_id: item.idItemUsed,  // Cambio a `inventory_id`
-            quantityUsed: parseInt(item.quantityUsed, 10),  // Asegúrate de que la cantidad sea un número
+        // Transformar los datos de los artículos
+        const itemsToSubmit = items.map(item => ({
+            id_item: item.id_item,  // Cambiado a `id_item`
+            cantidad: parseInt(item.cantidad, 10),  // Asegura que sea un número
         }));
-    
-        // Crear el objeto con todos los datos
+
+        // Crear el objeto completo
         const dataToSubmit = { 
-            ...formData,  // Esto incluye description, technician, status, etc.
-            inventoryItems,  // Esto incluye los items correctamente formateados
+            ...formData,  // Incluye descripción, fecha, técnico (RUT)
+            items: itemsToSubmit,  // Incluye los artículos correctamente formateados
         };
-    
-        console.log('Datos a enviar:', dataToSubmit);  // Verifica los datos antes de enviarlos
-    
+
         action(dataToSubmit); // Envía los datos combinados al `action`
     };
-    
-    
 
     return (
         <div>
@@ -58,9 +54,27 @@ export default function Popup({ show, setShow, data, action }) {
                             title={isEdit ? "Editar mantenimiento" : "Crear mantenimiento"}
                             fields={[
                                 {
+                                    label: "Técnico (RUT)",
+                                    name: "rut_trabajador",
+                                    defaultValue: maintenanceData.rut_trabajador || "",
+                                    placeholder: "RUT del técnico",
+                                    fieldType: "input",
+                                    type: "text",
+                                    required: true,
+                                },
+                                {
+                                    label: "Cliente (RUT)",
+                                    name: "rut_cliente",
+                                    defaultValue: maintenanceData.rut_cliente || "",
+                                    placeholder: "RUT del cliente",
+                                    fieldType: "input",
+                                    type: "text",
+                                    required: true,
+                                },                                
+                                {
                                     label: "Descripción",
-                                    name: "description",
-                                    defaultValue: maintenanceData.description || "",
+                                    name: "descripcion",
+                                    defaultValue: maintenanceData.descripcion || "",
                                     placeholder: "Descripción del mantenimiento",
                                     fieldType: "input",
                                     type: "text",
@@ -69,57 +83,34 @@ export default function Popup({ show, setShow, data, action }) {
                                     maxLength: 150,
                                 },
                                 {
-                                    label: "Técnico",
-                                    name: "technician",
-                                    defaultValue: maintenanceData.technician || "",
-                                    placeholder: "Nombre del técnico",
-                                    fieldType: "input",
-                                    type: "text",
-                                    required: true,
-                                    minLength: 5,
-                                    maxLength: 100,
-                                },
-                                {
-                                    label: "Estado",
-                                    name: "status",
-                                    fieldType: "select",
-                                    options: [
-                                        { value: "pendiente", label: "Pendiente" },
-                                        { value: "en_proceso", label: "En Proceso" },
-                                        { value: "completado", label: "Completado" },
-                                    ],
-                                    required: true,
-                                    defaultValue: maintenanceData.status || "pendiente",
-                                },
-                                {
                                     label: "Fecha",
-                                    name: "date",
-                                    defaultValue: maintenanceData.date || "",
-                                    placeholder: "Fecha de mantenimiento",
+                                    name: "fecha_mantenimiento",
+                                    defaultValue: maintenanceData.fecha_mantenimiento || "",
+                                    placeholder: "Fecha del mantenimiento",
                                     fieldType: "input",
                                     type: "date",
                                     required: true,
                                 },
-                                ...items.flatMap((item, index) => [ // Mapear los items para crear los campos
+                                ...items.flatMap((item, index) => [ // flatmap para aplanar el array y evitar arrays anidados
                                     {
                                         label: `ID de artículo usado ${index + 1}`,
-                                        name: `idItemUsed-${index}`,
-                                        defaultValue: item.idItemUsed || "0",
+                                        name: `id_item-${index}`,
+                                        defaultValue: item.id_item || "",
                                         placeholder: "ID del artículo usado",
                                         fieldType: "input",
-                                        type: "number",
+                                        type: "text",
                                         required: true,
-                                        onChange: (e) => handleItemChange(index, "idItemUsed", e.target.value),
+                                        onChange: (e) => handleItemChange(index, "id_item", e.target.value),
                                     },
                                     {
                                         label: `Cantidad usada ${index + 1}`,
-                                        name: `quantityUsed-${index}`,
-                                        defaultValue: item.quantityUsed || "0",
-                                        placeholder: "Cantidad de artículo usado",
+                                        name: `cantidad-${index}`,
+                                        defaultValue: item.cantidad || "",
+                                        placeholder: "Cantidad del artículo usado",
                                         fieldType: "input",
                                         type: "number",
                                         required: true,
-                                        onChange: (e) => handleItemChange(index, "quantityUsed", e.target.value),
+                                        onChange: (e) => handleItemChange(index, "cantidad", e.target.value),
                                     },
                                 ]),
                             ]}
