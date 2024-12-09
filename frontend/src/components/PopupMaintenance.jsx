@@ -4,6 +4,7 @@ import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 
 export default function Popup({ show, setShow, data, action }) {
+    const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
     const isEdit = data && Object.keys(data).length > 0;
     const maintenanceData = isEdit ? data : {};
 
@@ -56,7 +57,7 @@ export default function Popup({ show, setShow, data, action }) {
                                 {
                                     label: "Técnico (RUT)",
                                     name: "rut_trabajador",
-                                    defaultValue: maintenanceData.rut_trabajador || "",
+                                    defaultValue: maintenanceData.rut_trabajador || currentUser?.rut || "",
                                     placeholder: "RUT del técnico",
                                     fieldType: "input",
                                     type: "text",
