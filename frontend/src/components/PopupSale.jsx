@@ -1,6 +1,6 @@
 import  {useState} from 'react';
 import Form from './Form';
-import '@styles/popup.css';
+import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 
 export default function PopupSale({ show, setShow, inventoryItems = [], onPurchase }) {

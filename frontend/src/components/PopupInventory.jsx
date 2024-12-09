@@ -1,5 +1,5 @@
 import Form from './Form';
-import '@styles/popup.css';
+import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg'; // Asegúrate de tener este icono o uno similar
 
 export default function PopupInventory({ show, setShow, inventoryItem = {}, onSave, onDelete }) {
