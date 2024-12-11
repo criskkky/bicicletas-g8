@@ -19,7 +19,7 @@ export const userQueryValidation = Joi.object({
       "number.positive": "El id debe ser un número positivo.",
     }),
   email: Joi.string()
-    .min(15)
+    .min(14)
     .max(35)
     .email()
     .messages({
@@ -66,7 +66,7 @@ export const userBodyValidation = Joi.object({
         "El nombre completo solo puede contener letras y espacios.",
     }),
   email: Joi.string()
-    .min(15)
+    .min(14)
     .max(35)
     .email()
     .messages({
@@ -80,7 +80,7 @@ export const userBodyValidation = Joi.object({
     })
     .custom(domainEmailValidator, "Validación dominio email"),
   password: Joi.string()
-    .min(8)
+    .min(7)
     .max(26)
     .pattern(/^[a-zA-Z0-9]+$/)
     .messages({
@@ -92,7 +92,7 @@ export const userBodyValidation = Joi.object({
         "La contraseña solo puede contener letras y números.",
     }),
   newPassword: Joi.string()
-    .min(8)
+    .min(7)
     .max(26)
     .allow("")
     .pattern(/^[a-zA-Z0-9]+$/)

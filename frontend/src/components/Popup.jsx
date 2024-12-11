@@ -85,7 +85,7 @@ export default function Popup({ show, setShow, data, action }) {
                                 fieldType: 'input',
                                 type: "password",
                                 required: false,
-                                minLength: 8,
+                                minLength: 7,
                                 maxLength: 26,
                                 pattern: /^[a-zA-Z0-9]+$/,
                                 patternMessage: "Debe contener solo letras y números",

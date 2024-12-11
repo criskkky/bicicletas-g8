@@ -38,7 +38,7 @@ const Login = () => {
                         fieldType: 'input',
                         type: "email",
                         required: true,
-                        minLength: 15,
+                        minLength: 5,
                         maxLength: 30,
                         errorMessageData: errorEmail,
                         validate: {
@@ -53,7 +53,7 @@ const Login = () => {
                         fieldType: 'input',
                         type: "password",
                         required: true,
-                        minLength: 8,
+                        minLength: 7,
                         maxLength: 26,
                         pattern: /^[a-zA-Z0-9]+$/,
                         patternMessage: "Debe contener solo letras y números",

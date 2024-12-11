@@ -2,9 +2,9 @@
 import Joi from "joi";
 
 const domainEmailValidator = (value, helper) => {
-  if (!value.endsWith("@gmail.cl")) {
+  if (!value.includes("@")) {
     return helper.message(
-      "El correo electrónico debe finalizar en @gmail.cl."
+      "El correo electrónico debe contener @."
     );
   }
   return value;
@@ -12,7 +12,7 @@ const domainEmailValidator = (value, helper) => {
 
 export const authValidation = Joi.object({
   email: Joi.string()
-    .min(15)
+    .min(14)
     .max(35)
     .email()
     .required()
@@ -26,7 +26,7 @@ export const authValidation = Joi.object({
     })
     .custom(domainEmailValidator, "Validación dominio email"),
   password: Joi.string()
-    .min(8)
+    .min(7)
     .max(26)
     .pattern(/^[a-zA-Z0-9]+$/)
     .required()
@@ -69,7 +69,7 @@ export const registerValidation = Joi.object({
       "string.pattern.base": "Formato rut inválido, debe ser xx.xxx.xxx-x o xxxxxxxx-x.",
     }),
   email: Joi.string()
-    .min(15)
+    .min(14)
     .max(35)
     .email()
     .required()
@@ -83,7 +83,7 @@ export const registerValidation = Joi.object({
     })
     .custom(domainEmailValidator, "Validación dominio email"),
   password: Joi.string()
-    .min(8)
+    .min(7)
     .max(26)
     .pattern(/^[a-zA-Z0-9]+$/)
     .required()

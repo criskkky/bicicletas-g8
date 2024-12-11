@@ -61,7 +61,7 @@ const patternRut = new RegExp(/^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d
                         maxLength: 35,
                         errorMessageData: errorEmail,
                         validate: {
-                            emailDomain: (value) => value.endsWith('@gmail.cl') || 'El correo debe terminar en @gmail.cl'
+                            emailDomain: (value) => value.includes('@'), // Validar presencia de @
                         },
                         onChange: (e) => handleInputChange('email', e.target.value)
                     },
@@ -86,7 +86,7 @@ const patternRut = new RegExp(/^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d
                         fieldType: 'input',
                         type: "password",
                         required: true,
-                        minLength: 8,
+                        minLength: 7,
                         maxLength: 26,
                         pattern: /^[a-zA-Z0-9]+$/,
                         patternMessage: "Debe contener solo letras y números",
