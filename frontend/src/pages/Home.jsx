@@ -1,7 +1,7 @@
 const Home = () => {
   return (
     <><>
-      <div className="main-container">
+      <div className="home-container">
         <h1>Sistema de Gestión Interna</h1>
         <p>Bienvenido al sistema de gestión interna de nuestro taller de bicicletas.</p>
         <p>Utiliza la barra de navegación superior para acceder a las diferentes secciones.</p>
@@ -13,13 +13,17 @@ const Home = () => {
     </>
     
     <style>{`
-      .main-container {
-        margin-top: -250px;
-        padding: 20px;
-        text-align: center;
+      .home-container {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          width: 100%;
+          padding-top: 150px;
+          box-sizing: border-box;
       }
 
-      .main-container h1 {
+      .home-container h1  {
         font-size: 24px;
         margin-bottom: 10px;
         background: #e0e0e0;
@@ -27,14 +31,16 @@ const Home = () => {
         border-radius: 25px;
       }
 
-      .main-container p {
+      .home-container p {
         font-size: 18px;
         margin-bottom: -15px;
       }
 
       .image-container {
-        margin-top: -300px;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0px;
       }
     `}</style></>
   );
