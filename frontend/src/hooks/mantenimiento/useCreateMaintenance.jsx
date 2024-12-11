@@ -7,7 +7,11 @@ const useCreateMaintenance = (setMaintenances) => {
 
     const handleCreate = async (newMaintenanceData) => {
         // Validar estructura de los datos
-        if (!newMaintenanceData || !newMaintenanceData.rut_trabajador || !newMaintenanceData.rut_cliente || !newMaintenanceData.fecha_mantenimiento) {
+        if (!newMaintenanceData || 
+            !newMaintenanceData.rut_trabajador || 
+            !newMaintenanceData.rut_cliente || 
+            !newMaintenanceData.fecha_mantenimiento ||
+            !newMaintenanceData.descripcion ) {
             setError("Datos incompletos. Verifique que todos los campos obligatorios estén presentes.");
             return;
         }
@@ -23,7 +27,7 @@ const useCreateMaintenance = (setMaintenances) => {
                 // Agregar el mantenimiento creado a la lista existente
                 setMaintenances(prevState => [
                     ...prevState,
-                    { ...response, id_mantenimiento: response.id } // Asegurar consistencia con el MER
+                    { ...response }
                 ]);
             }
         } catch (error) {

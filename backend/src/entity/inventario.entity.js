@@ -22,7 +22,7 @@ const InventorySchema = new EntitySchema({
     },
     descripcion: {
       type: "text",
-      nullable: false,
+      nullable: true,
     },
     precio: {
       type: "decimal",

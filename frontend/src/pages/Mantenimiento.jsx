@@ -20,11 +20,12 @@ const Maintenance = () => {
     handleUpdate,
     dataMaintenance,
     setDataMaintenance,
-  } = useEditMaintenance(setMaintenances);
+    isPopupOpen,
+    setIsPopupOpen,
+  } = useEditMaintenance(fetchMaintenances, setMaintenances);
 
   const { handleDelete } = useDeleteMaintenance(fetchMaintenances, setDataMaintenance);
-  const { handleCreate } = useCreateMaintenance(setMaintenances);
-  const [showPopup, setShowPopup] = useState(false);
+  const { handleCreate } = useCreateMaintenance(fetchMaintenances, setMaintenances);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -38,16 +39,16 @@ const Maintenance = () => {
   );
 
   const columns = [
-    { title: 'ID Mantenimiento', field: 'id_mantenimiento', width: 100, responsive: 0 },
-    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 300, responsive: 1 },
-    { title: 'Cliente (RUT)', field: 'rut_cliente', width: 300, responsive: 1 },
-    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 4 },
-    { title: 'Fecha Mantenimiento', field: 'fecha_mantenimiento', width: 200, responsive: 1 },
+    { title: 'ID MNT', field: 'id_mantenimiento', width: 100, responsive: 0 },
+    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 100, responsive: 1 },
+    { title: 'Cliente (RUT)', field: 'rut_cliente', width: 100, responsive: 1 },
+    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 3 },
+    { title: 'Fecha MNT', field: 'fecha_mantenimiento', width: 150, responsive: 2 },
     {
       title: 'Artículos Usados',
-      field: 'items', // Ajuste para reflejar el campo correcto
-      width: 300,
-      responsive: 3,
+      field: 'items',
+      width: 200,
+      responsive: 2,
       render: rowData => (
         rowData.items && rowData.items.length > 0 && (
           rowData.items.map(item => (
@@ -58,12 +59,12 @@ const Maintenance = () => {
         )
       )
     },
-    { title: 'Creado', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
 
   const handleUpdateClick = () => {
-    setShowPopup(true);
+    setIsPopupOpen(true);
   };
 
   const handleDeleteClick = () => {
@@ -78,8 +79,7 @@ const Maintenance = () => {
         <div className="top-table">
           <h1 className="title-table">Mantenimientos</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID de Mantenimiento'} />
-            {/* Botón de editar */}
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID MNT'} />
             <button onClick={handleUpdateClick} disabled={!dataMaintenance.id_mantenimiento}>
               {dataMaintenance.id_mantenimiento ? (
                 <img src={UpdateIcon} alt="edit" />
@@ -87,7 +87,6 @@ const Maintenance = () => {
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
-            {/* Botón de eliminar */}
             <button className="delete-maintenance-button" onClick={handleDeleteClick} disabled={!dataMaintenance.id_mantenimiento}>
               {dataMaintenance.id_mantenimiento ? (
                 <img src={DeleteIcon} alt="delete" />
@@ -95,8 +94,7 @@ const Maintenance = () => {
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            {/* Botón de crear */}
-            <button onClick={() => { setDataMaintenance({}); setShowPopup(true); }}>
+            <button onClick={() => { setDataMaintenance({}); setIsPopupOpen(true); }}>
               +
             </button>
           </div>
@@ -110,15 +108,15 @@ const Maintenance = () => {
         />
       </div>
 
-      {/* Popup para crear o editar mantenimientos */}
       <Popup
-        show={showPopup}
-        setShow={setShowPopup}
+        show={isPopupOpen}
+        setShow={setIsPopupOpen}
         data={dataMaintenance}
-        action={dataMaintenance.id_mantenimiento ? handleUpdate : handleCreate}
+        action={dataMaintenance && dataMaintenance.id_mantenimiento ? handleUpdate : handleCreate}
       />
     </div>
   );
 };
 
 export default Maintenance;
+

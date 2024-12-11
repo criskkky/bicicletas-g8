@@ -5,8 +5,7 @@ import { formatDataMaintenance } from '@helpers/formatDataMaintenance.js';
 export async function getMaintenances() {
     try {
         const response = await axios.get('/maintenance/');
-        console.log('Respuesta de la API:', response);
-
+        
         if (!response || !response.data) {
             throw new Error("La respuesta de la API no tiene la estructura esperada.");
         }
@@ -14,7 +13,6 @@ export async function getMaintenances() {
         // Formatea los datos para incluir `id_mantenimiento`
         const formattedData = response.data.map(maintenance => ({
             ...formatDataMaintenance(maintenance),
-            id_mantenimiento: maintenance.id, // Asigna el ID correcto
         }));
         return formattedData;
     } catch (error) {
@@ -49,13 +47,37 @@ export async function createMaintenance(maintenanceData) {
 // Función para actualizar un mantenimiento existente
 export async function updateMaintenance(id_mantenimiento, maintenanceData) {
     try {
-        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
+        // Asegúrate de que los items estén incluidos en maintenanceData
+        const { items, ...restData } = maintenanceData;
+        const dataToSend = {
+            ...restData,
+            items: items.map(item => ({
+                id_item: item.id_item,
+                cantidad: parseInt(item.cantidad, 10)
+            }))
+        };
+
+        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, dataToSend);
+        console.log('Datos de mantenimiento actualizados:', response.data);
+        
+        if (!response.data || !response.data.maintenance) {
+            throw new Error('La respuesta del servidor no tiene la estructura esperada');
+        }
+        
+        // Asumimos que el servidor devuelve el mantenimiento actualizado en response.data.maintenance
+        const updatedMaintenance = response.data.maintenance;
+        
+        // Aseguramos que id_mantenimiento esté presente y que los items estén incluidos
         return {
-            ...response.data,
-            id_mantenimiento: response.data.id, // Asegura la consistencia
+            ...updatedMaintenance,
+            id_mantenimiento: updatedMaintenance.id || id_mantenimiento,
+            items: updatedMaintenance.items && updatedMaintenance.items.length > 0 
+                ? updatedMaintenance.items 
+                : items
         };
     } catch (error) {
-        return error.response?.data || { error: 'Error al actualizar el mantenimiento' };
+        console.error('Error en updateMaintenance:', error);
+        throw error;
     }
 }
 
@@ -68,3 +90,4 @@ export async function deleteMaintenance(id_mantenimiento) {
         return error.response?.data || { error: 'Error al eliminar el mantenimiento' };
     }
 }
+

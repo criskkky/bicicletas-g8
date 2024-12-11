@@ -1,4 +1,3 @@
-"use strict";
 import { EntitySchema } from "typeorm";
 
 const MaintenanceInventorySchema = new EntitySchema({
@@ -31,14 +30,16 @@ const MaintenanceInventorySchema = new EntitySchema({
     mantenimiento: {
       target: "Mantenimiento",
       type: "many-to-one",
-      joinColumn: { name: "id_mantenimiento" },
-      onDelete: "CASCADE", // Manteniendo la opción de eliminar en cascada como estaba definido
+      joinColumn: { name: "id_mantenimiento", referencedColumnName: "id_mantenimiento" },
+      inverseSide: "items",
+      onDelete: "CASCADE",
     },
     items: {
       target: "Inventario",
       type: "many-to-one",
-      joinColumn: { name: "id_item" },
-      onDelete: "SET NULL", // Esto hace que si se elimina un item, la venta no se elimine.
+      joinColumn: { name: "id_item", referencedColumnName: "id_item" },
+      inverseSide: "mantenimientoInventario",
+      onDelete: "SET NULL",
     },
   },
 });

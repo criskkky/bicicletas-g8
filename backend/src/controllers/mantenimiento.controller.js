@@ -81,6 +81,7 @@ export async function updateMaintenance(req, res) {
 
     // Mezcla los valores existentes con los nuevos valores proporcionados
     const updatedData = {
+      id_mantenimiento: currentMaintenance.id_mantenimiento,
       rut_cliente: req.body.rut_cliente ?? currentMaintenance.rut_cliente,
       rut_trabajador: req.body.rut_trabajador ?? currentMaintenance.rut_trabajador,
       fecha_mantenimiento: req.body.fecha_mantenimiento ?? currentMaintenance.fecha_mantenimiento,

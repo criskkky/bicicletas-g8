@@ -1,29 +1,31 @@
 import Table from '@components/Table';
-import useInventory from '@hooks/inventario/useGetInventory';
+import useInventoryItems from '@hooks/inventario/useGetInventoryItems.jsx';
 import Search from '../components/Search';
+import Popup from '../components/PopupInventory';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
-import useEditInventory from '@hooks/inventario/useEditInventory';
-import useDeleteInventory from '@hooks/inventario/useDeleteInventory';
-import useCreateInventory from '@hooks/inventario/useCreateInventory';
-import PopupInventory from '../components/PopupInventory';
+import '@styles/inventory.css';
+import useEditInventoryItem from '@hooks/inventario/useEditInventoryItem';
+import useDeleteInventoryItem from '@hooks/inventario/useDeleteInventoryItem';
+import useCreateInventoryItem from '@hooks/inventario/useCreateInventoryItem';
 
 const Inventory = () => {
-  const { inventory, fetchInventory, setInventory } = useInventory();
+  const { inventoryItems, fetchInventoryItems, setInventoryItems } = useInventoryItems();
   const [filterId, setFilterId] = useState('');
-  const [showPopup, setShowPopup] = useState(false);
 
   const {
     handleUpdate,
-    dataInventory = {},
-    setDataInventory,
-  } = useEditInventory(setInventory);
+    inventoryItem,
+    setInventoryItem,
+    isPopupOpen,
+    setIsPopupOpen,
+  } = useEditInventoryItem(fetchInventoryItems, setInventoryItems);
 
-  const { handleDelete } = useDeleteInventory(fetchInventory, setDataInventory);
-  const { handleCreate } = useCreateInventory(setInventory);
+  const { handleDelete } = useDeleteInventoryItem(fetchInventoryItems, setInventoryItem);
+  const { handleCreate } = useCreateInventoryItem(fetchInventoryItems, setInventoryItems);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -31,28 +33,29 @@ const Inventory = () => {
 
   const handleSelectionChange = useCallback(
     (selectedItems) => {
-      setDataInventory(selectedItems.length > 0 ? selectedItems[0] : {});
+      setInventoryItem(selectedItems.length > 0 ? selectedItems[0] : {});
     },
-    [setDataInventory]
+    [setInventoryItem]
   );
 
   const columns = [
-    { title: 'ID Inventario', field: 'id', width: 100 },
-    { title: 'Nombre', field: 'name', width: 350 },
-    { title: 'Tipo', field: 'type', width: 150 },
-    { title: 'Cantidad', field: 'quantity', width: 150 },
-    { title: 'Precio', field: 'price', width: 150 },
-    { title: 'Fecha Creación', field: 'createdAt', width: 200 },
+    { title: 'ID Artículo', field: 'id_item', width: 100, responsive: 0 },
+    { title: 'Nombre', field: 'nombre', width: 200, responsive: 1 },
+    { title: 'Marca', field: 'marca', width: 150, responsive: 1 },
+    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 2 },
+    { title: 'Precio', field: 'precio', width: 100, responsive: 2 },
+    { title: 'Stock', field: 'stock', width: 100, responsive: 2 },
+    { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
 
+  const handleUpdateClick = () => {
+    setIsPopupOpen(true);
+  };
 
-  const isDataInventoryValid = dataInventory && dataInventory.id;
-
-  const handleInventoryAction = (inventoryData) => {
-    if (isDataInventoryValid) {
-      handleUpdate(inventoryData);
-    } else {
-      handleCreate(inventoryData);
+  const handleDeleteClick = () => {
+    if (inventoryItem && inventoryItem.id_item) {
+      handleDelete([inventoryItem]);
     }
   };
 
@@ -62,32 +65,40 @@ const Inventory = () => {
         <div className="top-table">
           <h1 className="title-table">Inventario</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
-            <button onClick={() => setShowPopup(true)} disabled={!isDataInventoryValid}>
-              {isDataInventoryValid ? <img src={UpdateIcon} alt="edit" /> : <img src={UpdateIconDisable} alt="edit-disabled" />}
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID Artículo'} />
+            <button onClick={handleUpdateClick} disabled={!inventoryItem.id_item}>
+              {inventoryItem.id_item ? (
+                <img src={UpdateIcon} alt="edit" />
+              ) : (
+                <img src={UpdateIconDisable} alt="edit-disabled" />
+              )}
             </button>
-            <button onClick={() => handleDelete([dataInventory])} disabled={!isDataInventoryValid}>
-              {isDataInventoryValid ? <img src={DeleteIcon} alt="delete" /> : <img src={DeleteIconDisable} alt="delete-disabled" />}
+            <button className="delete-inventory-button" onClick={handleDeleteClick} disabled={!inventoryItem.id_item}>
+              {inventoryItem.id_item ? (
+                <img src={DeleteIcon} alt="delete" />
+              ) : (
+                <img src={DeleteIconDisable} alt="delete-disabled" />
+              )}
             </button>
-            <button onClick={() => { setDataInventory({}); setShowPopup(true); }}>
+            <button onClick={() => { setInventoryItem({}); setIsPopupOpen(true); }}>
               +
             </button>
           </div>
         </div>
         <Table
-          data={inventory}
+          data={inventoryItems}
           columns={columns}
           filter={filterId}
-          dataToFilter="id"
+          dataToFilter="id_item"
           onSelectionChange={handleSelectionChange}
         />
       </div>
 
-      <PopupInventory
-        show={showPopup}
-        setShow={setShowPopup}
-        data={dataInventory}
-        action={handleInventoryAction}
+      <Popup
+        show={isPopupOpen}
+        setShow={setIsPopupOpen}
+        data={inventoryItem}
+        action={inventoryItem && inventoryItem.id_item ? handleUpdate : handleCreate}
       />
     </div>
   );

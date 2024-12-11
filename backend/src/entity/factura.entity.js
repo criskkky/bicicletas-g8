@@ -9,6 +9,7 @@ const FacturaSchema = new EntitySchema({
       type: "int",
       primary: true,
       generated: true,
+      unique: true,
     },
     id_venta: {
       type: "int",
@@ -60,16 +61,16 @@ const FacturaSchema = new EntitySchema({
   relations: {
     venta: {
       target: "Venta",
-      type: "many-to-one",
+      type: "one-to-many",
       joinColumn: { name: "id_venta", referencedColumnName: "id_venta" },
-      onDelete: "CASCADE", // Si se elimina una venta también se elimina la factura asociada.
+      onDelete: "CASCADE",
     },
     mantenimiento: {
       target: "Mantenimiento",
-      type: "many-to-one",
+      type: "one-to-many",
       joinColumn: { name: "id_mantenimiento", referencedColumnName: "id_mantenimiento" },
-      onDelete: "CASCADE", // Si se elimina un mantenimiento también se elimina la factura asociada.
-    },
+      onDelete: "CASCADE",
+    },    
   },
 });
 

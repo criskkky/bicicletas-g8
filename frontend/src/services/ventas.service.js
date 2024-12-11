@@ -1,60 +1,76 @@
 import axios from './root.service.js';
+import { formatDataSale } from '@helpers/formatDataSales.js';
 
+// Función para obtener todas las ventas
 export async function getSales() {
     try {
         const response = await axios.get('/sale/');
-        console.log('Respuesta de la API:', response);
-
+        
         if (!response || !response.data) {
-            throw new Error("Respuesta de la API no válida.");
+            throw new Error("La respuesta de la API no tiene la estructura esperada.");
         }
 
-        return response.data;
+        // Formatea los datos para incluir `id_venta`
+        const formattedData = response.data.map(sale => ({
+            ...formatDataSale(sale),
+        }));
+        return formattedData;
     } catch (error) {
-        console.error("Error al obtener ventas:", error);
-        if (error.response) {
-            console.error("Detalles del error:", error.response.data);
-        }
+        console.error("Error al obtener las ventas:", error);
         return { error: error.message || 'Error al obtener las ventas' };
     }
 }
 
-export async function getSale(saleId) {
+// Función para obtener una venta específica por su ID
+export async function getSale(id_venta) {
     try {
-        const { data } = await axios.get(`/sale/${saleId}`);
-        return data;
+        const { data } = await axios.get(`/sale/${id_venta}`);
+        return {
+            ...formatDataSale(data),
+            id_venta: data.id, // Asegura que el campo esté alineado con el MER
+        };
     } catch (error) {
-        console.error("Error al obtener la venta:", error);
-        return { error: error.message || 'Error al obtener la venta' };
+        return error.response?.data || { error: 'Error al obtener la venta' };
     }
 }
 
+// Función para crear una nueva venta
 export async function createSale(saleData) {
     try {
         const response = await axios.post('/sale/', saleData);
         return response.data;
     } catch (error) {
-        console.error("Error al crear la venta:", error);
-        return { error: error.message || 'Error al crear la venta' };
+        return error.response?.data || { error: 'Error al crear la venta' };
     }
 }
 
-export async function updateSale(saleId, saleData) {
+// Función para actualizar una venta existente
+export async function updateSale(id_venta, saleData) {
     try {
-        const response = await axios.patch(`/sale/${saleId}`, saleData);
-        return response.data;
+        const response = await axios.put(`/sale/${id_venta}`, saleData);
+        console.log('Datos de venta actualizados:', response.data);
+        
+        if (!response.data || !response.data.sale) {
+            throw new Error('La respuesta del servidor no tiene la estructura esperada');
+        }
+        
+        // Aseguramos que id_venta esté presente
+        return {
+            ...response.data.sale,
+            id_venta: response.data.sale.id || id_venta,
+        };
     } catch (error) {
-        console.error("Error al actualizar la venta:", error);
-        return { error: error.message || 'Error al actualizar la venta' };
+        console.error('Error en updateSale:', error);
+        throw error;
     }
 }
 
-export async function deleteSale(saleId) {
+// Función para eliminar una venta
+export async function deleteSale(id_venta) {
     try {
-        const response = await axios.delete(`/sale/${saleId}`);
+        const response = await axios.delete(`/sale/${id_venta}`);
         return response.data;
     } catch (error) {
-        console.error("Error al eliminar la venta:", error);
-        return { error: error.message || 'Error al eliminar la venta' };
+        return error.response?.data || { error: 'Error al eliminar la venta' };
     }
 }

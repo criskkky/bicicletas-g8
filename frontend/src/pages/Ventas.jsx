@@ -1,32 +1,31 @@
 import Table from '@components/Table';
-import useSales from '@hooks/ventas/useGetSales';
-import useInventory from '@hooks/inventario/useGetInventory';
+import useSales from '@hooks/ventas/useGetSales.jsx';
 import Search from '../components/Search';
+import Popup from '../components/PopupSales';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
+import '@styles/sales.css';
 import useEditSale from '@hooks/ventas/useEditSale';
 import useDeleteSale from '@hooks/ventas/useDeleteSale';
 import useCreateSale from '@hooks/ventas/useCreateSale';
-import PopupSale from '../components/PopupSale';
 
 const Sales = () => {
   const { sales, fetchSales, setSales } = useSales();
-  const { inventory } = useInventory();
   const [filterId, setFilterId] = useState('');
-  const [showPopup, setShowPopup] = useState(false);
 
   const {
     handleUpdate,
-    dataSale = {},
-    setDataSale,
-  } = useEditSale(setSales);
+    sale,
+    setSale,
+    isPopupOpen,
+    setIsPopupOpen,
+  } = useEditSale(fetchSales, setSales);
 
-
-  const { handleDelete } = useDeleteSale(fetchSales, setDataSale);
-  const { handleCreate } = useCreateSale(setSales); 
+  const { handleDelete } = useDeleteSale(fetchSales, setSale);
+  const { handleCreate } = useCreateSale(fetchSales, setSales);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -34,28 +33,28 @@ const Sales = () => {
 
   const handleSelectionChange = useCallback(
     (selectedSales) => {
-      setDataSale(selectedSales.length > 0 ? selectedSales[0] : {});
+      setSale(selectedSales.length > 0 ? selectedSales[0] : {});
     },
-    [setDataSale]
+    [setSale]
   );
 
   const columns = [
-    { title: 'ID Venta', field: 'id', width: 100 },
-    { title: 'Artículo', field: 'inventoryItemName', width: 350 },
-    { title: 'Cantidad', field: 'quantity', width: 150 },
-    { title: 'Precio Total', field: 'totalPrice', width: 200 },
-    { title: 'Fecha de Venta', field: 'createdAt', width: 200 },
-    { title: 'Precio Artículo', field: 'inventoryItemPrice', width: 150 },
-    { title: 'Tipo de Artículo', field: 'inventoryItemType', width: 150 },
-];
+    { title: 'ID Venta', field: 'id_venta', width: 100, responsive: 0 },
+    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 100, responsive: 1 },
+    { title: 'Cliente (RUT)', field: 'rut_cliente', width: 100, responsive: 1 },
+    { title: 'Fecha Venta', field: 'fecha_venta', width: 150, responsive: 2 },
+    { title: 'Total', field: 'total', width: 150, responsive: 2 },
+    { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
+  ];
 
-  const isDataSaleValid = dataSale && dataSale.id;
+  const handleUpdateClick = () => {
+    setIsPopupOpen(true);
+  };
 
-  const handlePurchase = (purchaseData) => {
-    if (isDataSaleValid) {
-      handleUpdate(purchaseData);
-    } else {
-      handleCreate(purchaseData);
+  const handleDeleteClick = () => {
+    if (sale && sale.id_venta) {
+      handleDelete([sale]);
     }
   };
 
@@ -65,14 +64,22 @@ const Sales = () => {
         <div className="top-table">
           <h1 className="title-table">Ventas</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
-            <button onClick={() => setShowPopup(true)} disabled={!isDataSaleValid}>
-              {isDataSaleValid ? <img src={UpdateIcon} alt="edit" /> : <img src={UpdateIconDisable} alt="edit-disabled" />}
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID Venta'} />
+            <button onClick={handleUpdateClick} disabled={!sale.id_venta}>
+              {sale.id_venta ? (
+                <img src={UpdateIcon} alt="edit" />
+              ) : (
+                <img src={UpdateIconDisable} alt="edit-disabled" />
+              )}
             </button>
-            <button onClick={() => handleDelete([dataSale])} disabled={!isDataSaleValid}>
-              {isDataSaleValid ? <img src={DeleteIcon} alt="delete" /> : <img src={DeleteIconDisable} alt="delete-disabled" />}
+            <button className="delete-sale-button" onClick={handleDeleteClick} disabled={!sale.id_venta}>
+              {sale.id_venta ? (
+                <img src={DeleteIcon} alt="delete" />
+              ) : (
+                <img src={DeleteIconDisable} alt="delete-disabled" />
+              )}
             </button>
-            <button onClick={() => { setDataSale({}); setShowPopup(true); }}>
+            <button onClick={() => { setSale({}); setIsPopupOpen(true); }}>
               +
             </button>
           </div>
@@ -81,17 +88,16 @@ const Sales = () => {
           data={sales}
           columns={columns}
           filter={filterId}
-          dataToFilter="id"
+          dataToFilter="id_venta"
           onSelectionChange={handleSelectionChange}
         />
       </div>
 
-      <PopupSale
-        show={showPopup}
-        setShow={setShowPopup}
-        inventoryItems={inventory}
-        data={dataSale}
-        onPurchase={handlePurchase} 
+      <Popup
+        show={isPopupOpen}
+        setShow={setIsPopupOpen}
+        data={sale}
+        action={sale && sale.id_venta ? handleUpdate : handleCreate}
       />
     </div>
   );

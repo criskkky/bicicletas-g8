@@ -14,6 +14,7 @@ const MaintenanceSchema = new EntitySchema({
       type: "int",
       primary: true,
       generated: true,
+      unique: true,
     },
     rut_cliente: {
       type: "varchar",
@@ -50,6 +51,11 @@ const MaintenanceSchema = new EntitySchema({
       type: "one-to-many",
       inverseSide: "mantenimiento",
       onDelete: "CASCADE", // Si se elimina un mantenimiento también todos los registros de MantenimientoInventario
+    },
+    invoice: {
+      target: "Factura",
+      type: "many-to-one",
+      onDelete: "CASCADE", // Si se elimina un mantenimiento también se elimina la factura asociada
     },
   },
 });

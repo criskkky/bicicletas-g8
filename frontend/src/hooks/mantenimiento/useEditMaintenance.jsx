@@ -3,42 +3,43 @@ import { updateMaintenance } from '@services/mantenimiento.service.js';
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 import { formatMaintenancePostUpdate } from '@helpers/formatDataMaintenance.js';
 
-const useEditMaintenance = (setMaintenances) => {
+const useEditMaintenance = (fetchMaintenances, setMaintenances) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [dataMaintenance, setDataMaintenance] = useState({});
 
     const handleClickUpdate = () => {
-        if (dataMaintenance && dataMaintenance.id_mantenimiento) { // Usa el campo correcto
+        if (dataMaintenance && dataMaintenance.id_mantenimiento) {
             setIsPopupOpen(true);
         }
     };
 
     const handleUpdate = async (updatedMaintenanceData) => {
-        if (updatedMaintenanceData && dataMaintenance && dataMaintenance.id_mantenimiento) { // Usa el campo correcto
+        if (updatedMaintenanceData && updatedMaintenanceData.id_mantenimiento) {
             try {
-                // Actualiza el mantenimiento en el backend
-                const updatedMaintenance = await updateMaintenance(dataMaintenance.id_mantenimiento, updatedMaintenanceData);
+                console.log('Datos a actualizar:', updatedMaintenanceData);
+                const updatedMaintenance = await updateMaintenance(updatedMaintenanceData.id_mantenimiento, updatedMaintenanceData);
+
+                console.log('Mantenimiento actualizado:', updatedMaintenance);
 
                 showSuccessAlert('¡Actualizado!', 'El mantenimiento ha sido actualizado correctamente.');
                 setIsPopupOpen(false);
 
-                // Formatea los datos actualizados
                 const formattedMaintenance = formatMaintenancePostUpdate(updatedMaintenance);
 
-                // Actualiza la lista de mantenimientos
-                setMaintenances(prevMaintenances => prevMaintenances.map(maintenance => {
-                    return maintenance.id_mantenimiento === formattedMaintenance.id_mantenimiento
-                        ? formattedMaintenance
-                        : maintenance;
-                }));
+                setMaintenances(prevMaintenances => prevMaintenances.map(maintenance => 
+                    maintenance.id_mantenimiento === formattedMaintenance.id_mantenimiento
+                        ? { ...formattedMaintenance, items: updatedMaintenance.items }
+                        : maintenance
+                ));
 
-                setDataMaintenance({}); // Limpia el estado
+                await fetchMaintenances();
+                setDataMaintenance({});
             } catch (error) {
                 console.error('Error al actualizar el mantenimiento:', error);
-                showErrorAlert('Cancelado', 'Ocurrió un error al actualizar el mantenimiento.');
+                showErrorAlert('Error', `Ocurrió un error al actualizar el mantenimiento: ${error.message}`);
             }
         } else {
-            console.error("No se puede actualizar: 'dataMaintenance' no tiene un 'id_mantenimiento' válido.");
+            showErrorAlert('Error', 'No se puede actualizar: falta el ID de mantenimiento');
         }
     };
 
@@ -53,3 +54,4 @@ const useEditMaintenance = (setMaintenances) => {
 };
 
 export default useEditMaintenance;
+

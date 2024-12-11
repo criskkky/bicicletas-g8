@@ -4,18 +4,18 @@ import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 import { isAdmin } from '@helpers/session.jsx';
 
-export default function PopupMaintenance({ show, setShow, data, action }) {
+export default function PopupSales({ show, setShow, data, action }) {
     const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
     const isEdit = data && Object.keys(data).length > 0;
-    const [maintenanceData, setMaintenanceData] = useState({});
+    const [saleData, setSaleData] = useState({});
     const [items, setItems] = useState([]);
 
     useEffect(() => {
         if (isEdit) {
-            setMaintenanceData(data);
+            setSaleData(data);
             setItems(Array.isArray(data.items) ? data.items.map(item => ({ ...item })) : []);
         } else {
-            setMaintenanceData({});
+            setSaleData({});
             setItems([{ id_item: "", cantidad: "" }]);
         }
     }, [data, isEdit]);
@@ -49,7 +49,7 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
     
         const dataToSubmit = { 
             ...formData,
-            id_mantenimiento: isEdit ? maintenanceData.id_mantenimiento : undefined,
+            id_venta: isEdit ? saleData.id_venta : undefined,
             items: itemsToSubmit,  
         };
 
@@ -67,12 +67,12 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
                             <img src={CloseIcon} alt="Cerrar" />
                         </button>
                         <Form
-                            title={isEdit ? "Editar mantenimiento" : "Crear mantenimiento"}
+                            title={isEdit ? "Editar venta" : "Crear venta"}
                             fields={[
                                 {
                                     label: "Técnico (RUT)",
                                     name: "rut_trabajador",
-                                    defaultValue: maintenanceData.rut_trabajador || currentUser?.rut || "",
+                                    defaultValue: saleData.rut_trabajador || currentUser?.rut || "",
                                     placeholder: "RUT del técnico",
                                     fieldType: "input",
                                     type: "text",
@@ -82,47 +82,36 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
                                 {
                                     label: "Cliente (RUT)",
                                     name: "rut_cliente",
-                                    defaultValue: maintenanceData.rut_cliente || "",
+                                    defaultValue: saleData.rut_cliente || "",
                                     placeholder: "RUT del cliente",
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
                                 },                                
                                 {
-                                    label: "Descripción",
-                                    name: "descripcion",
-                                    defaultValue: maintenanceData.descripcion || "",
-                                    placeholder: "Descripción del mantenimiento",
-                                    fieldType: "input",
-                                    type: "text",
-                                    required: false,
-                                    minLength: 10,
-                                    maxLength: 150,
-                                },
-                                {
-                                    label: "Fecha",
-                                    name: "fecha_mantenimiento",
-                                    defaultValue: maintenanceData.fecha_mantenimiento || "",
-                                    placeholder: "Fecha del mantenimiento",
+                                    label: "Fecha de venta",
+                                    name: "fecha_venta",
+                                    defaultValue: saleData.fecha_venta || "",
+                                    placeholder: "Fecha de la venta",
                                     fieldType: "input",
                                     type: "date",
                                     required: true,
                                 },
                                 ...items.flatMap((item, index) => [
                                     {
-                                        label: `ID de artículo usado ${index + 1}`,
+                                        label: `ID de artículo vendido ${index + 1}`,
                                         name: `id_item-${index}`,
                                         defaultValue: item.id_item || "",
-                                        placeholder: "ID del artículo usado",
+                                        placeholder: "ID del artículo vendido",
                                         fieldType: "input",
                                         type: "text",
                                         onChange: (e) => handleItemChange(index, "id_item", e.target.value),
                                     },
                                     {
-                                        label: `Cantidad usada ${index + 1}`,
+                                        label: `Cantidad vendida ${index + 1}`,
                                         name: `cantidad-${index}`,
                                         defaultValue: item.cantidad || "",
-                                        placeholder: "Cantidad del artículo usado",
+                                        placeholder: "Cantidad del artículo vendido",
                                         fieldType: "input",
                                         type: "number",
                                         onChange: (e) => handleItemChange(index, "cantidad", e.target.value),
@@ -130,7 +119,7 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
                                 ]),
                             ]}
                             onSubmit={handleSubmit}
-                            buttonText={isEdit ? "Guardar cambios" : "Crear mantenimiento"}
+                            buttonText={isEdit ? "Guardar cambios" : "Crear venta"}
                             backgroundColor={"#fff"}
                         />
                         <div className="form">
@@ -151,4 +140,3 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
         </div>
     );
 }
-
