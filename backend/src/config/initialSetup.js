@@ -76,6 +76,24 @@ async function createUsers() {
           rol: "usuario",
         }),
       ),
+      userRepository.save(
+        userRepository.create({
+          nombreCompleto: "Administrador A B C",
+          rut: "11.111.111-1",
+          email: "user@admin.com",
+          password: await encryptPassword("admin"),
+          rol: "administrador",
+        }),
+      ),  
+      userRepository.save(
+        userRepository.create({
+          nombreCompleto: "Tecnico A B C",
+          rut: "22.222.222-2",
+          email: "user@tecnico.com",
+          password: await encryptPassword("tecnico"),
+          rol: "tecnico",
+        }),
+      ),
     ]);
     console.log("* => Usuarios creados exitosamente");
   } catch (error) {
