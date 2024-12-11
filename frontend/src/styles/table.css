@@ -1,11 +1,11 @@
 .table-container .tabulator .tabulator-col {
-    background-color: #003366;
-    color: #fff;
+    background: #384B70;
+    color: #FCFAEE;
 }
 .tabulator .tabulator-footer .tabulator-page {
-    background-color: #fff;
+    background-color: #FCFAEE;
     color: black;
-    border: 1px solid #003366;
+    border: 1px solid #384B70;
     padding: 4px 8px;
     border-radius: 4px;
 }

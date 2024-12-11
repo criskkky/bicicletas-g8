@@ -22,7 +22,7 @@
 }
 
 .title-table {
-    color: #003366;
+    color: #384B70;
     font-size: 1.8em;
     font-weight: bold;
 }
@@ -44,7 +44,7 @@
 }
 
 .filter-actions button:hover {
-    background: #003366;
+    background: #384B70;
     color: white;
 }
 
