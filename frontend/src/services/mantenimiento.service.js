@@ -47,6 +47,8 @@ export async function createMaintenance(maintenanceData) {
 // Función para actualizar un mantenimiento existente
 export async function updateMaintenance(id_mantenimiento, maintenanceData) {
     try {
+        console.log('Datos enviados al backend:', maintenanceData);
+
         const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
 
         if (!response.data || typeof response.data !== 'object') {
@@ -68,9 +70,12 @@ export async function updateMaintenance(id_mantenimiento, maintenanceData) {
         };
     } catch (error) {
         console.error('Error en updateMaintenance:', error.response?.data || error.message);
+        console.log('Datos enviados:', maintenanceData);
         throw error;
     }
 }
+
+
 
 // Función para eliminar un mantenimiento
 export async function deleteMaintenance(id_mantenimiento) {
