@@ -62,6 +62,7 @@ export default function PopupSales({ show, setShow, data, action }) {
         const dataToSubmit = {
             ...formData,
             id_venta: isEdit ? saleData.id_venta : undefined,
+            id_factura: isEdit ? saleData.id_venta : undefined,
             items: itemsToSubmit,
             total: 0,
         };

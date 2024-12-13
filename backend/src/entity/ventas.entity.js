@@ -10,10 +10,6 @@ const SaleSchema = new EntitySchema({
       primary: true,
       generated: true,  // Esto asegura que id_venta sea generado automáticamente.
     },
-    id_factura: {
-      type: "int",
-      nullable: false,  // Ahora es una clave foránea, no generada aquí.
-    },
     rut_trabajador: {
       type: "varchar",
       length: 12,
