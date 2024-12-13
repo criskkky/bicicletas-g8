@@ -1,5 +1,5 @@
 import Table from '@components/Table';
-import useInventoryItems from '@hooks/inventario/useGetInventoryItems.jsx';
+import useInventory from '@hooks/inventario/useGetInventory.jsx';
 import Search from '../components/Search';
 import Popup from '../components/PopupInventory';
 import DeleteIcon from '../assets/deleteIcon.svg';
@@ -8,24 +8,24 @@ import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
 import { useCallback, useState } from 'react';
 import '@styles/inventory.css';
-import useEditInventoryItem from '@hooks/inventario/useEditInventoryItem';
-import useDeleteInventoryItem from '@hooks/inventario/useDeleteInventoryItem';
-import useCreateInventoryItem from '@hooks/inventario/useCreateInventoryItem';
+import useEditInventory from '@hooks/inventario/useEditInventory';
+import useDeleteInventory from '@hooks/inventario/useDeleteInventory';
+import useCreateInventory from '@hooks/inventario/useCreateInventory';
 
 const Inventory = () => {
-  const { inventoryItems, fetchInventoryItems, setInventoryItems } = useInventoryItems();
+  const { inventory, fetchInventory, setInventory } = useInventory();
   const [filterId, setFilterId] = useState('');
 
   const {
     handleUpdate,
-    inventoryItem,
-    setInventoryItem,
+    dataInventory,
+    setDataInventory,
     isPopupOpen,
     setIsPopupOpen,
-  } = useEditInventoryItem(fetchInventoryItems, setInventoryItems);
+  } = useEditInventory(fetchInventory, setInventory);
 
-  const { handleDelete } = useDeleteInventoryItem(fetchInventoryItems, setInventoryItem);
-  const { handleCreate } = useCreateInventoryItem(fetchInventoryItems, setInventoryItems);
+  const { handleDelete } = useDeleteInventory(fetchInventory, setDataInventory);
+  const { handleCreate } = useCreateInventory(fetchInventory, setInventory);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -33,17 +33,17 @@ const Inventory = () => {
 
   const handleSelectionChange = useCallback(
     (selectedItems) => {
-      setInventoryItem(selectedItems.length > 0 ? selectedItems[0] : {});
+      setDataInventory(selectedItems.length > 0 ? selectedItems[0] : {});
     },
-    [setInventoryItem]
+    [setDataInventory]
   );
 
   const columns = [
-    { title: 'ID Artículo', field: 'id_item', width: 100, responsive: 0 },
+    { title: 'ID', field: 'id_item', width: 100, responsive: 0 },
     { title: 'Nombre', field: 'nombre', width: 200, responsive: 1 },
     { title: 'Marca', field: 'marca', width: 150, responsive: 1 },
-    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 2 },
-    { title: 'Precio', field: 'precio', width: 100, responsive: 2 },
+    { title: 'Descripción', field: 'descripcion', width: 350, responsive: 3 },
+    { title: 'Precio', field: 'precio', width: 150, responsive: 2 },
     { title: 'Stock', field: 'stock', width: 100, responsive: 2 },
     { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
@@ -54,8 +54,8 @@ const Inventory = () => {
   };
 
   const handleDeleteClick = () => {
-    if (inventoryItem && inventoryItem.id_item) {
-      handleDelete([inventoryItem]);
+    if (dataInventory && dataInventory.id_item) {
+      handleDelete([dataInventory]);
     }
   };
 
@@ -65,28 +65,28 @@ const Inventory = () => {
         <div className="top-table">
           <h1 className="title-table">Inventario</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID Artículo'} />
-            <button onClick={handleUpdateClick} disabled={!inventoryItem.id_item}>
-              {inventoryItem.id_item ? (
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
+            <button onClick={handleUpdateClick} disabled={!dataInventory.id_item}>
+              {dataInventory.id_item ? (
                 <img src={UpdateIcon} alt="edit" />
               ) : (
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
-            <button className="delete-inventory-button" onClick={handleDeleteClick} disabled={!inventoryItem.id_item}>
-              {inventoryItem.id_item ? (
+            <button className="delete-inventory-button" onClick={handleDeleteClick} disabled={!dataInventory.id_item}>
+              {dataInventory.id_item ? (
                 <img src={DeleteIcon} alt="delete" />
               ) : (
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            <button onClick={() => { setInventoryItem({}); setIsPopupOpen(true); }}>
+            <button onClick={() => { setDataInventory({}); setIsPopupOpen(true); }}>
               +
             </button>
           </div>
         </div>
         <Table
-          data={inventoryItems}
+          data={inventory}
           columns={columns}
           filter={filterId}
           dataToFilter="id_item"
@@ -97,8 +97,8 @@ const Inventory = () => {
       <Popup
         show={isPopupOpen}
         setShow={setIsPopupOpen}
-        data={inventoryItem}
-        action={inventoryItem && inventoryItem.id_item ? handleUpdate : handleCreate}
+        data={dataInventory}
+        action={dataInventory && dataInventory.id_item ? handleUpdate : handleCreate}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createInventoryItem } from '@services/inventario.service.js';
 
-const useCreateInventory = (setInventoryItems) => {
+const useCreateInventory = (setInventory) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -10,9 +10,8 @@ const useCreateInventory = (setInventoryItems) => {
         if (!newInventoryData || 
             !newInventoryData.nombre || 
             !newInventoryData.marca || 
-            !newInventoryData.descripcion || 
-            newInventoryData.precio == null || 
-            newInventoryData.stock == null) {
+            !newInventoryData.precio || 
+            !newInventoryData.stock) {
             setError("Datos incompletos. Verifique que todos los campos obligatorios estén presentes.");
             return;
         }
@@ -21,19 +20,19 @@ const useCreateInventory = (setInventoryItems) => {
         setError(null); // Limpiar errores previos
 
         try {
-            // Llamada al servicio para crear un nuevo ítem en el inventario
+            // Llamada al servicio para crear el elemento del inventario
             const response = await createInventoryItem(newInventoryData);
 
             if (response) {
-                // Agregar el ítem creado a la lista existente
-                setInventoryItems(prevState => [
+                // Agregar el elemento creado al inventario existente
+                setInventory(prevState => [
                     ...prevState,
                     { ...response }
                 ]);
             }
         } catch (error) {
-            setError(error?.response?.data?.message || "Error al crear ítem en el inventario");
-            console.error("Error al crear ítem en el inventario:", error);
+            setError(error?.response?.data?.message || "Error al crear el elemento del inventario");
+            console.error("Error al crear el elemento del inventario:", error);
         } finally {
             setLoading(false);
         }

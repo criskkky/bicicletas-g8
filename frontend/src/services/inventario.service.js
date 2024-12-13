@@ -1,8 +1,8 @@
 import axios from './root.service.js';
 import { formatDataInventory } from '@helpers/formatDataInventory.js';
 
-// Función para obtener todos los artículos del inventario
-export async function getInventoryItems() {
+// Función para obtener todos los elementos del inventario
+export async function getInventory() {
     try {
         const response = await axios.get('/inventory/');
         
@@ -16,12 +16,12 @@ export async function getInventoryItems() {
         }));
         return formattedData;
     } catch (error) {
-        console.error("Error al obtener los datos del inventario:", error);
-        return { error: error.message || 'Error al obtener los datos del inventario' };
+        console.error("Error al obtener el inventario:", error);
+        return { error: error.message || 'Error al obtener el inventario' };
     }
 }
 
-// Función para obtener un artículo específico del inventario por su ID
+// Función para obtener un elemento específico del inventario por su ID
 export async function getInventoryItem(id_item) {
     try {
         const { data } = await axios.get(`/inventory/view/${id_item}`);
@@ -30,37 +30,39 @@ export async function getInventoryItem(id_item) {
             id_item: data.data.id, // Asegura que el campo esté alineado con el MER
         };
     } catch (error) {
-        return error.response?.data || { error: 'Error al obtener el artículo del inventario' };
+        return error.response?.data || { error: 'Error al obtener el elemento del inventario' };
     }
 }
 
-// Función para crear un nuevo artículo en el inventario
-export async function createInventoryItem(itemData) {
+// Función para crear un nuevo elemento en el inventario
+export async function createInventoryItem(inventoryData) {
     try {
-        const response = await axios.post('/inventory/add', itemData);
+        const response = await axios.post('/inventory/add', inventoryData);
         return response.data;
     } catch (error) {
-        return error.response?.data || { error: 'Error al crear el artículo del inventario' };
+        return error.response?.data || { error: 'Error al crear el elemento del inventario' };
     }
 }
 
-// Función para actualizar un artículo existente en el inventario
-export async function updateInventoryItem(id_item, itemData) {
+// Función para actualizar un elemento existente en el inventario
+export async function updateInventoryItem(id_item, inventoryData) {
     try {
-        const response = await axios.patch(`/inventory/edit/${id_item}`, itemData);
-        console.log('Datos del inventario actualizados:', response.data);
-        
-        if (!response.data || !response.data.item) {
+        const response = await axios.patch(`/inventory/edit/${id_item}`, inventoryData);
+        if (!response.data || typeof response.data !== 'object') {
             throw new Error('La respuesta del servidor no tiene la estructura esperada');
         }
-        
-        // Asumimos que el servidor devuelve el artículo actualizado en response.data.item
-        const updatedItem = response.data.item;
+        console.log('Datos de inventario actualizados correctamente:', response.data);
 
-        // Aseguramos que id_item esté presente
+        // Validar si el servidor devuelve correctamente el item actualizado
+        const updatedItem = response.data.item || response.data;
+        if (!updatedItem.id_item && !updatedItem.id) {
+            throw new Error('El elemento actualizado no está presente en la respuesta del servidor');
+        }
+
+        // Verificar y formatear los datos devueltos
         return {
             ...updatedItem,
-            id_item: updatedItem.id || id_item,
+            id_item: updatedItem.id_item || updatedItem.id || id_item, // Usar id_item o id según lo que devuelva la API
         };
     } catch (error) {
         console.error('Error en updateInventoryItem:', error);
@@ -68,12 +70,12 @@ export async function updateInventoryItem(id_item, itemData) {
     }
 }
 
-// Función para eliminar un artículo del inventario
+// Función para eliminar un elemento del inventario
 export async function deleteInventoryItem(id_item) {
     try {
         const response = await axios.delete(`/inventory/delete/${id_item}`);
         return response.data;
     } catch (error) {
-        return error.response?.data || { error: 'Error al eliminar el artículo del inventario' };
+        return error.response?.data || { error: 'Error al eliminar el elemento del inventario' };
     }
 }

@@ -2,30 +2,38 @@ import { useState, useEffect } from 'react';
 import Form from './Form';
 import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
+import { isAdmin } from '@helpers/session.jsx';
 
-export default function PopupInventory({ show, setShow, inventoryItem, action }) {
-    const isEdit = inventoryItem && Object.keys(inventoryItem).length > 0;
-    const [itemData, setItemData] = useState({});
+export default function PopupInventory({ show, setShow, data, action }) {
+    const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
+    const isEdit = data && Object.keys(data).length > 0;
+    const [inventoryData, setInventoryData] = useState({});
 
     useEffect(() => {
         if (isEdit) {
-            setItemData(inventoryItem);
+            setInventoryData(data);
         } else {
-            setItemData({});
+            setInventoryData({
+                nombre: "",
+                marca: "",
+                descripcion: "",
+                precio: "",
+                stock: "",
+            });
         }
-    }, [inventoryItem, isEdit]);
+    }, [data, isEdit]);
 
     const handleSubmit = (formData) => {
-        const dataToSubmit = { 
+        const dataToSubmit = {
             ...formData,
-            id_item: isEdit ? itemData.id_item : undefined,
+            id_item: isEdit ? inventoryData.id_item : undefined,
         };
 
         console.log('Datos a enviar:', dataToSubmit);
         action(dataToSubmit);
         setShow(false);
     };
-    
+
     return (
         <div>
             {show && (
@@ -35,13 +43,13 @@ export default function PopupInventory({ show, setShow, inventoryItem, action })
                             <img src={CloseIcon} alt="Cerrar" />
                         </button>
                         <Form
-                            title={isEdit ? "Editar artículo" : "Crear artículo"}
+                            title={isEdit ? "Editar inventario" : "Agregar al inventario"}
                             fields={[
                                 {
-                                    label: "Nombre",
+                                    label: "Nombre del producto",
                                     name: "nombre",
-                                    defaultValue: itemData.nombre || "",
-                                    placeholder: "Nombre del artículo",
+                                    defaultValue: inventoryData.nombre || "",
+                                    placeholder: "Nombre del producto",
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
@@ -49,8 +57,8 @@ export default function PopupInventory({ show, setShow, inventoryItem, action })
                                 {
                                     label: "Marca",
                                     name: "marca",
-                                    defaultValue: itemData.marca || "",
-                                    placeholder: "Marca del artículo",
+                                    defaultValue: inventoryData.marca || "",
+                                    placeholder: "Marca del producto",
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
@@ -58,36 +66,35 @@ export default function PopupInventory({ show, setShow, inventoryItem, action })
                                 {
                                     label: "Descripción",
                                     name: "descripcion",
-                                    defaultValue: itemData.descripcion || "",
-                                    placeholder: "Descripción del artículo",
+                                    defaultValue: inventoryData.descripcion || "",
+                                    placeholder: "Descripción del producto",
                                     fieldType: "textarea",
                                     required: false,
                                     minLength: 10,
-                                    maxLength: 150,
+                                    maxLength: 255,
                                 },
                                 {
-                                    label: "Precio",
+                                    label: "Precio unitario",
                                     name: "precio",
-                                    defaultValue: itemData.precio || "",
+                                    defaultValue: inventoryData.precio || "",
                                     placeholder: "Precio unitario",
                                     fieldType: "input",
                                     type: "number",
+                                    step: "0.01",
                                     required: true,
-                                    min: 0,
                                 },
                                 {
-                                    label: "Stock",
+                                    label: "Cantidad en stock",
                                     name: "stock",
-                                    defaultValue: itemData.stock || "",
-                                    placeholder: "Cantidad en stock",
+                                    defaultValue: inventoryData.stock || "",
+                                    placeholder: "Cantidad disponible",
                                     fieldType: "input",
                                     type: "number",
                                     required: true,
-                                    min: 0,
                                 },
                             ]}
                             onSubmit={handleSubmit}
-                            buttonText={isEdit ? "Guardar cambios" : "Crear artículo"}
+                            buttonText={isEdit ? "Guardar cambios" : "Agregar producto"}
                             backgroundColor={"#fff"}
                         />
                     </div>

@@ -47,36 +47,27 @@ export async function createMaintenance(maintenanceData) {
 // Función para actualizar un mantenimiento existente
 export async function updateMaintenance(id_mantenimiento, maintenanceData) {
     try {
-        // Asegúrate de que los items estén incluidos en maintenanceData
-        const { items, ...restData } = maintenanceData;
-        const dataToSend = {
-            ...restData,
-            items: items.map(item => ({
-                id_item: item.id_item,
-                cantidad: parseInt(item.cantidad, 10)
-            }))
-        };
+        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
 
-        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, dataToSend);
-        console.log('Datos de mantenimiento actualizados:', response.data);
-        
-        if (!response.data || !response.data.maintenance) {
+        if (!response.data || typeof response.data !== 'object') {
             throw new Error('La respuesta del servidor no tiene la estructura esperada');
         }
-        
-        // Asumimos que el servidor devuelve el mantenimiento actualizado en response.data.maintenance
-        const updatedMaintenance = response.data.maintenance;
-        
-        // Aseguramos que id_mantenimiento esté presente y que los items estén incluidos
+
+        console.log('Datos de mantenimiento actualizados correctamente:', response.data);
+
+        const updatedMaintenance = response.data.maintenance || response.data;
+        if (!updatedMaintenance.id_mantenimiento && !updatedMaintenance.id) {
+            console.error('Respuesta del servidor:', response.data);
+            throw new Error('El mantenimiento actualizado no está presente en la respuesta del servidor');
+        }
+
         return {
             ...updatedMaintenance,
-            id_mantenimiento: updatedMaintenance.id || id_mantenimiento,
-            items: updatedMaintenance.items && updatedMaintenance.items.length > 0 
-                ? updatedMaintenance.items 
-                : items
+            id_mantenimiento: updatedMaintenance.id_mantenimiento || updatedMaintenance.id || id_mantenimiento,
+            items: updatedMaintenance.items || maintenanceData.items,
         };
     } catch (error) {
-        console.error('Error en updateMaintenance:', error);
+        console.error('Error en updateMaintenance:', error.response?.data || error.message);
         throw error;
     }
 }
@@ -90,4 +81,3 @@ export async function deleteMaintenance(id_mantenimiento) {
         return error.response?.data || { error: 'Error al eliminar el mantenimiento' };
     }
 }
-
