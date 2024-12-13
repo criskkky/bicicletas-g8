@@ -61,7 +61,6 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
             items: itemsToSubmit,
         };
     
-        console.log('Datos a enviar Front:', dataToSubmit);
         action(dataToSubmit);
         setShow(false);
     };    

@@ -1,9 +1,9 @@
 import { deleteSale } from '@services/ventas.service.js';
 import { deleteDataAlert, showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
-const useDeleteSale = (fetchSales, setSale) => {
-    const handleDelete = async (salesToDelete) => {
-        if (!salesToDelete || salesToDelete.length === 0) {
+const useDeleteSale = (fetchSales, setDataSale) => {
+    const handleDelete = async (dataSale) => {
+        if (!dataSale || dataSale.length === 0) {
             showErrorAlert('Error', 'No se seleccionó ninguna venta para eliminar.');
             return;
         }
@@ -11,7 +11,7 @@ const useDeleteSale = (fetchSales, setSale) => {
         try {
             const result = await deleteDataAlert(); // Confirmación del usuario
             if (result.isConfirmed) {
-                const response = await deleteSale(salesToDelete[0].id_venta); // Usar id_venta
+                const response = await deleteSale(dataSale[0].id_venta); // Usar id_venta
 
                 if (response.status === 'Client error') {
                     return showErrorAlert('Error', response.details);
@@ -19,7 +19,7 @@ const useDeleteSale = (fetchSales, setSale) => {
 
                 showSuccessAlert('¡Eliminado!', 'La venta ha sido eliminada correctamente.');
                 await fetchSales(); // Actualiza la lista de ventas
-                setSale({}); // Limpia la selección
+                setDataSale([]); // Limpia la selección
             } else {
                 showErrorAlert('Cancelado', 'La operación ha sido cancelada.');
             }

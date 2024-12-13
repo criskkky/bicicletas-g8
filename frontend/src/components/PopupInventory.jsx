@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import Form from './Form';
 import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
-import { isAdmin } from '@helpers/session.jsx';
 
 export default function PopupInventory({ show, setShow, data, action }) {
-    const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
     const isEdit = data && Object.keys(data).length > 0;
     const [inventoryData, setInventoryData] = useState({});
 
@@ -80,7 +78,6 @@ export default function PopupInventory({ show, setShow, data, action }) {
                                     placeholder: "Precio unitario",
                                     fieldType: "input",
                                     type: "number",
-                                    step: "0.01",
                                     required: true,
                                 },
                                 {

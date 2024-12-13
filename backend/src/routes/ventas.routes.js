@@ -7,7 +7,7 @@ import {
     createSale,
     deleteSale,
     getAllSales,
-    getSaleById,
+    getSale,
     updateSale
 } from "../controllers/ventas.controller.js";
 
@@ -20,8 +20,8 @@ router
 
 router.post("/", createSale);
 router.get("/", getAllSales);
-router.get("/:id", getSaleById);
-router.put("/:id", updateSale);
+router.get("/:id", getSale);
+router.patch("/:id", updateSale);
 router.delete("/:id", deleteSale);
 
 export default router;

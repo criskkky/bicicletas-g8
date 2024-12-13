@@ -5,16 +5,23 @@ import { showWarningAlert } from '@helpers/sweetAlert.js';
 const useGetSales = () => {
     const [sales, setSales] = useState([]);
 
-    const formatSalesData = (sale) => ({
-        id_venta: sale.id_venta,
-        rut_trabajador: sale.rut_trabajador,
-        rut_cliente: sale.rut_cliente,
-        fecha_venta: sale.fecha_venta,
-        total: parseFloat(sale.total).toFixed(2),
-        createdAt: sale.createdAt,
-        updatedAt: sale.updatedAt,
-    });
-
+    const formatSaleData = (sale) => {
+        const items = Array.isArray(sale.items)
+            ? sale.items.map(item => `ID: ${item.id_item}, Cantidad: ${item.cantidad}`).join(', ')
+            : "N/A";
+    
+        return {
+            id_venta: sale.id_venta,
+            rut_trabajador: sale.rut_trabajador,
+            rut_cliente: sale.rut_cliente,
+            fecha_venta: sale.fecha_venta,
+            items,
+            total: sale.total,
+            createdAt: sale.createdAt,
+            updatedAt: sale.updatedAt,
+        };
+    };
+    
     const fetchSales = async () => {
         try {
             const response = await getSales();
@@ -24,10 +31,10 @@ const useGetSales = () => {
                 return showWarningAlert("¡Advertencia!", "No existen registros de ventas.");
             }
 
-            const formattedData = response.map(formatSalesData);
+            const formattedData = response.map(formatSaleData);
             setSales(formattedData);
         } catch (error) {
-            console.error("Error al obtener los datos de ventas: ", error.message);
+            console.error("Error al obtener las ventas: ", error.message);
             showWarningAlert("Error", "No se pudo obtener los datos de ventas.");
         }
     };

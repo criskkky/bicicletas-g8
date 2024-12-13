@@ -5,15 +5,14 @@ import { formatDataSale } from '@helpers/formatDataSales.js';
 export async function getSales() {
     try {
         const response = await axios.get('/sale/');
-        
-        if (!response || !response.data) {
-            throw new Error("La respuesta de la API no tiene la estructura esperada.");
-        }
 
-        // Formatea los datos para incluir `id_venta`
-        const formattedData = response.data.map(sale => ({
+        // Si response.data no es un array, lo convertimos en uno
+        const salesData = Array.isArray(response.data) ? response.data : [response.data];
+
+        const formattedData = salesData.map(sale => ({
             ...formatDataSale(sale),
         }));
+
         return formattedData;
     } catch (error) {
         console.error("Error al obtener las ventas:", error);
@@ -47,7 +46,7 @@ export async function createSale(saleData) {
 // Función para actualizar una venta existente
 export async function updateSale(id_venta, saleData) {
     try {
-        const response = await axios.put(`/sale/${id_venta}`, saleData);
+        const response = await axios.patch(`/sale/${id_venta}`, saleData);
         console.log('Datos de venta actualizados:', response.data);
         
         if (!response.data || !response.data.sale) {

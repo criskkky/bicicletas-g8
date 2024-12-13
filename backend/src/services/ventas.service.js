@@ -1,12 +1,12 @@
 import { AppDataSource } from "../config/configDb.js";
-import Venta from "../entity/ventas.entity.js";
-import VentaInventario from "../entity/ventas_inventario.entity.js";
+import Sale from "../entity/ventas.entity.js";
+import SaleInventory from "../entity/ventas_inventario.entity.js";
 import Inventario from "../entity/inventario.entity.js";
 import User from "../entity/user.entity.js";
 import Invoice from "../entity/factura.entity.js";
 import Order from "../entity/orden.entity.js";
 
-// Ajustar inventario para los ítems de venta
+// Ajustar inventario para los ítems de la venta
 async function ajustarInventario(itemId, cambioCantidad) {
   const inventoryRepository = AppDataSource.getRepository(Inventario);
   const item = await inventoryRepository.findOne({ where: { id_item: itemId } });
@@ -19,40 +19,52 @@ async function ajustarInventario(itemId, cambioCantidad) {
   return { success: true, item };
 }
 
+// Crear venta
 export async function createSaleService(data) {
   try {
-    console.log("Iniciando creación de venta con datos:", data);
-
     const userRepository = AppDataSource.getRepository(User);
+
+    // Validar si el trabajador existe
     const trabajador = await userRepository.findOne({ where: { rut: data.rut_trabajador } });
     if (!trabajador) throw new Error(`Trabajador con RUT ${data.rut_trabajador} no encontrado`);
 
-    let total = 0;
+    const saleRepository = AppDataSource.getRepository(Sale);
 
-    // Calcular total para los items
-    if (data.items && Array.isArray(data.items)) {
-      for (const itemData of data.items) {
-        const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
-        if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
-        total += item.precio * itemData.cantidad;
-      }
-    }
-
-    console.log("Total calculado para la venta:", total);
-
-    // Crear la venta con el total calculado
-    const saleRepository = AppDataSource.getRepository(Venta);
+    // Inicializa el total con 0 para evitar valores null
     const sale = saleRepository.create({
       rut_trabajador: data.rut_trabajador,
       rut_cliente: data.rut_cliente,
       fecha_venta: data.fecha_venta,
-      total: total,
+      total: 0, // Valor inicial para evitar problemas
     });
 
     await saleRepository.save(sale);
-    console.log("Venta creada con éxito:", sale);
 
-    // Crear la factura
+    let total = 0;
+
+    if (data.items && Array.isArray(data.items)) {
+      const saleInventoryRepository = AppDataSource.getRepository(SaleInventory);
+      for (const itemData of data.items) {
+        const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
+        if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
+
+        const saleInventoryItem = saleInventoryRepository.create({
+          id_venta: sale.id_venta,
+          id_item: item.id_item,
+          cantidad: itemData.cantidad,
+          precio_costo: item.precio * itemData.cantidad,
+        });
+
+        await saleInventoryRepository.save(saleInventoryItem);
+
+        total += item.precio * itemData.cantidad;
+      }
+    }
+
+    // Actualizar el total calculado en la venta
+    sale.total = total;
+    await saleRepository.save(sale);
+
     const invoiceRepository = AppDataSource.getRepository(Invoice);
     const invoice = invoiceRepository.create({
       id_venta: sale.id_venta,
@@ -65,71 +77,53 @@ export async function createSaleService(data) {
     });
 
     await invoiceRepository.save(invoice);
-    console.log("Factura creada con éxito:", invoice);
 
-    // Crear la orden después de crear la factura y teniendo `id_factura`
     const orderRepository = AppDataSource.getRepository(Order);
     const order = orderRepository.create({
       id_venta: sale.id_venta,
-      rut_cliente: data.rut_cliente,
+      id_factura: invoice.id_factura,
       rut_trabajador: data.rut_trabajador,
       fecha_orden: new Date(),
-      tipo_orden: "venta",
-      total: total,
       estado_orden: "pendiente",
+      total: invoice.total,
+      tipo_orden: "venta",
       hora_inicio: data.hora_inicio ? new Date(data.hora_inicio) : null,
       hora_fin: data.hora_fin ? new Date(data.hora_fin) : null,
-      id_factura: invoice.id_factura,
     });
 
     await orderRepository.save(order);
-    console.log("Orden creada con éxito:", order);
 
-    return [sale, null];
+    return [sale, invoice, order, null];
   } catch (error) {
-    console.error("Error al crear la venta:", error);
-    return [null, error.message || "Error al crear la venta"];
+    console.error("Error en la creación de la venta:", error);
+    return [null, null, null, error];
   }
 }
-
 
 // Obtener todas las ventas
 export async function getAllSalesService() {
-  try {
-    const saleRepository = AppDataSource.getRepository(Venta);
-    const sales = await saleRepository.find({ relations: ["items"] });
-    return [sales, null];
-  } catch (error) {
-    console.error("Error al obtener todas las ventas:", error);
-    return [null, "Error al obtener las ventas"];
-  }
+  const saleRepository = AppDataSource.getRepository(Sale);
+  return await saleRepository.find({ relations: ["items"] });
 }
 
-// Obtener una venta por ID
-export async function getSaleByIdService(id) {
-  try {
-    const saleRepository = AppDataSource.getRepository(Venta);
-    const sale = await saleRepository.findOne({ where: { id_venta: id }, relations: ["items"] });
-    if (!sale) {
-      return [null, "Venta no encontrada"];
-    }
-    return [sale, null];
-  } catch (error) {
-    console.error("Error al obtener la venta por ID:", error);
-    return [null, "Error al obtener la venta"];
-  }
+// Obtener una venta específica
+export async function getSaleService(id) {
+  const saleRepository = AppDataSource.getRepository(Sale);
+  return await saleRepository.findOne({ where: { id_venta: id }, relations: ["items"] });
 }
 
-// Actualizar una venta
+// Actualizar venta
 export async function updateSaleService(id, data) {
   try {
+    const userRepository = AppDataSource.getRepository(User);
+
     // Validar si el trabajador existe
     if (data.rut_trabajador) {
-      const trabajador = await AppDataSource.getRepository(User).findOne({ where: { rut: data.rut_trabajador } });
+      const trabajador = await userRepository.findOne({ where: { rut: data.rut_trabajador } });
       if (!trabajador) throw new Error(`Trabajador con RUT ${data.rut_trabajador} no encontrado`);
     }
 
-    const saleRepository = AppDataSource.getRepository(Venta);
+    const saleRepository = AppDataSource.getRepository(Sale);
     const sale = await saleRepository.findOne({
       where: { id_venta: id },
       relations: ["items", "invoice"],
@@ -146,21 +140,21 @@ export async function updateSaleService(id, data) {
     let total = 0;
 
     if (data.items && Array.isArray(data.items)) {
-      const saleInventoryRepository = AppDataSource.getRepository(VentaInventario);
-      
-      const itemsActuales = sale.items.map(item => item.id_item);
-      const nuevosItems = data.items.map(item => item.id_item);
-      const itemsAEliminar = itemsActuales.filter(item => !nuevosItems.includes(item));
+      const saleInventoryRepository = AppDataSource.getRepository(SaleInventory);
+
+      const itemsActuales = sale.items.map((item) => item.id_item);
+      const nuevosItems = data.items.map((item) => item.id_item);
+      const itemsAEliminar = itemsActuales.filter((itemId) => !nuevosItems.includes(itemId));
 
       for (const itemId of itemsAEliminar) {
-        await saleInventoryRepository.delete({ id_venta: id, id_item: itemId });
+        await saleInventoryRepository.delete({ id_venta: sale.id_venta, id_item: itemId });
       }
 
       for (const itemData of data.items) {
         const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
         if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
-        let saleInventoryItem = sale.items.find(inv => inv.id_item === itemData.id_item);
+        let saleInventoryItem = sale.items.find((inv) => inv.id_item === itemData.id_item);
 
         if (saleInventoryItem) {
           saleInventoryItem.cantidad = itemData.cantidad;
@@ -173,7 +167,6 @@ export async function updateSaleService(id, data) {
             cantidad: itemData.cantidad,
             precio_costo: item.precio * itemData.cantidad,
           });
-
           await saleInventoryRepository.save(saleInventoryItem);
         }
 
@@ -198,10 +191,10 @@ export async function updateSaleService(id, data) {
   }
 }
 
-// Eliminar una venta
+// Eliminar venta
 export async function deleteSaleService(id) {
   try {
-    const saleRepository = AppDataSource.getRepository(Venta);
+    const saleRepository = AppDataSource.getRepository(Sale);
     const sale = await saleRepository.findOne({ where: { id_venta: id }, relations: ["items"] });
 
     if (!sale) {
@@ -217,20 +210,20 @@ export async function deleteSaleService(id) {
       }
     }
 
-    const saleInventoryRepository = AppDataSource.getRepository(VentaInventario);
+    const saleInventoryRepository = AppDataSource.getRepository(SaleInventory);
     await saleInventoryRepository.delete({ id_venta: sale.id_venta });
 
     const orderRepository = AppDataSource.getRepository(Order);
     const order = await orderRepository.findOne({ where: { id_venta: sale.id_venta } });
     if (order) {
-      await orderRepository.delete({ id_orden: order.id_orden });
+      await orderRepository.delete(order.id_orden);
     }
 
-    await saleRepository.delete({ id_venta: sale.id_venta });
+    await saleRepository.delete(id);
 
     return { success: true };
   } catch (error) {
-    console.error("Error al eliminar la venta:", error);
+    console.error("Error en la eliminación de la venta:", error);
     return { success: false, message: error.message };
   }
 }

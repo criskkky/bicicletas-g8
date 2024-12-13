@@ -5,10 +5,10 @@ import { formatSalePostUpdate } from '@helpers/formatDataSales.js';
 
 const useEditSale = (fetchSales, setSales) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [sale, setSale] = useState({});
+    const [dataSale, setDataSale] = useState({});
 
     const handleClickUpdate = () => {
-        if (sale && sale.id_venta) {
+        if (dataSale && dataSale.id_venta) {
             setIsPopupOpen(true);
         }
     };
@@ -26,14 +26,14 @@ const useEditSale = (fetchSales, setSales) => {
 
                 const formattedSale = formatSalePostUpdate(updatedSale);
 
-                setSales((prevSales) =>
-                    prevSales.map((sale) =>
-                        sale.id_venta === formattedSale.id_venta ? { ...formattedSale } : sale
-                    )
-                );
+                setSales(prevSales => prevSales.map(sale => 
+                    sale.id_venta === formattedSale.id_venta
+                        ? { ...formattedSale, items: updatedSale.items }
+                        : sale
+                ));
 
                 await fetchSales();
-                setSale({});
+                setDataSale({});
             } catch (error) {
                 console.error('Error al actualizar la venta:', error);
                 showErrorAlert('Error', `Ocurrió un error al actualizar la venta: ${error.message}`);
@@ -48,8 +48,8 @@ const useEditSale = (fetchSales, setSales) => {
         handleUpdate,
         isPopupOpen,
         setIsPopupOpen,
-        sale,
-        setSale,
+        dataSale,
+        setDataSale
     };
 };
 

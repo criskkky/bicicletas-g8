@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { createSale } from '@services/ventas.service.js';
-import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
-const useCreateSale = (fetchSales, setSales) => {
+const useCreateSale = (setSales) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const handleCreate = async (newSaleData) => {
         // Validar estructura de los datos
-        if (
-            !newSaleData ||
-            !newSaleData.rut_trabajador ||
-            !newSaleData.rut_cliente ||
-            !newSaleData.fecha_venta
-        ) {
+        if (!newSaleData || 
+            !newSaleData.rut_trabajador || 
+            !newSaleData.rut_cliente || 
+            !newSaleData.fecha_venta) {
             setError("Datos incompletos. Verifique que todos los campos obligatorios estén presentes.");
             return;
         }
@@ -22,18 +19,19 @@ const useCreateSale = (fetchSales, setSales) => {
         setError(null); // Limpiar errores previos
 
         try {
-            // Llamada al servicio para crear una nueva venta
+            // Llamada al servicio para crear la venta
             const response = await createSale(newSaleData);
 
             if (response) {
-                showSuccessAlert('¡Creado!', 'La venta ha sido creada correctamente.');
-                await fetchSales(); // Actualiza la lista de ventas
-                setSales((prevSales) => [...prevSales, { ...response }]);
+                // Agregar la venta creada a la lista existente
+                setSales(prevState => [
+                    ...prevState,
+                    { ...response }
+                ]);
             }
         } catch (error) {
-            setError(error?.response?.data?.message || "Error al crear la venta");
-            console.error("Error al crear la venta:", error);
-            showErrorAlert('Error', 'Ocurrió un error al crear la venta.');
+            setError(error?.response?.data?.message || "Error al crear venta");
+            console.error("Error al crear venta:", error);
         } finally {
             setLoading(false);
         }
