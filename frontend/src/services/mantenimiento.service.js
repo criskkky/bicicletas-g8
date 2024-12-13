@@ -47,36 +47,33 @@ export async function createMaintenance(maintenanceData) {
 // Función para actualizar un mantenimiento existente
 export async function updateMaintenance(id_mantenimiento, maintenanceData) {
     try {
-        console.log('Datos enviados al backend:', maintenanceData);
-
-        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
-
-        if (!response.data || typeof response.data !== 'object') {
-            throw new Error('La respuesta del servidor no tiene la estructura esperada');
-        }
-
-        console.log('Datos de mantenimiento actualizados correctamente:', response.data);
-
-        const updatedMaintenance = response.data.maintenance || response.data;
-        if (!updatedMaintenance.id_mantenimiento && !updatedMaintenance.id) {
-            console.error('Respuesta del servidor:', response.data);
-            throw new Error('El mantenimiento actualizado no está presente en la respuesta del servidor');
-        }
-
-        return {
-            ...updatedMaintenance,
-            id_mantenimiento: updatedMaintenance.id_mantenimiento || updatedMaintenance.id || id_mantenimiento,
-            items: updatedMaintenance.items || maintenanceData.items,
-        };
+      console.log('Datos enviados al backend:', maintenanceData);
+  
+      const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
+  
+      console.log('Datos de mantenimiento actualizados correctamente:', response.data);
+  
+      if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
+        throw new Error('La respuesta del servidor no tiene la estructura esperada');
+      }
+  
+      const updatedMaintenance = response.data[0];
+      if (!updatedMaintenance || !updatedMaintenance.id_mantenimiento) {
+        console.error('Respuesta del servidor:', response.data);
+        throw new Error('El mantenimiento actualizado no está presente en la respuesta del servidor');
+      }
+  
+      return {
+        ...updatedMaintenance,
+        items: maintenanceData.items, // Asumiendo que los items no se devuelven en la respuesta
+      };
     } catch (error) {
-        console.error('Error en updateMaintenance:', error.response?.data || error.message);
-        console.log('Datos enviados:', maintenanceData);
-        throw error;
+      console.error('Error en updateMaintenance:', error.response?.data || error.message);
+      console.log('Datos enviados:', maintenanceData);
+      throw error;
     }
-}
-
-
-
+  }
+  
 // Función para eliminar un mantenimiento
 export async function deleteMaintenance(id_mantenimiento) {
     try {
@@ -86,3 +83,4 @@ export async function deleteMaintenance(id_mantenimiento) {
         return error.response?.data || { error: 'Error al eliminar el mantenimiento' };
     }
 }
+

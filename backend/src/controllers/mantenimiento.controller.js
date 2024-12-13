@@ -68,39 +68,35 @@ export async function getAllMaintenance(req, res) {
   }
 }
 
-export async function updateMaintenance(req, res) {
-  const { id } = req.params;
-
+export const updateMaintenance = async (req, res) => {
   try {
-    // Obtén el mantenimiento existente
-    const currentMaintenance = await getMaintenanceService(id);
+    const { id } = req.params;
+    const updateData = req.body;
 
-    if (!currentMaintenance) {
+    await updateMaintenanceService(id, updateData);
+
+    console.log("Datos recibidos para actualización:", JSON.stringify(updateData));
+
+    // Validación de datos
+    if (!updateData.rut_trabajador || !updateData.rut_cliente || !updateData.fecha_mantenimiento) {
+      return res.status(400).json({ error: "Faltan campos requeridos" });
+    }
+
+    // Intenta actualizar el mantenimiento
+    const updatedMaintenance = await updateMaintenanceService(id, updateData);
+
+    if (!updatedMaintenance) {
       return res.status(404).json({ error: "Mantenimiento no encontrado" });
     }
 
-    // Mezcla los valores existentes con los nuevos valores proporcionados
-    const updatedData = {
-      id_mantenimiento: currentMaintenance.id_mantenimiento,
-      rut_cliente: req.body.rut_cliente ?? currentMaintenance.rut_cliente,
-      rut_trabajador: req.body.rut_trabajador ?? currentMaintenance.rut_trabajador,
-      fecha_mantenimiento: req.body.fecha_mantenimiento ?? currentMaintenance.fecha_mantenimiento,
-      descripcion: req.body.descripcion ?? currentMaintenance.descripcion,
-      items: req.body.items ?? currentMaintenance.items, // Si no se proporciona, se mantiene el actual
-    };
+    console.log("Mantenimiento actualizado:", JSON.stringify(updatedMaintenance));
 
-    const { success, maintenance, message } = await updateMaintenanceService(id, updatedData);
-
-    if (!success) {
-      return res.status(400).json({ error: message });
-    }
-
-    return res.json({ message: "Mantenimiento actualizado con éxito", maintenance });
+    res.json(updatedMaintenance);
   } catch (error) {
-    console.error("Error al actualizar el mantenimiento:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    console.error("Error al actualizar mantenimiento:", error);
+    res.status(400).json({ error: error.message || "Error al actualizar el mantenimiento" });
   }
-}
+};
 
 export async function deleteMaintenance(req, res) {
   try {
