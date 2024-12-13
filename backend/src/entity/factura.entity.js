@@ -12,12 +12,13 @@ const FacturaSchema = new EntitySchema({
     },
     id_venta: {
       type: "int",
-      nullable: false,
-      unique: true,  // Aseguramos que id_venta sea único en la tabla factura
+      nullable: true,
+      unique: true,
     },
     id_mantenimiento: {
       type: "int",
       nullable: true,
+      unique: true,
     },
     rut_trabajador: {
       type: "varchar",
