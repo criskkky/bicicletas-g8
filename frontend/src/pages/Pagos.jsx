@@ -12,7 +12,7 @@ import useEditPayment from '@hooks/pagos/useEditPayment';
 import useDeletePayment from '@hooks/pagos/useDeletePayment';
 import useCreatePayment from '@hooks/pagos/useCreatePayment';
 
-const Payment = () => {
+const Payments = () => {
   const { payments, fetchPayments, setPayments } = usePayments();
   const [filterId, setFilterId] = useState('');
 
@@ -20,41 +20,44 @@ const Payment = () => {
     handleUpdate,
     dataPayment,
     setDataPayment,
-  } = useEditPayment(setPayments);
+    isPopupOpen,
+    setIsPopupOpen,
+  } = useEditPayment(fetchPayments, setPayments);
 
   const { handleDelete } = useDeletePayment(fetchPayments, setDataPayment);
-  const { handleCreate } = useCreatePayment(setPayments); // Manejo de creación
-  const [showPopup, setShowPopup] = useState(false); // Estado para controlar el popup
+  const { handleCreate } = useCreatePayment(fetchPayments, setPayments);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
   };
 
-  // Maneja los pagos seleccionados desde la tabla
   const handleSelectionChange = useCallback(
     (selectedPayments) => {
-      setDataPayment(selectedPayments.length > 0 ? selectedPayments[0] : {}); // Selecciona solo el primero
+      setDataPayment(selectedPayments.length > 0 ? selectedPayments[0] : {});
     },
     [setDataPayment]
   );
 
   const columns = [
-    { title: 'ID PAGO', field: 'id', width: 100, responsive: 0 },
-    { title: 'Cliente', field: 'cliente', width: 350, responsive: 4 },
-    { title: 'Técnico Asignado', field: 'technician', width: 300, responsive: 3 },
-    { title: 'Monto', field: 'monto', width: 150, responsive: 0 },
-    { title: 'Fecha', field: 'date', width: 200, responsive: 0 },
-    { title: 'Creado', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'ID Pago', field: 'id_pago', width: 100, responsive: 0 },
+    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 100, responsive: 1 },
+    { title: 'Cantidad de Órdenes', field: 'cantidad_ordenes_realizadas', width: 150, responsive: 2 },
+    { title: 'Horas Trabajadas', field: 'horas_trabajadas', width: 150, responsive: 2 },
+    { title: 'Fecha de Pago', field: 'fecha_pago', width: 150, responsive: 2 },
+    { title: 'Monto', field: 'monto', width: 150, responsive: 1 },
+    { title: 'Estado', field: 'estado', width: 150, responsive: 2 },
+    { title: 'Método de Pago', field: 'metodo_pago', width: 150, responsive: 2 },
+    { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
 
   const handleUpdateClick = () => {
-    setShowPopup(true); // Abre el popup en modo edición
+    setIsPopupOpen(true);
   };
 
   const handleDeleteClick = () => {
-    if (dataPayment && dataPayment.id) {
-      handleDelete([dataPayment]); // Llama al handler de eliminación solo si 'dataPayment' tiene un ID
+    if (dataPayment && dataPayment.id_pago) {
+      handleDelete([dataPayment]);
     }
   };
 
@@ -64,25 +67,22 @@ const Payment = () => {
         <div className="top-table">
           <h1 className="title-table">Pagos</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID'} />
-            {/* Botón de editar */}
-            <button onClick={handleUpdateClick} disabled={!dataPayment.id}>
-              {dataPayment.id ? (
+            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID Pago'} />
+            <button onClick={handleUpdateClick} disabled={!dataPayment.id_pago}>
+              {dataPayment.id_pago ? (
                 <img src={UpdateIcon} alt="edit" />
               ) : (
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
-            {/* Botón de eliminar */}
-            <button className="delete-payment-button" onClick={handleDeleteClick} disabled={!dataPayment.id}>
-              {dataPayment.id ? (
+            <button className="delete-payment-button" onClick={handleDeleteClick} disabled={!dataPayment.id_pago}>
+              {dataPayment.id_pago ? (
                 <img src={DeleteIcon} alt="delete" />
               ) : (
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            {/* Botón de crear */}
-            <button onClick={() => { setDataPayment({}); setShowPopup(true); }}>
+            <button onClick={() => { setDataPayment({}); setIsPopupOpen(true); }}>
               +
             </button>
           </div>
@@ -91,20 +91,19 @@ const Payment = () => {
           data={payments}
           columns={columns}
           filter={filterId}
-          dataToFilter="id"
-          onSelectionChange={handleSelectionChange} // Actualiza la selección según selección en la tabla
+          dataToFilter="id_pago"
+          onSelectionChange={handleSelectionChange}
         />
       </div>
 
-      {/* Popup para crear o editar pagos */}
       <Popup
-        show={showPopup}
-        setShow={setShowPopup}
+        show={isPopupOpen}
+        setShow={setIsPopupOpen}
         data={dataPayment}
-        action={dataPayment.id ? handleUpdate : handleCreate} // Crear o actualizar
+        action={dataPayment && dataPayment.id_pago ? handleUpdate : handleCreate}
       />
     </div>
   );
 };
 
-export default Payment;
+export default Payments;

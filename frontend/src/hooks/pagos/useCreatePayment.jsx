@@ -1,23 +1,38 @@
 import { useState } from 'react';
-import { createPayment } from '@services/pagos.service.js'; // Servicio adaptado para manejar la creación de pagos
+import { createPayment } from '@services/pagos.service.js';
 
 const useCreatePayment = (setPayments) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const handleCreate = async (newPaymentData) => {
+        // Validar estructura de los datos
+        if (!newPaymentData || 
+            !newPaymentData.rut_trabajador || 
+            !newPaymentData.fecha_pago || 
+            !newPaymentData.monto || 
+            !newPaymentData.metodo_pago) {
+            setError("Datos incompletos. Verifique que todos los campos obligatorios estén presentes.");
+            return;
+        }
+
         setLoading(true);
         setError(null); // Limpiar errores previos
+
         try {
-            const response = await createPayment(newPaymentData); // Llamada al servicio para crear el pago
+            // Llamada al servicio para crear el pago
+            const response = await createPayment(newPaymentData);
+
             if (response) {
-                // Al crear el pago, se obtiene la lista actualizada
-                setPayments(prevState => [...prevState, response]); // Agregar el pago creado a la lista existente
-                window.location.reload();
+                // Agregar el pago creado a la lista existente
+                setPayments(prevState => [
+                    ...prevState,
+                    { ...response }
+                ]);
             }
         } catch (error) {
-            setError(error); // Manejo de errores
-            console.error("Error al crear pago:", error);
+            setError(error?.response?.data?.message || "Error al crear el pago");
+            console.error("Error al crear el pago:", error);
         } finally {
             setLoading(false);
         }

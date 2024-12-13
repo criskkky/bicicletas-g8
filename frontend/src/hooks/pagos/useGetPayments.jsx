@@ -1,32 +1,39 @@
 import { useState, useEffect } from 'react';
-import { getPayments } from '@services/pagos.service.js'; // Servicio adaptado para pagos
+import { getPayments } from '@services/pagos.service.js';
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetPayments = () => {
     const [payments, setPayments] = useState([]);
 
+    const formatPaymentData = (payment) => {
+        return {
+            id_pago: payment.id_pago,
+            rut_trabajador: payment.rut_trabajador,
+            cantidad_ordenes_realizadas: payment.cantidad_ordenes_realizadas,
+            horas_trabajadas: payment.horas_trabajadas,
+            fecha_pago: payment.fecha_pago,
+            monto: payment.monto,
+            estado: payment.estado,
+            metodo_pago: payment.metodo_pago,
+            createdAt: payment.createdAt,
+            updatedAt: payment.updatedAt,
+        };
+    };
+
     const fetchPayments = async () => {
         try {
             const response = await getPayments();
+            console.log(response); // Para verificar la estructura de la respuesta
 
-            // Verifica si la respuesta es un array válido
             if (!Array.isArray(response)) {
                 return showWarningAlert("¡Advertencia!", "No existen registros de pagos.");
             }
 
-            // Formatear los datos
-            const formattedData = response.map(payment => ({
-                id: payment.id,
-                idCliente: payment.idCliente,
-                idTecnico: payment.idTecnico,
-                monto: payment.monto,
-                createdAt: payment.createdAt,
-                updatedAt: payment.updatedAt,
-            }));
-
+            const formattedData = response.map(formatPaymentData);
             setPayments(formattedData);
         } catch (error) {
-            console.error("Error: ", error.message);
+            console.error("Error al obtener los pagos: ", error.message);
+            showWarningAlert("Error", "No se pudo obtener los datos de pagos.");
         }
     };
 

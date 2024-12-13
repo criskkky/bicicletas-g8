@@ -1,61 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Form from './Form';
 import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 
-export default function Popup({ show, setShow, data, action }) {
+export default function PopupPayment({ show, setShow, data, action }) {
     const isEdit = data && Object.keys(data).length > 0;
-    const paymentData = isEdit ? data : {};
+    const [paymentData, setPaymentData] = useState({});
+
+    useEffect(() => {
+        if (isEdit) {
+            setPaymentData(data);
+        } else {
+            setPaymentData({});
+        }
+    }, [data, isEdit]);
 
     const handleSubmit = (formData) => {
-        // Crear el objeto con todos los datos
-        const dataToSubmit = {
-            ...formData,  // Esto incluye técnico, monto, etc.
+        const dataToSubmit = { 
+            ...formData,
+            id_pago: isEdit ? paymentData.id_pago : undefined,
         };
-
-        console.log('Datos a enviar:', dataToSubmit);  // Verifica los datos antes de enviarlos
-
-        action(dataToSubmit); // Envía los datos combinados al `action`
+    
+        action(dataToSubmit);
+        setShow(false);
     };
-
 
     return (
         <div>
             {show && (
                 <div className="bg">
                     <div className="popup" style={{ overflow: "auto" }}>
-                        <button className="close" onClick={() => setShow(false)}>
-                            <img src={CloseIcon} alt="Close" />
+                        <button className="close" onClick={() => setShow(false)} aria-label="Cerrar">
+                            <img src={CloseIcon} alt="Cerrar" />
                         </button>
                         <Form
                             title={isEdit ? "Editar pago" : "Crear pago"}
                             fields={[
                                 {
-                                    label: "Técnico",
-                                    name: "idTecnico",  // Cambiado a 'idTecnico' para coincidir con la entidad
-                                    defaultValue: paymentData.idTecnico || "",
-                                    placeholder: "ID del técnico",
+                                    label: "Técnico (RUT)",
+                                    name: "rut_trabajador",
+                                    defaultValue: paymentData.rut_trabajador || "",
+                                    placeholder: "11.111.111-1",
                                     fieldType: "input",
-                                    type: "number",  // Cambiado a 'number' para que coincida con el tipo de dato
+                                    type: "text",
                                     required: true,
                                 },
                                 {
-                                    label: "Monto",
-                                    name: "monto",
-                                    defaultValue: paymentData.monto || "",
-                                    placeholder: "Monto del pago",
-                                    fieldType: "input",
-                                    type: "number",
-                                    required: true,
-                                    min: 1,
-                                },
-                                {
-                                    label: "Fecha",
-                                    name: "date",
-                                    defaultValue: paymentData.date || "",
+                                    label: "Fecha de Pago",
+                                    name: "fecha_pago",
+                                    defaultValue: paymentData.fecha_pago || "",
                                     placeholder: "Fecha del pago",
                                     fieldType: "input",
                                     type: "date",
+                                    required: true,
+                                },
+                                {
+                                    label: "Estado",
+                                    name: "estado",
+                                    defaultValue: paymentData.estado || "pendiente",
+                                    placeholder: "Estado del pago",
+                                    fieldType: "select",
+                                    options: [
+                                        { value: "pendiente", label: "Pendiente" },
+                                        { value: "realizado", label: "Realizado" },
+                                    ],
+                                    required: true,
+                                },
+                                {
+                                    label: "Método de Pago",
+                                    name: "metodo_pago",
+                                    defaultValue: paymentData.metodo_pago || "efectivo",
+                                    placeholder: "Método de pago",
+                                    fieldType: "select",
+                                    options: [
+                                        { value: "efectivo", label: "Efectivo" },
+                                        { value: "tarjeta", label: "Tarjeta" },
+                                        { value: "transferencia", label: "Transferencia" },
+                                    ],
                                     required: true,
                                 },
                             ]}
