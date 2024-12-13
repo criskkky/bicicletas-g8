@@ -13,6 +13,7 @@ import Mantenimiento from '@pages/Mantenimiento';
 import Orden from '@pages/Orden'; // Importa la nueva página de órdenes
 import Inventario from '@pages/Inventario';
 import Pagos from '@pages/Pagos';
+import Facturas from '@pages/Facturas';
 
 const router = createBrowserRouter([
   {
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/orders',  // Nueva ruta para las órdenes
+        path: '/orders',
         element: (
           <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
             <Orden />
@@ -67,11 +68,19 @@ const router = createBrowserRouter([
       {
         path: '/pagos',
         element: (
-          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+          <ProtectedRoute allowedRoles={['administrador']}>
             <Pagos />
           </ProtectedRoute>
         ),
       },
+      {
+        path: 'facturas',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'tecnico']}>
+            <Facturas />
+          </ProtectedRoute>
+        ),
+      }
     ],
   },
   {
