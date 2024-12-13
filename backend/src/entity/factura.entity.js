@@ -8,12 +8,12 @@ const FacturaSchema = new EntitySchema({
     id_factura: {
       type: "int",
       primary: true,
-      generated: true,
-      unique: true,
+      generated: true,  // id_factura se genera automáticamente
     },
     id_venta: {
       type: "int",
-      nullable: true,
+      nullable: false,
+      unique: true,  // Aseguramos que id_venta sea único en la tabla factura
     },
     id_mantenimiento: {
       type: "int",
@@ -61,17 +61,26 @@ const FacturaSchema = new EntitySchema({
   relations: {
     venta: {
       target: "Venta",
-      type: "one-to-many",
+      type: "many-to-one",
       joinColumn: { name: "id_venta", referencedColumnName: "id_venta" },
       onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
     mantenimiento: {
       target: "Mantenimiento",
       type: "one-to-many",
       joinColumn: { name: "id_mantenimiento", referencedColumnName: "id_mantenimiento" },
       onDelete: "CASCADE",
-    },    
+      onUpdate: "CASCADE",
+    },
   },
+  indices: [
+    {
+      name: "IDX_FACTURA",
+      columns: ["id_factura"],
+      unique: true,
+    },
+  ],
 });
 
 export default FacturaSchema;

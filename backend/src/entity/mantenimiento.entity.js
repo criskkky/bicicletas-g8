@@ -43,21 +43,29 @@ const MaintenanceSchema = new EntitySchema({
       target: "User",
       type: "many-to-one",
       joinColumn: { name: "rut_trabajador", referencedColumnName: "rut" },
-      inverseSide: "mantenimientos", // En plural para indicar que un trabajador puede tener múltiples mantenimientos
-      onDelete: "RESTRICT", // No se puede eliminar un trabajador si tiene mantenimientos asociados
+      inverseSide: "mantenimientos",
+      onDelete: "RESTRICT",
     },
     items: {
       target: "MantenimientoInventario",
       type: "one-to-many",
       inverseSide: "mantenimiento",
-      onDelete: "CASCADE", // Si se elimina un mantenimiento también todos los registros de MantenimientoInventario
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     invoice: {
       target: "Factura",
       type: "many-to-one",
-      onDelete: "CASCADE", // Si se elimina un mantenimiento también se elimina la factura asociada
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
   },
+  indices: [
+    {
+      name: "IDX_MNT",
+      columns: ["id_mantenimiento"],
+    },
+  ],
 });
 
 export default MaintenanceSchema;

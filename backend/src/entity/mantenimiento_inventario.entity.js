@@ -42,6 +42,12 @@ const MaintenanceInventorySchema = new EntitySchema({
       onDelete: "SET NULL",
     },
   },
+  indices: [
+    {
+      name: "IDX_MNTINV",
+      columns: ["id"],
+    },
+  ],
 });
 
 export default MaintenanceInventorySchema;

@@ -93,7 +93,13 @@ const OrdenesSchema = new EntitySchema({
       inverseSide: "ordenes",
       nullable: true,
     },
-  },  
+  },
+  indices: [
+    {
+      name: "IDX_ORDEN",
+      columns: ["id_orden"],
+    },
+  ],
 });
 
 export default OrdenesSchema;

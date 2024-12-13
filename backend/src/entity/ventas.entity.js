@@ -5,15 +5,19 @@ const SaleSchema = new EntitySchema({
   name: "Venta",
   tableName: "venta",
   columns: {
+    id_venta: {
+      type: "int",
+      primary: true,
+      generated: true,  // Esto asegura que id_venta sea generado automáticamente.
+    },
+    id_factura: {
+      type: "int",
+      nullable: false,  // Ahora es una clave foránea, no generada aquí.
+    },
     rut_trabajador: {
       type: "varchar",
       length: 12,
       nullable: false,
-    },
-    id_venta: {
-      type: "int",
-      primary: true,
-      generated: true,
     },
     rut_cliente: {
       type: "varchar",
@@ -45,13 +49,21 @@ const SaleSchema = new EntitySchema({
       type: "many-to-one",
       joinColumn: { name: "rut_trabajador", referencedColumnName: "rut" },
       inverseSide: "ordenes",
-      onDelete: "RESTRICT", // No se puede eliminar un trabajador si tiene mantenimientos asociados
+      onDelete: "RESTRICT",
     },
-    items: {  // Relación con VentaInventario
+    items: {  
       target: "VentaInventario",
       type: "one-to-many",
+      joinColumn: { name: "id_item", referencedColumnName: "id_item" },
       inverseSide: "venta",
-      onDelete: "CASCADE", // Si se elimina una venta también todos los registros de VentaInventario asociados.
+      onDelete: "CASCADE",
+    },
+    invoice: {
+      target: "Factura",
+      type: "one-to-one",  
+      joinColumn: { name: "id_factura", referencedColumnName: "id_venta" },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
   },
   indices: [

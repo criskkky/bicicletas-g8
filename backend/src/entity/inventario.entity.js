@@ -56,6 +56,12 @@ const InventorySchema = new EntitySchema({
       inverseSide: "items",
     },
   },
+  indices: [
+    {
+      name: "IDX_ITEM",
+      columns: ["id_item"],
+    },
+  ],
 });
 
 export default InventorySchema;
