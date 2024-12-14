@@ -11,10 +11,11 @@ import '@styles/sales.css';
 import useEditSale from '@hooks/ventas/useEditSale';
 import useDeleteSale from '@hooks/ventas/useDeleteSale';
 import useCreateSale from '@hooks/ventas/useCreateSale';
-
+import useInventory from 'frontend/src/hooks/inventario/useGetInventory.jsx'
 const Sales = () => {
   const { sales, fetchSales, setSales } = useSales();
   const [filterId, setFilterId] = useState('');
+  const { inventory } = useInventory();
 
   const {
     handleUpdate,
@@ -113,6 +114,7 @@ const Sales = () => {
         setShow={setIsPopupOpen}
         data={dataSale}
         action={dataSale && dataSale.id_venta ? handleUpdate : handleCreate}
+        inventory = {inventory}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 import { isAdmin } from '@helpers/session.jsx';
 
-export default function PopupSales({ show, setShow, data, action }) {
+export default function PopupSales({ show, setShow, data, action, inventory }) {
     const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
     const isEdit = data && Object.keys(data).length > 0;
     const [saleData, setSaleData] = useState({});
@@ -42,11 +42,10 @@ export default function PopupSales({ show, setShow, data, action }) {
     };
 
     const handleSubmit = (formData) => {
-        // Filtrar las claves que correspondan a los items y convertirlas en un array
         const itemsToSubmit = Object.keys(formData)
             .filter(key => key.startsWith("id_item-") || key.startsWith("cantidad-"))
             .reduce((acc, key) => {
-                const index = key.split('-')[1]; // Extraer el índice del formato id_item-0
+                const index = key.split('-')[1]; 
                 const field = key.startsWith("id_item-") ? "id_item" : "cantidad";
                 
                 if (!acc[index]) {
@@ -56,9 +55,8 @@ export default function PopupSales({ show, setShow, data, action }) {
                 acc[index][field] = field === "cantidad" ? parseInt(formData[key], 10) : formData[key];
                 return acc;
             }, [])
-            .filter(item => item.id_item && item.cantidad); // Filtrar items válidos (que tengan ambos campos)
-    
-        // Crear los datos finales para enviar
+            .filter(item => item.id_item && item.cantidad); 
+
         const dataToSubmit = {
             ...formData,
             id_venta: isEdit ? saleData.id_venta : undefined,
@@ -67,7 +65,6 @@ export default function PopupSales({ show, setShow, data, action }) {
             total: 0,
         };
     
-        // Eliminar claves relacionadas con items individuales para limpiar los datos
         Object.keys(dataToSubmit).forEach(key => {
             if (key.startsWith("id_item-") || key.startsWith("cantidad-")) {
                 delete dataToSubmit[key];
@@ -77,7 +74,12 @@ export default function PopupSales({ show, setShow, data, action }) {
         console.log("Datos a enviar:", dataToSubmit);
         action(dataToSubmit);
         setShow(false);
-    };    
+    }; 
+
+    // const getItemNameById = (id) => {
+    //     const item = inventory.find(item => item.id_item === id);
+    //     return item ? item.nombre : 'Desconocido';
+    // };
     
     return (
         <div>
@@ -120,12 +122,15 @@ export default function PopupSales({ show, setShow, data, action }) {
                                 },
                                 ...items.flatMap((item, index) => [
                                     {
-                                        label: `ID de artículo vendido ${index + 1}`,
+                                        label: `Artículo vendido ${index + 1}`,
                                         name: `id_item-${index}`,
                                         defaultValue: item.id_item || "",
-                                        placeholder: "ID del artículo vendido",
-                                        fieldType: "input",
-                                        type: "text",
+                                        placeholder: "Selecciona un artículo",
+                                        fieldType: "select",
+                                        options: inventory.map(i => ({
+                                            value: i.id_item,
+                                            label:`${i.nombre} (${i.id_item})`,
+                                        })),
                                         onChange: (e) => handleItemChange(index, "id_item", e.target.value),
                                     },
                                     {
