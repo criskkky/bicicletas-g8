@@ -27,13 +27,16 @@ export async function createSale(req, res) {
 
     if (error) {
       console.error("Error al crear la venta:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+      if(error.message.includes("Inventario insuficiente")){
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Error interno del servidor(crear)" });
     }
 
     res.status(201).json({ message: "Venta creada con éxito", sale, invoice, order });
   } catch (error) {
     console.error("Error al crear la venta:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor(crear)" });
   }
 }
 
@@ -49,7 +52,7 @@ export async function getAllSales(req, res) {
     res.json(sales);
   } catch (error) {
     console.error("Error al obtener las ventas:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor(ver)" });
   }
 }
 
@@ -67,7 +70,7 @@ export async function getSale(req, res) {
     res.json(sale);
   } catch (error) {
     console.error("Error al obtener la venta:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor(ver)" });
   }
 }
 
@@ -86,7 +89,7 @@ export async function updateSale(req, res) {
 
     if (error) {
       console.error("Error al actualizar la venta:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+      return res.status(500).json({ error: "Error interno del servidor(update)" });
     }
 
     if (!updatedSale) {
@@ -96,7 +99,7 @@ export async function updateSale(req, res) {
     res.json({ message: "Venta actualizada con éxito", updatedSale, updatedInvoice, updatedOrder });
   } catch (error) {
     console.error("Error al actualizar la venta:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor(update)" });
   }
 }
 
@@ -114,6 +117,6 @@ export async function deleteSale(req, res) {
     res.json({ message: "Venta eliminada con éxito" });
   } catch (error) {
     console.error("Error al eliminar la venta:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor(eliminar)" });
   }
 }

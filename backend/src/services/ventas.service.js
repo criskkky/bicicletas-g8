@@ -32,27 +32,29 @@ export async function createSaleService(data) {
 
     let total = 0;
 
-    // Si hay ítems, calcula el total antes de crear la venta
     if (data.items && Array.isArray(data.items)) {
       for (const itemData of data.items) {
         const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
         if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
+        if (item.cantidad < itemData.cantidad) {
+          throw new Error(`Inventario insuficiente para el producto ID ${itemData.id_item}. 
+            Disponible: ${item.cantidad}, Solicitado: ${itemData.cantidad}`);
+        }
+
         total += item.precio * itemData.cantidad;
       }
     }
 
-    // Crear la venta con el total calculado
     const venta = ventaRepository.create({
       rut_trabajador: data.rut_trabajador,
       rut_cliente: data.rut_cliente,
       fecha_venta: data.fecha_venta,
-      total, // Asignar el total calculado
+      total,
     });
 
     await ventaRepository.save(venta);
 
-    // Procesar los ítems de la venta
     if (data.items && Array.isArray(data.items)) {
       const ventaInventarioRepository = AppDataSource.getRepository(VentaInventario);
 
@@ -60,10 +62,11 @@ export async function createSaleService(data) {
         const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
         if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
-        // Ajustar inventario (disminuir stock)
         const inventoryAdjustment = await ajustarInventario(itemData.id_item, -itemData.cantidad);
+
         if (!inventoryAdjustment.success) {
-          throw new Error(inventoryAdjustment.message);
+          throw new Error(`Inventario insuficiente para el producto ID ${itemData.id_item}. 
+            Disponible: ${inventoryAdjustment.available}, Solicitado: ${itemData.cantidad}`);
         }
 
         const ventaInventarioItem = ventaInventarioRepository.create({
@@ -156,7 +159,9 @@ export async function updateSaleService(id, data) {
         });
 
         if (ventaInventarioItem) {
-          const inventoryAdjustment = await ajustarInventario(item.id_item, itemData.cantidad - ventaInventarioItem.cantidad);
+          const inventoryAdjustment = await ajustarInventario(
+            item.id_item, itemData.cantidad - ventaInventarioItem.cantidad
+            );
           if (!inventoryAdjustment.success) {
             throw new Error(inventoryAdjustment.message);
           }
