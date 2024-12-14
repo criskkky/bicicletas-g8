@@ -25,7 +25,6 @@ const useGetSales = () => {
     const fetchSales = async () => {
         try {
             const response = await getSales();
-            console.log(response); // Para verificar la estructura de la respuesta
 
             if (!Array.isArray(response)) {
                 return showWarningAlert("¡Advertencia!", "No existen registros de ventas.");
