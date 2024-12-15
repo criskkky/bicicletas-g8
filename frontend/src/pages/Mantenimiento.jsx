@@ -11,10 +11,12 @@ import '@styles/maintenances.css';
 import useEditMaintenance from '@hooks/mantenimiento/useEditMaintenance';
 import useDeleteMaintenance from '@hooks/mantenimiento/useDeleteMaintenance';
 import useCreateMaintenance from '@hooks/mantenimiento/useCreateMaintenance';
+import useInventory from '@hooks/inventario/useGetInventory';
 
 const Maintenance = () => {
   const { maintenances, fetchMaintenances, setMaintenances } = useMaintenances();
   const [filterId, setFilterId] = useState('');
+  const { inventory } = useInventory();
 
   const {
     handleUpdate,
@@ -113,6 +115,7 @@ const Maintenance = () => {
         setShow={setIsPopupOpen}
         data={dataMaintenance}
         action={dataMaintenance && dataMaintenance.id_mantenimiento ? handleUpdate : handleCreate}
+        inventory={inventory}
       />
     </div>
   );

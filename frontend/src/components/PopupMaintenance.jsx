@@ -4,7 +4,7 @@ import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 import { isAdmin } from '@helpers/session.jsx';
 
-export default function PopupMaintenance({ show, setShow, data, action }) {
+export default function PopupMaintenance({ show, setShow, data, action, inventory }) {
     const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
     const isEdit = data && Object.keys(data).length > 0;
     const [maintenanceData, setMaintenanceData] = useState({});
@@ -13,7 +13,7 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
     useEffect(() => {
         if (isEdit) {
             setMaintenanceData(data);
-            setItems(Array.isArray(data.items) ? data.items.map(item => ({ ...item })) : []);
+            setItems(Array.isArray(data.items) ? data.items.map(item => ({ ...item })) : [{ id_item: "", cantidad: "" }]);
         } else {
             setMaintenanceData({});
             setItems([{ id_item: "", cantidad: "" }]);
@@ -41,32 +41,38 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
         });
     };
 
-    const handleSubmit = async (formData) => {
-        try {
-            Object.keys(formData).forEach(key => {
-                if (key.startsWith('id_item-') || key.startsWith('cantidad-')) {
-                    delete formData[key];
+    const handleSubmit = (formData) => {
+        const itemsToSubmit = Object.keys(formData)
+            .filter(key => key.startsWith("id_item-") || key.startsWith("cantidad-"))
+            .reduce((acc, key) => {
+                const index = key.split('-')[1]; 
+                const field = key.startsWith("id_item-") ? "id_item" : "cantidad";
+                
+                if (!acc[index]) {
+                    acc[index] = {};
                 }
-            });
+                
+                acc[index][field] = field === "cantidad" ? parseInt(formData[key], 10) : formData[key];
+                return acc;
+            }, [])
+            .filter(item => item.id_item && item.cantidad); 
+
+        const dataToSubmit = {
+            ...formData,
+            id_mantenimiento: isEdit ? maintenanceData.id_mantenimiento : undefined,
+            items: itemsToSubmit,
+        };
     
-            const itemsToSubmit = items.filter(item => item.id_item && item.cantidad).map(item => ({
-                id_item: parseInt(item.id_item, 10),
-                cantidad: parseInt(item.cantidad, 10),
-            }));
+        Object.keys(dataToSubmit).forEach(key => {
+            if (key.startsWith("id_item-") || key.startsWith("cantidad-")) {
+                delete dataToSubmit[key];
+            }
+        });
     
-            const dataToSubmit = { 
-                ...formData,
-                id_mantenimiento: isEdit ? maintenanceData.id_mantenimiento : undefined,
-                items: itemsToSubmit,
-            };
-    
-            await action(dataToSubmit); // Llama a la acción proporcionada (ej. crear/editar)
-            setShow(false);
-        } catch (error) {
-            console.error("Error al enviar el mantenimiento:", error);
-            alert("Ocurrió un error al guardar los datos. Por favor, inténtelo de nuevo.");
-        }
-    };
+        console.log("Datos a enviar:", dataToSubmit);
+        action(dataToSubmit);
+        setShow(false);
+    }; 
     
     return (
         <div>
@@ -120,16 +126,20 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
                                 },
                                 ...items.flatMap((item, index) => [
                                     {
-                                        label: `ID de artículo usado ${index + 1}`,
+                                        label: `Artículo usado ${index + 1}`,
                                         name: `id_item-${index}`,
                                         defaultValue: item.id_item || "",
-                                        placeholder: "ID del artículo usado",
-                                        fieldType: "input",
-                                        type: "text",
+                                        placeholder: "Selecciona un artículo",
+                                        fieldType: "select",
+                                        options: inventory.map(i => ({
+                                            value: i.id_item,
+                                            label:`(ID: ${i.id_item}) ${i.nombre}`,
+                                        })),
+                                        required: true,
                                         onChange: (e) => handleItemChange(index, "id_item", e.target.value),
                                     },
                                     {
-                                        label: `Cantidad usada ${index + 1}`,
+                                        label:`Cantidad usada ${index + 1}`,
                                         name: `cantidad-${index}`,
                                         defaultValue: item.cantidad || "",
                                         placeholder: "Cantidad del artículo usado",
@@ -161,4 +171,3 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
         </div>
     );
 }
-
