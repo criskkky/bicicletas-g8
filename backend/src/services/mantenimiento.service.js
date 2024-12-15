@@ -147,14 +147,6 @@ export async function updateMaintenanceService(id, data) {
       maintenance.rut_trabajador = data.rut_trabajador ?? maintenance.rut_trabajador;
       maintenance.descripcion = data.descripcion ?? maintenance.descripcion;
 
-      if (data.fecha_mantenimiento) {
-          const parsedDate = new Date(data.fecha_mantenimiento);
-          if (isNaN(parsedDate.getTime())) {
-              return { success: false, message: "Fecha de mantenimiento inválida" };
-          }
-          maintenance.fecha_mantenimiento = parsedDate;
-      }
-
       // Guardar cambios en mantenimiento
       await maintenanceRepository.save(maintenance);
 

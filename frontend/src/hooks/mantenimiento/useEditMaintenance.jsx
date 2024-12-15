@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { updateMaintenance } from '@services/mantenimiento.service.js';
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
-import { formatMaintenancePostUpdate } from '@helpers/formatDataMaintenance.js';
 
 const useEditMaintenance = (fetchMaintenances, setMaintenances) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -38,14 +37,11 @@ const useEditMaintenance = (fetchMaintenances, setMaintenances) => {
                 );
                 setIsPopupOpen(false);
     
-                // Formatear los datos recibidos del backend
-                const formattedMaintenance = formatMaintenancePostUpdate(maintenance);
-    
                 // Actualizar la lista de mantenimientos
                 setMaintenances((prevMaintenances) =>
                     prevMaintenances.map((existingMaintenance) =>
-                        existingMaintenance.id_mantenimiento === formattedMaintenance.id_mantenimiento
-                            ? { ...formattedMaintenance, items: maintenance.items || [] }
+                        existingMaintenance.id_mantenimiento === maintenance.id_mantenimiento
+                            ? { ...maintenance, items: maintenance.items || [] }
                             : existingMaintenance
                     )
                 );

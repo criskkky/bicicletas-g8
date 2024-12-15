@@ -1,5 +1,5 @@
 import axios from './root.service.js';
-import { formatDataMaintenance } from '@helpers/formatDataMaintenance.js';
+import { formatMaintenanceDataGet } from '@helpers/formatDataMaintenance.js';
 
 // Función para obtener todos los mantenimientos
 export async function getMaintenances() {
@@ -12,7 +12,7 @@ export async function getMaintenances() {
 
         // Formatea los datos para incluir `id_mantenimiento`
         const formattedData = response.data.map(maintenance => ({
-            ...formatDataMaintenance(maintenance),
+            ...formatMaintenanceDataGet(maintenance),
         }));
         return formattedData;
     } catch (error) {
@@ -26,7 +26,7 @@ export async function getMaintenance(id_mantenimiento) {
     try {
         const { data } = await axios.get(`/maintenance/view/${id_mantenimiento}`);
         return {
-            ...formatDataMaintenance(data.data),
+            ...formatMaintenanceDataGet(data.data),
             id_mantenimiento: data.data.id, // Asegura que el campo esté alineado con el MER
         };
     } catch (error) {
