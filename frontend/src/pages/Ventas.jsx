@@ -176,8 +176,6 @@ const Sales = () => {
   };
   
   
-  
-
   return (
     <div className="main-container">
       <div className="table-container">

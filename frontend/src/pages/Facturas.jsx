@@ -1,3 +1,4 @@
+import jsPDF from 'jspdf';
 import Table from '@components/Table';
 import useInvoices from '@hooks/facturas/useGetInvoices.jsx';
 import Search from '../components/Search';
@@ -60,6 +61,54 @@ const Invoices = () => {
     }
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(24);
+    doc.text("Facturas - Reporte", 14, 10);
+
+    doc.setFontSize(12);
+    let yPosition = 20;
+
+    invoices.forEach((invoice) => {
+      doc.text(`ID Factura: ${invoice.id_factura}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Técnico (RUT): ${invoice.rut_trabajador}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Cliente (RUT): ${invoice.rut_cliente}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Fecha de Factura: ${invoice.fecha_factura}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Método de Pago: ${invoice.metodo_pago}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Tipo de Factura: ${invoice.tipo_factura}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Total: ${invoice.total}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Tiempo de Creación: ${invoice.createdAt}`, 14, yPosition);
+      yPosition += 10;
+
+      doc.text(`Última Actualización: ${invoice.updatedAt}`, 14, yPosition);
+      yPosition += 10;
+
+      yPosition += 10;
+
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+    });
+
+    doc.save("facturas_report.pdf");
+  };
+
   return (
     <div className="main-container">
       <div className="table-container">
@@ -84,6 +133,7 @@ const Invoices = () => {
             <button onClick={() => { setDataInvoice({}); setIsPopupOpen(true); }}>
               +
             </button>
+            <button onClick={downloadPDF}>Descargar PDF</button>
           </div>
         </div>
         <Table
