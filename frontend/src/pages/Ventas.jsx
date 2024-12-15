@@ -1,3 +1,5 @@
+import jsPDF from "jspdf";
+import "jspdf-autotable"; 
 import Table from '@components/Table';
 import useSales from '@hooks/ventas/useGetSales.jsx';
 import Search from '../components/Search';
@@ -11,7 +13,8 @@ import '@styles/sales.css';
 import useEditSale from '@hooks/ventas/useEditSale';
 import useDeleteSale from '@hooks/ventas/useDeleteSale';
 import useCreateSale from '@hooks/ventas/useCreateSale';
-import useInventory from '@hooks/inventario/useGetInventory.jsx'
+import useInventory from '@hooks/inventario/useGetInventory';
+
 const Sales = () => {
   const { sales, fetchSales, setSales } = useSales();
   const [filterId, setFilterId] = useState('');
@@ -71,7 +74,38 @@ const Sales = () => {
   const handleDeleteClick = () => {
     if (dataSale && dataSale.id_venta) {
       handleDelete([dataSale]);
+      setSales(prevSales => prevSales.filter(sale => sale.id_venta !== dataSale.id_venta));
+      setDataSale({});
     }
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    doc.text("Ventas - Reporte", 14,10);
+
+    let yPosition = 20;
+    const TableColumn = columns.map(col => col.title);
+    const tableData = sales.map(sale => columns.map(col => {
+      if (col.field === "items"){
+
+        if(Array.isArray(sale.items)){
+          return sale.items.map(item => `ID Artículo: ${item.id_item}, Cantidad: ${item.cantidad}`).join("\n");
+        } else {
+          return "No hay articulos disponibles";
+        }
+      }
+      return sale[col.field];
+    }))
+
+    doc.autoTable({
+      startY: yPosition,
+      head: [TableColumn],
+      body: tableData,
+      theme: 'grid',
+    });
+
+    doc.save("ventas_report.pdf");
   };
 
   return (
@@ -98,6 +132,7 @@ const Sales = () => {
             <button onClick={() => { setDataSale({}); setIsPopupOpen(true); }}>
               +
             </button>
+            <button onClick={downloadPDF}>Descargar PDF</button>
           </div>
         </div>
         <Table
