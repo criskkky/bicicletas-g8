@@ -1,5 +1,4 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable"; 
 import Table from '@components/Table';
 import useSales from '@hooks/ventas/useGetSales.jsx';
 import Search from '../components/Search';
@@ -81,32 +80,103 @@ const Sales = () => {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-
-    doc.text("Ventas - Reporte", 14,10);
-
+  
+    doc.setFontSize(24);
+    doc.text("Ventas - Reporte", 14, 10);
+  
+    doc.setFontSize(12);
     let yPosition = 20;
-    const TableColumn = columns.map(col => col.title);
-    const tableData = sales.map(sale => columns.map(col => {
-      if (col.field === "items"){
-
-        if(Array.isArray(sale.items)){
-          return sale.items.map(item => `ID Artículo: ${item.id_item}, Cantidad: ${item.cantidad}`).join("\n");
-        } else {
-          return "No hay articulos disponibles";
+  
+    sales.forEach((sale) => {
+      console.log("Datos originales", sale.items);
+  
+      // Validación y transformación de `sale.items`
+      if (typeof sale.items === "string") {
+        const itemArray = sale.items.split(",").map((item) => item.trim());
+        const processedItems = [];
+  
+        for (let i = 0; i < itemArray.length; i++) {
+          const item = itemArray[i];
+  
+          // Procesa si es un ID
+          if (item.startsWith("ID:")) {
+            const id_item = item.replace("ID:", "").trim();
+  
+            // Verifica si el siguiente elemento es una cantidad
+            if (i + 1 < itemArray.length && itemArray[i + 1].startsWith("Cantidad:")) {
+              const cantidad = itemArray[i + 1].replace("Cantidad:", "").trim();
+              processedItems.push({ id_item, cantidad });
+              i++; // Salta al siguiente elemento ya procesado
+            } else {
+              console.warn(`Cantidad no encontrada para ID: ${id_item}`);
+            }
+          }
         }
+  
+        sale.items = processedItems;
+      } else if (!Array.isArray(sale.items)) {
+        console.warn("Formato inesperado en sale.items:", sale.items);
+        sale.items = [];
       }
-      return sale[col.field];
-    }))
-
-    doc.autoTable({
-      startY: yPosition,
-      head: [TableColumn],
-      body: tableData,
-      theme: 'grid',
+  
+      // Renderización de datos en PDF
+      doc.text(`ID Venta: ${sale.id_venta}`, 14, yPosition);
+      yPosition += 10;
+  
+      doc.text(`Técnico (RUT): ${sale.rut_trabajador}`, 14, yPosition);
+      yPosition += 10;
+  
+      doc.text(`Cliente (RUT): ${sale.rut_cliente}`, 14, yPosition);
+      yPosition += 10;
+  
+      doc.text(`Fecha Venta: ${sale.fecha_venta}`, 14, yPosition);
+      yPosition += 10;
+  
+      if (Array.isArray(sale.items) && sale.items.length > 0) {
+        doc.text("Artículos Vendidos:", 14, yPosition);
+        yPosition += 10;
+  
+        sale.items.forEach((item) => {
+          if (item.id_item && item.cantidad) {
+            doc.text(
+              `ID Artículo: ${item.id_item}, Cantidad: ${item.cantidad}`,
+              14,
+              yPosition
+            );
+            yPosition += 10;
+          } else {
+            doc.text("Artículo inválido detectado.", 14, yPosition);
+            yPosition += 10;
+          }
+        });
+      } else {
+        doc.text("No hay artículos disponibles", 14, yPosition);
+        yPosition += 10;
+      }
+  
+      doc.text(`Total Venta: ${sale.total}`, 14, yPosition);
+      yPosition += 10;
+  
+      doc.text(`Tiempo de Creación: ${sale.createdAt}`, 14, yPosition);
+      yPosition += 10;
+  
+      doc.text(`Última Actualización: ${sale.updatedAt}`, 14, yPosition);
+      yPosition += 10;
+  
+      yPosition += 10;
+  
+      // Salto de página si el contenido supera el límite
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
     });
-
+  
     doc.save("ventas_report.pdf");
   };
+  
+  
+  
 
   return (
     <div className="main-container">
