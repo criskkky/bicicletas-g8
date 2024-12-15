@@ -3,45 +3,36 @@ import { getPayments } from '@services/pagos.service.js';
 import { showWarningAlert } from '@helpers/sweetAlert.js';
 
 const useGetPayments = () => {
-    const [payments, setPayments] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const formatPaymentData = (payment) => {
-        return {
-            id_pago: payment.id_pago,
-            rut_trabajador: payment.rut_trabajador,
-            cantidad_ordenes_realizadas: payment.cantidad_ordenes_realizadas,
-            horas_trabajadas: payment.horas_trabajadas,
-            fecha_pago: payment.fecha_pago,
-            monto: payment.monto,
-            estado: payment.estado,
-            metodo_pago: payment.metodo_pago,
-            createdAt: payment.createdAt,
-            updatedAt: payment.updatedAt,
-        };
-    };
+  const fetchPayments = async () => {
+    setLoading(true);
+    setError(null);
 
-    const fetchPayments = async () => {
-        try {
-            const response = await getPayments();
-            console.log(response); // Para verificar la estructura de la respuesta
+    try {
+      const response = await getPayments();
 
-            if (!Array.isArray(response)) {
-                return showWarningAlert("¡Advertencia!", "No existen registros de pagos.");
-            }
+      if (!Array.isArray(response)) {
+        throw new Error("La respuesta del servidor no tiene el formato esperado.");
+      }
 
-            const formattedData = response.map(formatPaymentData);
-            setPayments(formattedData);
-        } catch (error) {
-            console.error("Error al obtener los pagos: ", error.message);
-            showWarningAlert("Error", "No se pudo obtener los datos de pagos.");
-        }
-    };
+      setPayments(response);
+    } catch (error) {
+      console.error("Error al obtener los pagos: ", error.message);
+      setError(error.message || "Error al obtener los pagos");
+      showWarningAlert("Error", error.message || "No se pudieron obtener los pagos.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchPayments();
-    }, []);
+  useEffect(() => {
+    fetchPayments();
+  }, []);
 
-    return { payments, fetchPayments, setPayments };
+  return { payments, fetchPayments, loading, error };
 };
 
 export default useGetPayments;

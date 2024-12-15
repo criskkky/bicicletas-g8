@@ -17,15 +17,15 @@ const Payments = () => {
   const [filterId, setFilterId] = useState('');
 
   const {
-    handleUpdate,
+    handleEditPayment,
     dataPayment,
     setDataPayment,
     isPopupOpen,
     setIsPopupOpen,
   } = useEditPayment(fetchPayments, setPayments);
 
-  const { handleDelete } = useDeletePayment(fetchPayments, setDataPayment);
-  const { handleCreate } = useCreatePayment(fetchPayments, setPayments);
+  const { handleDeletePayment } = useDeletePayment(fetchPayments, setDataPayment);
+  const { handleCreatePayment } = useCreatePayment(setPayments);
 
   const handleIdFilterChange = (e) => {
     setFilterId(e.target.value);
@@ -33,21 +33,21 @@ const Payments = () => {
 
   const handleSelectionChange = useCallback(
     (selectedPayments) => {
-      setDataPayment(selectedPayments.length > 0 ? selectedPayments[0] : {});
+      setDataPayment(selectedPayments?.length > 0 ? selectedPayments[0] : {});
     },
     [setDataPayment]
   );
 
   const columns = [
     { title: 'ID Pago', field: 'id_pago', width: 100, responsive: 0 },
-    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 100, responsive: 1 },
-    { title: 'Cantidad de Órdenes', field: 'cantidad_ordenes_realizadas', width: 150, responsive: 2 },
-    { title: 'Horas Trabajadas', field: 'horas_trabajadas', width: 150, responsive: 2 },
-    { title: 'Fecha de Pago', field: 'fecha_pago', width: 150, responsive: 2 },
-    { title: 'Monto', field: 'monto', width: 150, responsive: 1 },
-    { title: 'Estado', field: 'estado', width: 150, responsive: 2 },
+    { title: 'Técnico (RUT)', field: 'rut_trabajador', width: 150, responsive: 1 },
+    { title: 'Fecha de Pago', field: 'fecha_pago', width: 150, responsive: 1 },
+    { title: 'Estado', field: 'estado', width: 100, responsive: 2 },
     { title: 'Método de Pago', field: 'metodo_pago', width: 150, responsive: 2 },
-    { title: 'Tiempo de Creación', field: 'createdAt', width: 200, responsive: 0 },
+    { title: 'Cantidad de Órdenes', field: 'cantidad_ordenes_realizadas', width: 200, responsive: 3 },
+    { title: 'Horas Trabajadas', field: 'horas_trabajadas', width: 200, responsive: 3 },
+    { title: 'Monto', field: 'monto', width: 150, responsive: 3 },
+    { title: 'Creado', field: 'createdAt', width: 200, responsive: 0 },
     { title: 'Última Actualización', field: 'updatedAt', width: 200, responsive: 0 },
   ];
 
@@ -56,8 +56,8 @@ const Payments = () => {
   };
 
   const handleDeleteClick = () => {
-    if (dataPayment && dataPayment.id_pago) {
-      handleDelete([dataPayment]);
+    if (dataPayment && dataPayment?.id_pago) {
+      handleDeletePayment(dataPayment?.id_pago);
     }
   };
 
@@ -68,15 +68,15 @@ const Payments = () => {
           <h1 className="title-table">Pagos</h1>
           <div className="filter-actions">
             <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID Pago'} />
-            <button onClick={handleUpdateClick} disabled={!dataPayment.id_pago}>
-              {dataPayment.id_pago ? (
+            <button onClick={handleUpdateClick} disabled={!dataPayment?.id_pago}>
+              {dataPayment?.id_pago ? (
                 <img src={UpdateIcon} alt="edit" />
               ) : (
                 <img src={UpdateIconDisable} alt="edit-disabled" />
               )}
             </button>
-            <button className="delete-payment-button" onClick={handleDeleteClick} disabled={!dataPayment.id_pago}>
-              {dataPayment.id_pago ? (
+            <button className="delete-payment-button" onClick={handleDeleteClick} disabled={!dataPayment?.id_pago}>
+              {dataPayment?.id_pago ? (
                 <img src={DeleteIcon} alt="delete" />
               ) : (
                 <img src={DeleteIconDisable} alt="delete-disabled" />
@@ -100,7 +100,7 @@ const Payments = () => {
         show={isPopupOpen}
         setShow={setIsPopupOpen}
         data={dataPayment}
-        action={dataPayment && dataPayment.id_pago ? handleUpdate : handleCreate}
+        action={dataPayment && dataPayment?.id_pago ? handleEditPayment : handleCreatePayment}
       />
     </div>
   );

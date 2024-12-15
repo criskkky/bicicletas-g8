@@ -5,13 +5,13 @@ import CloseIcon from '@assets/XIcon.svg';
 
 export default function PopupPayment({ show, setShow, data, action }) {
     const isEdit = data && Object.keys(data).length > 0;
-    const [paymentData, setPaymentData] = useState({});
+    const [paymentData, setDataPayment] = useState({});
 
     useEffect(() => {
         if (isEdit) {
-            setPaymentData(data);
+            setDataPayment(data);
         } else {
-            setPaymentData({});
+            setDataPayment({});
         }
     }, [data, isEdit]);
 

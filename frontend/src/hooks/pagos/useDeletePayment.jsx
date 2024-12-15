@@ -1,35 +1,41 @@
 import { deletePayment } from '@services/pagos.service.js';
 import { deleteDataAlert, showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 
-const useDeletePayment = (fetchPayments, setDataPayment) => {
-    const handleDelete = async (dataPayment) => {
-        if (!dataPayment || dataPayment.length === 0) {
-            showErrorAlert('Error', 'No se seleccionó ningún pago para eliminar.');
-            return;
+const useDeletePayment = (fetchPayments, setPayments) => {
+  const handleDeletePayment = async (paymentId) => {
+    if (!paymentId) {
+      showErrorAlert('Error', 'No se seleccionó ningún pago para eliminar.');
+      return;
+    }
+
+    try {
+      // Confirmación del usuario antes de eliminar
+      const result = await deleteDataAlert();
+      if (result.isConfirmed) {
+        const response = await deletePayment(paymentId);
+
+        if (response.error) {
+          throw new Error(response.error);
         }
 
-        try {
-            const result = await deleteDataAlert(); // Confirmación del usuario
-            if (result.isConfirmed) {
-                const response = await deletePayment(dataPayment[0].id_pago); // Usar id_pago
+        // Mostrar alerta de éxito
+        showSuccessAlert('¡Eliminado!', 'El pago ha sido eliminado correctamente.');
 
-                if (response.status === 'Client error') {
-                    return showErrorAlert('Error', response.details);
-                }
+        // Actualizar la lista de pagos localmente
+        setPayments((prevState) => prevState.filter((payment) => payment.id_pago !== paymentId));
 
-                showSuccessAlert('¡Eliminado!', 'El pago ha sido eliminado correctamente.');
-                await fetchPayments(); // Actualiza la lista de pagos
-                setDataPayment([]); // Limpia la selección
-            } else {
-                showErrorAlert('Cancelado', 'La operación ha sido cancelada.');
-            }
-        } catch (error) {
-            console.error('Error al eliminar el pago:', error);
-            showErrorAlert('Error', 'Ocurrió un error al eliminar el pago.');
-        }
-    };
+        // Refrescar la lista de pagos si es necesario
+        if (fetchPayments) await fetchPayments();
+      } else {
+        showErrorAlert('Cancelado', 'La operación ha sido cancelada.');
+      }
+    } catch (error) {
+      console.error('Error al eliminar el pago:', error);
+      showErrorAlert('Error', error.message || 'Ocurrió un error al eliminar el pago.');
+    }
+  };
 
-    return { handleDelete };
+  return { handleDeletePayment };
 };
 
 export default useDeletePayment;
