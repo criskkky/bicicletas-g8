@@ -28,7 +28,7 @@ export async function createMaintenance(req, res) {
       return res.status(500).json({ error: message || "Error interno del servidor" });
     }
 
-    console.log("Mantenimiento creado con éxito:", maintenance);
+    // console.log("Mantenimiento creado con éxito:", maintenance);
     res.status(201).json({ message: "Mantenimiento creado con éxito", maintenance, invoice, order });
   } catch (error) {
     console.error("Error al crear el mantenimiento:", error);
@@ -45,7 +45,7 @@ export async function getMaintenance(req, res) {
       return res.status(404).json({ error: "Mantenimiento no encontrado" });
     }
 
-    console.log("Mantenimiento obtenido:", maintenance);
+    // console.log("Mantenimiento obtenido:", maintenance);
     return res.json(maintenance);
   } catch (error) {
     console.error("Error al obtener el mantenimiento:", error);
@@ -62,7 +62,7 @@ export async function getAllMaintenance(req, res) {
       return res.json([]); // Devolver un array vacío si no hay mantenimientos
     }
 
-    console.log("Mantenimientos obtenidos:", maintenances);
+    // console.log("Mantenimientos obtenidos:", maintenances);
     return res.json(maintenances);
   } catch (error) {
     console.error("Error al obtener los mantenimientos:", error);
@@ -75,7 +75,7 @@ export const updateMaintenance = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    console.log("Datos recibidos para actualización:", updateData);
+    // console.log("Datos recibidos para actualización:", updateData);
 
     if (!updateData.rut_trabajador || !updateData.rut_cliente || !updateData.fecha_mantenimiento) {
       return res.status(400).json({ error: "Faltan campos requeridos" });
@@ -88,7 +88,7 @@ export const updateMaintenance = async (req, res) => {
       return res.status(400).json({ error: message || "Error al actualizar el mantenimiento" });
     }
 
-    console.log("Mantenimiento actualizado:", maintenance);
+    // console.log("Mantenimiento actualizado:", maintenance);
     res.json({ message: "Mantenimiento actualizado con éxito", maintenance, invoice, order });
   } catch (error) {
     console.error("Error al actualizar mantenimiento:", error);
@@ -106,7 +106,7 @@ export async function deleteMaintenance(req, res) {
       return res.status(404).json({ error: message });
     }
 
-    console.log("Mantenimiento eliminado exitosamente:", id);
+    // console.log("Mantenimiento eliminado exitosamente:", id);
     return res.json({ message: "Mantenimiento eliminado exitosamente" });
   } catch (error) {
     console.error("Error al eliminar el mantenimiento:", error);
