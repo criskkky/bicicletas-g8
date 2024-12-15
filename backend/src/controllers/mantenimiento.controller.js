@@ -11,25 +11,24 @@ export async function createMaintenance(req, res) {
   try {
     const { rut_cliente, rut_trabajador, fecha_mantenimiento, descripcion, items } = req.body;
 
-    // Validación de campos obligatorios, `items` es opcional
     if (!rut_cliente || !rut_trabajador || !fecha_mantenimiento || !descripcion) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    // Llamada al servicio para crear mantenimiento
-    const [maintenance, invoice, order, error] = await createMaintenanceService({
+    const { success, maintenance, invoice, order, message } = await createMaintenanceService({
       rut_cliente,
       rut_trabajador,
       fecha_mantenimiento,
       descripcion,
-      items, // Puede ser nulo
+      items,
     });
 
-    if (error) {
-      console.error("Error al crear mantenimiento:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+    if (!success) {
+      console.error("Error al crear mantenimiento:", message);
+      return res.status(500).json({ error: message || "Error interno del servidor" });
     }
 
+    console.log("Mantenimiento creado con éxito:", maintenance);
     res.status(201).json({ message: "Mantenimiento creado con éxito", maintenance, invoice, order });
   } catch (error) {
     console.error("Error al crear el mantenimiento:", error);
@@ -46,6 +45,7 @@ export async function getMaintenance(req, res) {
       return res.status(404).json({ error: "Mantenimiento no encontrado" });
     }
 
+    console.log("Mantenimiento obtenido:", maintenance);
     return res.json(maintenance);
   } catch (error) {
     console.error("Error al obtener el mantenimiento:", error);
@@ -58,9 +58,11 @@ export async function getAllMaintenance(req, res) {
     const maintenances = await getAllMaintenanceService();
 
     if (!maintenances || maintenances.length === 0) {
-      return res.status(404).json({ error: "No se encontraron mantenimientos" });
+      console.warn("No se encontraron mantenimientos registrados.");
+      return res.json([]); // Devolver un array vacío si no hay mantenimientos
     }
 
+    console.log("Mantenimientos obtenidos:", maintenances);
     return res.json(maintenances);
   } catch (error) {
     console.error("Error al obtener los mantenimientos:", error);
@@ -73,25 +75,21 @@ export const updateMaintenance = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    await updateMaintenanceService(id, updateData);
+    console.log("Datos recibidos para actualización:", updateData);
 
-    console.log("Datos recibidos para actualización:", JSON.stringify(updateData));
-
-    // Validación de datos
     if (!updateData.rut_trabajador || !updateData.rut_cliente || !updateData.fecha_mantenimiento) {
       return res.status(400).json({ error: "Faltan campos requeridos" });
     }
 
-    // Intenta actualizar el mantenimiento
-    const updatedMaintenance = await updateMaintenanceService(id, updateData);
+    const { success, maintenance, invoice, order, message } = await updateMaintenanceService(id, updateData);
 
-    if (!updatedMaintenance) {
-      return res.status(404).json({ error: "Mantenimiento no encontrado" });
+    if (!success) {
+      console.error("Error al actualizar mantenimiento:", message);
+      return res.status(400).json({ error: message || "Error al actualizar el mantenimiento" });
     }
 
-    console.log("Mantenimiento actualizado:", JSON.stringify(updatedMaintenance));
-
-    res.json(updatedMaintenance);
+    console.log("Mantenimiento actualizado:", maintenance);
+    res.json({ message: "Mantenimiento actualizado con éxito", maintenance, invoice, order });
   } catch (error) {
     console.error("Error al actualizar mantenimiento:", error);
     res.status(400).json({ error: error.message || "Error al actualizar el mantenimiento" });
@@ -104,9 +102,11 @@ export async function deleteMaintenance(req, res) {
     const { success, message } = await deleteMaintenanceService(id);
 
     if (!success) {
+      console.error("Error al eliminar mantenimiento:", message);
       return res.status(404).json({ error: message });
     }
 
+    console.log("Mantenimiento eliminado exitosamente:", id);
     return res.json({ message: "Mantenimiento eliminado exitosamente" });
   } catch (error) {
     console.error("Error al eliminar el mantenimiento:", error);

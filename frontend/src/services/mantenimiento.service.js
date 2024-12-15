@@ -47,33 +47,54 @@ export async function createMaintenance(maintenanceData) {
 // Función para actualizar un mantenimiento existente
 export async function updateMaintenance(id_mantenimiento, maintenanceData) {
     try {
-      console.log('Datos enviados al backend:', maintenanceData);
-  
-      const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
-  
-      console.log('Datos de mantenimiento actualizados correctamente:', response.data);
-  
-      if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
-        throw new Error('La respuesta del servidor no tiene la estructura esperada');
-      }
-  
-      const updatedMaintenance = response.data[0];
-      if (!updatedMaintenance || !updatedMaintenance.id_mantenimiento) {
-        console.error('Respuesta del servidor:', response.data);
-        throw new Error('El mantenimiento actualizado no está presente en la respuesta del servidor');
-      }
-  
-      return {
-        ...updatedMaintenance,
-        items: maintenanceData.items, // Asumiendo que los items no se devuelven en la respuesta
-      };
+        console.log('Datos enviados al backend:', maintenanceData);
+
+        const response = await axios.patch(`/maintenance/edit/${id_mantenimiento}`, maintenanceData);
+
+        console.log('Datos de mantenimiento actualizados correctamente:', response.data);
+
+        // Validar que los datos esenciales estén presentes
+        const { maintenance, invoice, order } = response.data;
+
+        // Validar estructura y tipos de datos
+        if (
+            !maintenance ||
+            typeof maintenance.id_mantenimiento !== 'number' ||
+            typeof maintenance.rut_trabajador !== 'string' ||
+            typeof maintenance.rut_cliente !== 'string' ||
+            typeof maintenance.descripcion !== 'string' ||
+            !Array.isArray(maintenance.items)
+        ) {
+            throw new Error('La respuesta del servidor no cumple con la estructura esperada (maintenance).');
+        }
+
+        if (
+            !invoice ||
+            typeof invoice.id_factura !== 'number' ||
+            typeof invoice.total !== 'number' ||
+            typeof invoice.rut_cliente !== 'string'
+        ) {
+            throw new Error('La respuesta del servidor no cumple con la estructura esperada (invoice).');
+        }
+
+        if (
+            !order ||
+            typeof order.id_orden !== 'number' ||
+            typeof order.total !== 'number' ||
+            typeof order.estado_orden !== 'string'
+        ) {
+            throw new Error('La respuesta del servidor no cumple con la estructura esperada (order).');
+        }
+
+        // Retorna los datos validados
+        return { maintenance, invoice, order };
     } catch (error) {
-      console.error('Error en updateMaintenance:', error.response?.data || error.message);
-      console.log('Datos enviados:', maintenanceData);
-      throw error;
+        console.error('Error en updateMaintenance:', error.response?.data || error.message);
+        console.log('Datos enviados:', maintenanceData);
+        throw error;
     }
-  }
-  
+}
+
 // Función para eliminar un mantenimiento
 export async function deleteMaintenance(id_mantenimiento) {
     try {
@@ -83,4 +104,3 @@ export async function deleteMaintenance(id_mantenimiento) {
         return error.response?.data || { error: 'Error al eliminar el mantenimiento' };
     }
 }
-
