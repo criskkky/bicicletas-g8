@@ -13,7 +13,7 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
     useEffect(() => {
         if (isEdit) {
             setSaleData(data);
-            setItems(Array.isArray(data.items) ? data.items.map(item => ({ ...item })) : []);
+            setItems(Array.isArray(data.items) ? data.items.map(item => ({ ...item })) : [{ id_item: "", cantidad: "" }]);
         } else {
             setSaleData({});
             setItems([{ id_item: "", cantidad: "" }]);
@@ -75,11 +75,6 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
         action(dataToSubmit);
         setShow(false);
     }; 
-
-    // const getItemNameById = (id) => {
-    //     const item = inventory.find(item => item.id_item === id);
-    //     return item ? item.nombre : 'Desconocido';
-    // };
     
     return (
         <div>
@@ -122,19 +117,20 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
                                 },
                                 ...items.flatMap((item, index) => [
                                     {
-                                        label: `Artículo vendido ${index + 1}`,
+                                        label: `Artículo vendido ${index + 1} `,
                                         name: `id_item-${index}`,
                                         defaultValue: item.id_item || "",
                                         placeholder: "Selecciona un artículo",
                                         fieldType: "select",
                                         options: inventory.map(i => ({
                                             value: i.id_item,
-                                            label:`${i.nombre} (${i.id_item})`,
+                                            label:`(ID: ${i.id_item}) ${i.nombre}`,
                                         })),
+                                        required: true,
                                         onChange: (e) => handleItemChange(index, "id_item", e.target.value),
                                     },
                                     {
-                                        label: `Cantidad vendida ${index + 1}`,
+                                        label:`Cantidad vendida ${index + 1}`,
                                         name: `cantidad-${index}`,
                                         defaultValue: item.cantidad || "",
                                         placeholder: "Cantidad del artículo vendido",
