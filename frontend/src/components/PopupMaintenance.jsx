@@ -41,29 +41,32 @@ export default function PopupMaintenance({ show, setShow, data, action }) {
         });
     };
 
-    const handleSubmit = (formData) => {
-        // Eliminar claves innecesarias
-        Object.keys(formData).forEach(key => {
-            if (key.startsWith('id_item-') || key.startsWith('cantidad-')) {
-                delete formData[key];
-            }
-        });
+    const handleSubmit = async (formData) => {
+        try {
+            Object.keys(formData).forEach(key => {
+                if (key.startsWith('id_item-') || key.startsWith('cantidad-')) {
+                    delete formData[key];
+                }
+            });
     
-        // Formatear los items antes de enviarlos
-        const itemsToSubmit = items.filter(item => item.id_item && item.cantidad).map(item => ({
-            id_item: parseInt(item.id_item, 10),
-            cantidad: parseInt(item.cantidad, 10),
-        }));
+            const itemsToSubmit = items.filter(item => item.id_item && item.cantidad).map(item => ({
+                id_item: parseInt(item.id_item, 10),
+                cantidad: parseInt(item.cantidad, 10),
+            }));
     
-        const dataToSubmit = { 
-            ...formData,
-            id_mantenimiento: isEdit ? maintenanceData.id_mantenimiento : undefined,
-            items: itemsToSubmit,
-        };
+            const dataToSubmit = { 
+                ...formData,
+                id_mantenimiento: isEdit ? maintenanceData.id_mantenimiento : undefined,
+                items: itemsToSubmit,
+            };
     
-        action(dataToSubmit);
-        setShow(false);
-    };    
+            await action(dataToSubmit); // Llama a la acción proporcionada (ej. crear/editar)
+            setShow(false);
+        } catch (error) {
+            console.error("Error al enviar el mantenimiento:", error);
+            alert("Ocurrió un error al guardar los datos. Por favor, inténtelo de nuevo.");
+        }
+    };
     
     return (
         <div>

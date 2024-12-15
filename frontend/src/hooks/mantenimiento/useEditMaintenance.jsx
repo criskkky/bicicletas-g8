@@ -17,26 +17,48 @@ const useEditMaintenance = (fetchMaintenances, setMaintenances) => {
         if (updatedMaintenanceData && updatedMaintenanceData.id_mantenimiento) {
             try {
                 console.log('Datos a actualizar:', updatedMaintenanceData);
-                const updatedMaintenance = await updateMaintenance(updatedMaintenanceData.id_mantenimiento, updatedMaintenanceData);
-
-                console.log('Mantenimiento actualizado:', updatedMaintenance);
-
-                showSuccessAlert('¡Actualizado!', 'El mantenimiento ha sido actualizado correctamente.');
+    
+                // Llamada al servicio para actualizar el mantenimiento
+                const response = await updateMaintenance(
+                    updatedMaintenanceData.id_mantenimiento,
+                    updatedMaintenanceData
+                );
+    
+                if (!response || !response.maintenance) {
+                    throw new Error('La respuesta del servidor no contiene los datos esperados');
+                }
+    
+                const { maintenance, invoice, order } = response;
+    
+                console.log('Mantenimiento actualizado:', { maintenance, invoice, order });
+    
+                showSuccessAlert(
+                    '¡Actualizado!',
+                    'El mantenimiento ha sido actualizado correctamente.'
+                );
                 setIsPopupOpen(false);
-
-                const formattedMaintenance = formatMaintenancePostUpdate(updatedMaintenance);
-
-                setMaintenances(prevMaintenances => prevMaintenances.map(maintenance => 
-                    maintenance.id_mantenimiento === formattedMaintenance.id_mantenimiento
-                        ? { ...formattedMaintenance, items: updatedMaintenance.items }
-                        : maintenance
-                ));
-
+    
+                // Formatear los datos recibidos del backend
+                const formattedMaintenance = formatMaintenancePostUpdate(maintenance);
+    
+                // Actualizar la lista de mantenimientos
+                setMaintenances((prevMaintenances) =>
+                    prevMaintenances.map((existingMaintenance) =>
+                        existingMaintenance.id_mantenimiento === formattedMaintenance.id_mantenimiento
+                            ? { ...formattedMaintenance, items: maintenance.items || [] }
+                            : existingMaintenance
+                    )
+                );
+    
+                // Refrescar mantenimientos y limpiar estado local
                 await fetchMaintenances();
                 setDataMaintenance({});
             } catch (error) {
                 console.error('Error al actualizar el mantenimiento:', error);
-                showErrorAlert('Error', `Ocurrió un error al actualizar el mantenimiento: ${error.message}`);
+                showErrorAlert(
+                    'Error',
+                    `Ocurrió un error al actualizar el mantenimiento: ${error.message}`
+                );
             }
         } else {
             showErrorAlert('Error', 'No se puede actualizar: falta el ID de mantenimiento');
@@ -49,9 +71,8 @@ const useEditMaintenance = (fetchMaintenances, setMaintenances) => {
         isPopupOpen,
         setIsPopupOpen,
         dataMaintenance,
-        setDataMaintenance
+        setDataMaintenance,
     };
 };
 
 export default useEditMaintenance;
-
