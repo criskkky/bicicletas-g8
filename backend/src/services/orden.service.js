@@ -6,7 +6,7 @@ import Maintenance from "../entity/mantenimiento.entity.js";
 import Sale from "../entity/ventas.entity.js";
 import Pago from "../entity/pagos.entity.js";
 
-// Función para obtener `rut_trabajador` de `Mantenimiento` o `Venta`
+
 async function obtenerRutTrabajador(orderData) {
   let rut_trabajador;
 
@@ -42,7 +42,7 @@ export async function getOrderService(id_orden) {
   }
 }
 
-// Servicio para obtener todas las órdenes
+
 export async function getAllOrdersService() {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
@@ -55,29 +55,29 @@ export async function getAllOrdersService() {
   }
 }
 
-// Servicio para crear una nueva orden utilizando `rut_trabajador` de `Mantenimiento` o `Venta`
+
 export async function createOrderService(orderData) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
     const pagoRepository = AppDataSource.getRepository(Pago);
 
-    // Obtener `rut_trabajador` de la entidad relacionada
+    
     const rut_trabajador = await obtenerRutTrabajador(orderData);
 
-    // Obtener el pago asociado
+  
     let pago = null;
     if (orderData.id_pago) {
       pago = await pagoRepository.findOne({ where: { id_pago: orderData.id_pago } });
       if (!pago) throw new Error("Pago no encontrado");
     }
 
-    // Creación de la orden, incluyendo hora_inicio y hora_fin si se proporcionan
+   
     const newOrder = orderRepository.create({
       ...orderData,
-      rut_trabajador, // Asignar el `rut_trabajador` extraído del mantenimiento o la venta
+      rut_trabajador, 
       hora_inicio: orderData.hora_inicio ? new Date(orderData.hora_inicio) : null,
       hora_fin: orderData.hora_fin ? new Date(orderData.hora_fin) : null,
-      pago, // Relacionar el pago obtenido
+      pago, 
     });
 
     await orderRepository.save(newOrder);
@@ -88,7 +88,6 @@ export async function createOrderService(orderData) {
   }
 }
 
-// Servicio para actualizar una orden utilizando `rut_trabajador` de `Mantenimiento` o `Venta`
 export async function updateOrderService(id_orden, orderData) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
@@ -98,7 +97,7 @@ export async function updateOrderService(id_orden, orderData) {
       return [null, "Orden no encontrada"];
     }
 
-    // Actualizar hora_inicio y hora_fin si se proporcionan
+   
     if (orderData.hora_inicio) {
       order.hora_inicio = new Date(orderData.hora_inicio);
     }
@@ -106,12 +105,12 @@ export async function updateOrderService(id_orden, orderData) {
       order.hora_fin = new Date(orderData.hora_fin);
     }
 
-    // Obtener `rut_trabajador` de la entidad relacionada si se ha actualizado `id_mantenimiento` o `id_venta`
+    
     if (orderData.id_mantenimiento || orderData.id_venta) {
       order.rut_trabajador = await obtenerRutTrabajador(orderData);
     }
 
-    // Actualizar el pago asociado si se proporciona un nuevo `id_pago`
+    
     if (orderData.id_pago) {
       const pago = await pagoRepository.findOne({ where: { id_pago: orderData.id_pago } });
       if (!pago) {
@@ -130,7 +129,6 @@ export async function updateOrderService(id_orden, orderData) {
   }
 }
 
-// Servicio para eliminar una orden
 export async function deleteOrderService(id_orden) {
   try {
     const orderRepository = AppDataSource.getRepository(Order);

@@ -20,11 +20,11 @@ const useCreateOrder = (setOrders) => {
         setError(null); // Limpiar errores previos
 
         try {
-            // Llamada al servicio para crear la orden
+            // Llamada al servicio 
             const response = await createOrder(newOrderData);
 
             if (response) {
-                // Agregar la orden creada a la lista existente
+                
                 setOrders(prevState => [
                     ...prevState,
                     { ...response }

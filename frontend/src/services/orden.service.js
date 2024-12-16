@@ -1,7 +1,7 @@
 import axios from './root.service.js';
 import { formatDataOrder } from '@helpers/formatDataOrder.js';
 
-// Función para obtener todas las órdenes
+
 export async function getOrders() {
     try {
         const response = await axios.get('/orders/');
@@ -10,7 +10,7 @@ export async function getOrders() {
             throw new Error("La respuesta de la API no tiene la estructura esperada.");
         }
 
-        // Formatea los datos para incluir `id_orden`
+       
         const formattedData = response.data.map(order => ({
             ...formatDataOrder(order),
         }));
@@ -21,7 +21,7 @@ export async function getOrders() {
     }
 }
 
-// Función para obtener una orden específica por su ID
+
 export async function getOrder(id_orden) {
     try {
         const { data } = await axios.get(`/orders/view/${id_orden}`);
@@ -34,7 +34,7 @@ export async function getOrder(id_orden) {
     }
 }
 
-// Función para crear una nueva orden
+
 export async function createOrder(orderData) {
     try {
         const response = await axios.post('/orders/add', orderData);
@@ -44,7 +44,7 @@ export async function createOrder(orderData) {
     }
 }
 
-// Función para actualizar una orden existente
+
 export async function updateOrder(id_orden, orderData) {
     try {
         console.log('Datos enviados al backend:', orderData);
@@ -74,7 +74,7 @@ export async function updateOrder(id_orden, orderData) {
     }
 }
 
-// Función para eliminar una orden
+
 export async function deleteOrder(id_orden) {
     try {
         const response = await axios.delete(`/orders/delete/${id_orden}`);

@@ -89,7 +89,7 @@ const OrdenesSchema = new EntitySchema({
     pago: {
       target: "Pago",
       type: "many-to-one",
-      joinColumn: { name: "id_pago" }, // Asegúrate de que exista `id_pago` en la tabla `ordenes`
+      joinColumn: { name: "id_pago" }, 
       inverseSide: "ordenes",
       nullable: true,
     },

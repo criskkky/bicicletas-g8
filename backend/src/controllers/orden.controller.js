@@ -1,4 +1,4 @@
-/* eslint-disable operator-linebreak */
+
 "use strict";
 import {
   createOrderService,

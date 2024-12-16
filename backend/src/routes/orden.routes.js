@@ -17,7 +17,7 @@ router
 .use(isAdminOrTechnician);
 
 
-router // http://localhost:5000/api/orders
+router // http://localhost:3000/api/orders
     .get("/", getAllOrders)
     .get("/view/:id", getOrder)
     .post("/add", createOrder)
