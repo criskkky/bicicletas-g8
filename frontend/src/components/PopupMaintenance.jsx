@@ -111,8 +111,8 @@ export default function PopupMaintenance({ show, setShow, data, action, inventor
                                     placeholder: "Descripción del mantenimiento",
                                     fieldType: "input",
                                     type: "text",
-                                    required: false,
-                                    minLength: 10,
+                                    required: true,
+                                    minLength: 5,
                                     maxLength: 150,
                                 },
                                 {
