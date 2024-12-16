@@ -132,11 +132,10 @@ export async function getSaleService(id) {
 export async function updateSaleService(id, data) {
   try {
     const ventaRepository = AppDataSource.getRepository(Venta);
-
     const venta = await ventaRepository.findOne({ where: { id_venta: id }, relations: ["items"] });
 
     if (!venta) {
-      throw new Error("Venta no encontrada");
+      return { success: false, message: "Venta no encontrada" };
     }
 
     // Actualizar datos básicos de la venta
@@ -144,47 +143,60 @@ export async function updateSaleService(id, data) {
     venta.rut_trabajador = data.rut_trabajador ?? venta.rut_trabajador;
     venta.fecha_venta = data.fecha_venta ? new Date(data.fecha_venta) : venta.fecha_venta;
 
+    const ventaInventarioRepository = AppDataSource.getRepository(VentaInventario);
+
+    // Obtener ítems actuales de la venta
+    const itemsActuales = await ventaInventarioRepository.find({ where: { id_venta: venta.id_venta } });
+
+    // Revertir ajustes de inventario para ítems eliminados
+    const nuevosItemsIds = data.items.map(item => item.id_item);
+    for (const item of itemsActuales) {
+      if (!nuevosItemsIds.includes(item.id_item)) {
+        await ajustarInventario(item.id_item, item.cantidad); // Revertir ajuste
+        await ventaInventarioRepository.delete({ id_venta: venta.id_venta, id_item: item.id_item });
+      }
+    }
+
     // Inicializar total
     let total = 0;
 
     // Actualización de los items y el inventario
     if (data.items && Array.isArray(data.items)) {
-      const ventaInventarioRepository = AppDataSource.getRepository(VentaInventario);
-
       for (const itemData of data.items) {
         const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
         if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
-        let ventaInventarioItem = await ventaInventarioRepository.findOne({
+        const ventaInventarioItem = await ventaInventarioRepository.findOne({
           where: { id_venta: venta.id_venta, id_item: item.id_item },
         });
 
         if (ventaInventarioItem) {
           const inventoryAdjustment = await ajustarInventario(
-            item.id_item, 
+            item.id_item,
             itemData.cantidad - ventaInventarioItem.cantidad
-            );
+          );
           if (!inventoryAdjustment.success) {
             throw new Error(inventoryAdjustment.message);
           }
 
           ventaInventarioItem.cantidad = itemData.cantidad;
           ventaInventarioItem.precio_costo = item.precio * itemData.cantidad;
+          await ventaInventarioRepository.save(ventaInventarioItem);
         } else {
-          
-          const inventoryAdjustment = await ajustarInventario(item.id_item, -itemData.cantidad);
-          if (!inventoryAdjustment.success) {
-            throw new Error(inventoryAdjustment.message);
-          }
-
-          ventaInventarioItem = ventaInventarioRepository.create({
+          const newItem = ventaInventarioRepository.create({
             id_venta: venta.id_venta,
             id_item: item.id_item,
             cantidad: itemData.cantidad,
             precio_costo: item.precio * itemData.cantidad,
           });
+          await ventaInventarioRepository.save(newItem);
+
+          // Ajustar inventario para el nuevo ítem
+          const inventoryAdjustment = await ajustarInventario(itemData.id_item, -itemData.cantidad);
+          if (!inventoryAdjustment.success) {
+            throw new Error(inventoryAdjustment.message);
+          }
         }
-        await ventaInventarioRepository.save(newItem);
 
         // Sumar al total
         total += item.precio * itemData.cantidad;
@@ -210,18 +222,12 @@ export async function updateSaleService(id, data) {
       await orderRepository.save(order);
     }
 
-    const response = { venta, invoice, order };
-    if (!response.venta || !response.invoice || !response.order) {
-      throw new Error("Estructura de datos retornada por el backend incompleta o inválida.");
-    }
-
     return [venta, invoice, order, null];
   } catch (error) {
     console.error("Error en la actualización de la venta:", error);
     return [null, null, null, error];
   }
 }
-
 
 // Eliminar una venta
 export async function deleteSaleService(id) {
