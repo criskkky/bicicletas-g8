@@ -27,3 +27,7 @@ body {
     padding-top: 150px;
     box-sizing: border-box;
 }
+
+.swal2-popup {
+    z-index: 9999;
+}
