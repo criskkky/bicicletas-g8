@@ -193,7 +193,7 @@ const Sales = () => {
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            <button onClick={() => { setDataSale({}); setIsPopupOpen(true); }}>
+            <button onClick={() => { setDataSale({}); setIsPopupOpen(true); }} disabled={dataSale.id_venta}>
               +
             </button>
             <button onClick={downloadPDF}>Descargar PDF</button>
