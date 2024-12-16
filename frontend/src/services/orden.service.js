@@ -1,6 +1,4 @@
 import axios from './root.service.js';
-import { formatDataOrder } from '@helpers/formatDataOrder.js';
-
 
 export async function getOrders() {
     try {
@@ -10,40 +8,30 @@ export async function getOrders() {
             throw new Error("La respuesta de la API no tiene la estructura esperada.");
         }
 
-       
-        const formattedData = response.data.map(order => ({
-            ...formatDataOrder(order),
-        }));
-        return formattedData;
+        return response.data;
     } catch (error) {
         console.error("Error al obtener órdenes:", error);
-        return { error: error.message || 'Error al obtener las órdenes' };
+        throw new Error(error.response?.data?.error || error.message || 'Error al obtener las órdenes');
     }
 }
-
 
 export async function getOrder(id_orden) {
     try {
         const { data } = await axios.get(`/orders/view/${id_orden}`);
-        return {
-            ...formatDataOrder(data.data),
-            id_orden: data.data.id, // Asegura que el campo esté alineado con el MER
-        };
+        return data.data;
     } catch (error) {
-        return error.response?.data || { error: 'Error al obtener la orden' };
+        throw new Error(error.response?.data?.error || error.message || 'Error al obtener la orden');
     }
 }
-
 
 export async function createOrder(orderData) {
     try {
         const response = await axios.post('/orders/add', orderData);
         return response.data;
     } catch (error) {
-        return error.response?.data || { error: 'Error al crear la orden' };
+        throw new Error(error.response?.data?.error || error.message || 'Error al crear la orden');
     }
 }
-
 
 export async function updateOrder(id_orden, orderData) {
     try {
@@ -63,23 +51,19 @@ export async function updateOrder(id_orden, orderData) {
             throw new Error('La orden actualizada no está presente en la respuesta del servidor');
         }
 
-        return {
-            ...updatedOrder,
-            id_orden: updatedOrder.id_orden || updatedOrder.id || id_orden,
-        };
+        return updatedOrder;
     } catch (error) {
         console.error('Error en updateOrder:', error.response?.data || error.message);
         console.log('Datos enviados:', orderData);
-        throw error;
+        throw new Error(error.response?.data?.error || error.message || 'Error al actualizar la orden');
     }
 }
-
 
 export async function deleteOrder(id_orden) {
     try {
         const response = await axios.delete(`/orders/delete/${id_orden}`);
         return response.data;
     } catch (error) {
-        return error.response?.data || { error: 'Error al eliminar la orden' };
+        throw new Error(error.response?.data?.error || error.message || 'Error al eliminar la orden');
     }
 }

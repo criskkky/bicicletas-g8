@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { updateOrder } from '@services/orden.service.js';
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
-import { formatOrderPostUpdate } from '@helpers/formatDataOrder.js';
 
 const useEditOrder = (fetchOrders, setOrders) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -24,11 +23,9 @@ const useEditOrder = (fetchOrders, setOrders) => {
                 showSuccessAlert('¡Actualizado!', 'La orden ha sido actualizada correctamente.');
                 setIsPopupOpen(false);
 
-                const formattedOrder = formatOrderPostUpdate(updatedOrder);
-
                 setOrders(prevOrders => prevOrders.map(order => 
-                    order.id_orden === formattedOrder.id_orden
-                        ? { ...formattedOrder }
+                    order.id_orden === updatedOrder.id_orden
+                        ? { ...updatedOrder }
                         : order
                 ));
 
