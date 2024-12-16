@@ -130,9 +130,9 @@ const Invoices = () => {
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            <button onClick={() => { setDataInvoice({}); setIsPopupOpen(true); }}>
+            {/* <button onClick={() => { setDataInvoice({}); setIsPopupOpen(true); }}>
               +
-            </button>
+            </button> */}
             <button onClick={downloadPDF}>Descargar PDF</button>
           </div>
         </div>

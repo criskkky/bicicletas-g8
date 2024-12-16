@@ -82,9 +82,9 @@ const Orders = () => {
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            <button onClick={() => { setDataOrder({}); setIsPopupOpen(true); }} >
+            {/* <button onClick={() => { setDataOrder({}); setIsPopupOpen(true); }} >
               +
-            </button>
+            </button> */}
           </div>
         </div>
         <Table
