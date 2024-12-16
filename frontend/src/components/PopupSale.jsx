@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Form from './Form';
 import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
-import { isAdmin } from '@helpers/session.jsx';
+import { isAdmin } from '@helpers/session.js';
 
 export default function PopupSales({ show, setShow, data, action, inventory }) {
     const currentUser = JSON.parse(sessionStorage.getItem('usuario'));
