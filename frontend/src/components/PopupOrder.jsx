@@ -1,15 +1,30 @@
+
+import { useState, useEffect } from 'react';
 import Form from './Form';
 import '@styles/popup_1.css';
 import CloseIcon from '@assets/XIcon.svg';
 
-export default function PopupOrder({ show, setShow, data, action }) {
-    
+export default function PopupOrderEdit({ show, setShow, data, action }) {
     const isEdit = data && Object.keys(data).length > 0;
-    const orderData = isEdit ? data : {};
+    const [orderData, setOrderData] = useState({});
+
+    useEffect(() => {
+        if (isEdit) {
+            setOrderData(data);
+        } else {
+            setOrderData({});
+        }
+    }, [data, isEdit]);
 
     const handleSubmit = (formData) => {
-        action(formData); 
-        setShow(false);  
+        const dataToSubmit = {
+            ...formData,
+            id_orden: orderData.id_orden,
+        };
+
+        console.log("Datos a enviar:", dataToSubmit);
+        action(dataToSubmit);
+        setShow(false);
     };
 
     return (
@@ -17,76 +32,55 @@ export default function PopupOrder({ show, setShow, data, action }) {
             {show && (
                 <div className="bg">
                     <div className="popup" style={{ overflow: "auto" }}>
-                        <button className="close" onClick={() => setShow(false)}>
+                        <button className="close" onClick={() => setShow(false)} aria-label="Cerrar">
                             <img src={CloseIcon} alt="Cerrar" />
                         </button>
                         <Form
-                            title={isEdit ? "Editar Orden" : "Nueva Orden"}
+                            title="Editar Orden"
                             fields={[
                                 {
-                                    label: "RUT Trabajador",
-                                    name: "workerRUT",
-                                    defaultValue: orderData.workerRUT || "",
-                                    placeholder: "Ej. 12345678-9",
+                                    label: "Fecha de Orden",
+                                    name: "fecha_orden",
+                                    defaultValue: orderData.fecha_orden || "",
+                                    placeholder: "Fecha de la orden",
                                     fieldType: "input",
-                                    type: "text",
+                                    type: "date",
                                     required: true,
-                                    pattern: "\\d{7,8}-[0-9kK]", 
                                 },
                                 {
-                                    label: "Tipo de Trabajo Realizado",
-                                    name: "jobType",
-                                    fieldType: "select",
-                                    options: [
-                                        { value: "Mantenimiento", label: "Mantenimiento" },
-                                        { value: "Venta", label: "Venta" },
-                                    ],
-                                    required: true,
-                                    defaultValue: orderData.jobType || "Mantenimiento",
-                                },
-                                {
-                                    label: "ID Trabajo Realizado",
-                                    name: "jobID",
-                                    defaultValue: orderData.jobID || "",
-                                    placeholder: "Ej. 00123",
+                                    label: "Hora de Inicio",
+                                    name: "hora_inicio",
+                                    defaultValue: orderData.hora_inicio || "",
+                                    placeholder: "Hora de inicio",
                                     fieldType: "input",
-                                    type: "text",
-                                    required: true,
-                                },
-                                {
-                                    label: "Cantidad de Horas Trabajadas",
-                                    name: "hoursWorked",
-                                    defaultValue: orderData.hoursWorked || 0,
-                                    placeholder: "Horas dedicadas",
-                                    fieldType: "input",
-                                    type: "number",
-                                    required: true,
-                                    min: 0,
-                                },
-                                {
-                                    label: "Nota (Opcional)",
-                                    name: "note",
-                                    defaultValue: orderData.note || "",
-                                    placeholder: "Observaciones adicionales",
-                                    fieldType: "textarea",
-                                    maxLength: 300,
+                                    type: "datetime-local",
                                     required: false,
                                 },
                                 {
-                                    label: "Estado",
-                                    name: "status",
+                                    label: "Hora de Fin",
+                                    name: "hora_fin",
+                                    defaultValue: orderData.hora_fin || "",
+                                    placeholder: "Hora de fin",
+                                    fieldType: "input",
+                                    type: "datetime-local",
+                                    required: false,
+                                },
+                                {
+                                    label: "Estado de la Orden",
+                                    name: "estado_orden",
+                                    defaultValue: orderData.estado_orden || "pendiente",
+                                    placeholder: "Estado",
                                     fieldType: "select",
                                     options: [
-                                        { value: "Pendiente", label: "Pendiente" },
-                                        { value: "En Proceso", label: "En Proceso" },
-                                        { value: "Completado", label: "Completado" },
+                                        { value: "pendiente", label: "Pendiente" },
+                                        { value: "en proceso", label: "En Proceso" },
+                                        { value: "completada", label: "Completada" },
                                     ],
                                     required: true,
-                                    defaultValue: orderData.status || "Pendiente",
                                 },
                             ]}
                             onSubmit={handleSubmit}
-                            buttonText={isEdit ? "Guardar Cambios" : "Crear Orden"}
+                            buttonText="Guardar cambios"
                             backgroundColor={"#fff"}
                         />
                     </div>
