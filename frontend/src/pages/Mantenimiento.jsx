@@ -96,7 +96,7 @@ const Maintenance = () => {
                 <img src={DeleteIconDisable} alt="delete-disabled" />
               )}
             </button>
-            <button onClick={() => { setDataMaintenance({}); setIsPopupOpen(true); }}>
+            <button onClick={() => { setDataMaintenance({}); setIsPopupOpen(true); }} disabled={dataMaintenance.id_mantenimiento}>
               +
             </button>
           </div>
