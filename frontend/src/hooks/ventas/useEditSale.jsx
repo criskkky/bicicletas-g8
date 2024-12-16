@@ -1,20 +1,18 @@
 import { useState } from 'react';
-import { updateSale } from '@services/ventas.service.js'; // Importar el servicio correspondiente
+import { updateSale } from '@services/ventas.service.js'; 
 import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
 import { formatSalePostUpdate } from '@helpers/formatDataSales.js';
 
 const useEditSale = (fetchSales, setSales) => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Controla la visibilidad del popup
-  const [dataSale, setDataSale] = useState({}); // Almacena los datos de la venta seleccionada para edición
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
+  const [dataSale, setDataSale] = useState({}); 
 
-  // Abre el popup de edición si hay una venta seleccionada
   const handleClickUpdate = () => {
     if (dataSale && dataSale.id_venta) {
       setIsPopupOpen(true);
     }
   };
 
-  // Lógica para actualizar una venta
   const handleUpdate = async (updatedSaleData) => {
     if (updatedSaleData && updatedSaleData.id_venta) {
       try {
@@ -35,8 +33,8 @@ const useEditSale = (fetchSales, setSales) => {
           : sale
         ));
 
-        await fetchSales(); // Refrescar la lista de ventas desde el backend
-        setDataSale({}); // Limpiar los datos de la venta seleccionada
+        await fetchSales(); 
+        setDataSale({}); 
       } catch (error) {
         console.error('Error al actualizar la venta:', error);
         showErrorAlert('Error', `Ocurrió un error al actualizar la venta: ${error.message}`);

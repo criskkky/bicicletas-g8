@@ -132,10 +132,11 @@ export async function getSaleService(id) {
 export async function updateSaleService(id, data) {
   try {
     const ventaRepository = AppDataSource.getRepository(Venta);
+
     const venta = await ventaRepository.findOne({ where: { id_venta: id }, relations: ["items"] });
 
     if (!venta) {
-      return { success: false, message: "Venta no encontrada" };
+      throw new Error("Venta no encontrada");
     }
 
     // Actualizar datos básicos de la venta
@@ -154,13 +155,14 @@ export async function updateSaleService(id, data) {
         const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
         if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
-        const ventaInventarioItem = await ventaInventarioRepository.findOne({
+        let ventaInventarioItem = await ventaInventarioRepository.findOne({
           where: { id_venta: venta.id_venta, id_item: item.id_item },
         });
 
         if (ventaInventarioItem) {
           const inventoryAdjustment = await ajustarInventario(
-            item.id_item, itemData.cantidad - ventaInventarioItem.cantidad
+            item.id_item, 
+            itemData.cantidad - ventaInventarioItem.cantidad
             );
           if (!inventoryAdjustment.success) {
             throw new Error(inventoryAdjustment.message);
@@ -168,16 +170,21 @@ export async function updateSaleService(id, data) {
 
           ventaInventarioItem.cantidad = itemData.cantidad;
           ventaInventarioItem.precio_costo = item.precio * itemData.cantidad;
-          await ventaInventarioRepository.save(ventaInventarioItem);
         } else {
-          const newItem = ventaInventarioRepository.create({
+          
+          const inventoryAdjustment = await ajustarInventario(item.id_item, -itemData.cantidad);
+          if (!inventoryAdjustment.success) {
+            throw new Error(inventoryAdjustment.message);
+          }
+
+          ventaInventarioItem = ventaInventarioRepository.create({
             id_venta: venta.id_venta,
             id_item: item.id_item,
             cantidad: itemData.cantidad,
             precio_costo: item.precio * itemData.cantidad,
           });
-          await ventaInventarioRepository.save(newItem);
         }
+        await ventaInventarioRepository.save(newItem);
 
         // Sumar al total
         total += item.precio * itemData.cantidad;
@@ -201,6 +208,11 @@ export async function updateSaleService(id, data) {
     if (order) {
       order.total = total;
       await orderRepository.save(order);
+    }
+
+    const response = { venta, invoice, order };
+    if (!response.venta || !response.invoice || !response.order) {
+      throw new Error("Estructura de datos retornada por el backend incompleta o inválida.");
     }
 
     return [venta, invoice, order, null];

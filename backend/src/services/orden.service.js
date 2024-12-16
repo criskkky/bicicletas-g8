@@ -12,7 +12,9 @@ async function obtenerRutTrabajador(orderData) {
 
   if (orderData.id_mantenimiento) {
     const maintenanceRepository = AppDataSource.getRepository(Maintenance);
-    const maintenance = await maintenanceRepository.findOne({ where: { id_mantenimiento: orderData.id_mantenimiento } });
+    const maintenance = await maintenanceRepository.findOne(
+      { where: { id_mantenimiento: orderData.id_mantenimiento } 
+    });
     if (!maintenance) throw new Error("Mantenimiento no encontrado");
     rut_trabajador = maintenance.rut_trabajador;
   } else if (orderData.id_venta) {

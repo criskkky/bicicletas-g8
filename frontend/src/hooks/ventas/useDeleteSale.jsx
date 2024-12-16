@@ -9,17 +9,17 @@ const useDeleteSale = (fetchSales, setDataSale) => {
         }
 
         try {
-            const result = await deleteDataAlert(); // Confirmación del usuario
+            const result = await deleteDataAlert(); 
             if (result.isConfirmed) {
-                const response = await deleteSale(dataSale[0].id_venta); // Usar id_venta
+                const response = await deleteSale(dataSale[0].id_venta); 
 
                 if (response.status === 'Client error') {
                     return showErrorAlert('Error', response.details);
                 }
 
                 showSuccessAlert('¡Eliminado!', 'La venta ha sido eliminada correctamente.');
-                await fetchSales(); // Actualiza la lista de ventas
-                setDataSale([]); // Limpia la selección
+                await fetchSales(); 
+                setDataSale([]); 
             } else {
                 showErrorAlert('Cancelado', 'La operación ha sido cancelada.');
             }

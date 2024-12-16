@@ -61,7 +61,6 @@ export async function updateSale(id_venta, saleData) {
   try {
     const response = await axios.patch(`/sale/${id_venta}`, saleData);
 
-    // Validar que la respuesta contiene los datos esperados
     if (!response.data || !response.data.updatedSale) {
       throw new Error('La respuesta del servidor no tiene la estructura esperada');
     }

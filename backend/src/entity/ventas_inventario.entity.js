@@ -5,7 +5,7 @@ const VentaInventarioSchema = new EntitySchema({
   name: "VentaInventario",
   tableName: "venta_inventario",
   columns: {
-    id: {  // Cambiado para reflejar una clave primaria única y no compuesta
+    id: {  
       type: "int",
       primary: true,
       generated: true,

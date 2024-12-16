@@ -8,7 +8,7 @@ const SaleSchema = new EntitySchema({
     id_venta: {
       type: "int",
       primary: true,
-      generated: true,  // Esto asegura que id_venta sea generado automáticamente.
+      generated: true,  
     },
     rut_trabajador: {
       type: "varchar",

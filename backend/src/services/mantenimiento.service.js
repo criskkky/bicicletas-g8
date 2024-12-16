@@ -19,7 +19,7 @@ async function ajustarInventario(itemId, cambioCantidad) {
   return { success: true, item };
 }
 
-// Crear mantenimiento
+
 // Crear mantenimiento
 export async function createMaintenanceService(data) {
   try {
@@ -45,14 +45,16 @@ export async function createMaintenanceService(data) {
       if (maintenance.items) {
         for (const existingItem of maintenance.items) {
           await ajustarInventario(existingItem.id_item, existingItem.cantidad); // Devolver al inventario
-          await maintenanceInventoryRepository.delete({ id_mantenimiento: id, id_item: existingItem.id_item }); // Eliminar vínculo
+          await maintenanceInventoryRepository.delete(
+            { id_mantenimiento: id, id_item: existingItem.id_item }); // Eliminar vínculo
         }
       }
 
       if (data.items && Array.isArray(data.items)) {
 
           for (const itemData of data.items) {
-              const item = await AppDataSource.getRepository(Inventario).findOne({ where: { id_item: itemData.id_item } });
+              const item = await AppDataSource.getRepository(Inventario).findOne(
+                { where: { id_item: itemData.id_item } });
               if (!item) throw new Error(`Ítem de inventario no encontrado: ID ${itemData.id_item}`);
 
               // Ajustar inventario (disminuir stock)

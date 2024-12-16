@@ -73,8 +73,6 @@ const Sales = () => {
   const handleDeleteClick = () => {
     if (dataSale && dataSale.id_venta) {
       handleDelete([dataSale]);
-      setSales(prevSales => prevSales.filter(sale => sale.id_venta !== dataSale.id_venta));
-      setDataSale({});
     }
   };
 
@@ -88,8 +86,6 @@ const Sales = () => {
     let yPosition = 20;
   
     sales.forEach((sale) => {
-      console.log("Datos originales", sale.items);
-  
       // Validación y transformación de `sale.items`
       if (typeof sale.items === "string") {
         const itemArray = sale.items.split(",").map((item) => item.trim());
