@@ -148,6 +148,7 @@ export async function updateMaintenanceService(id, data) {
       maintenance.rut_cliente = data.rut_cliente ?? maintenance.rut_cliente;
       maintenance.rut_trabajador = data.rut_trabajador ?? maintenance.rut_trabajador;
       maintenance.descripcion = data.descripcion ?? maintenance.descripcion;
+      maintenance.fecha_mantenimiento = data.fecha_mantenimiento ?? maintenance.fecha_mantenimiento;
 
       // Guardar cambios en mantenimiento
       await maintenanceRepository.save(maintenance);
