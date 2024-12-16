@@ -36,7 +36,9 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
     const handleItemChange = (index, field, value) => {
         setItems(prevItems => {
             const updatedItems = [...prevItems];
-            updatedItems[index] = { ...updatedItems[index], [field]: value };
+
+            const validatedValue = field === "cantidad" ? Math.max(0, parseInt(value, 10) || 0) : value;
+            updatedItems[index] = { ...updatedItems[index], [field]: validatedValue };
             return updatedItems;
         });
     };
@@ -51,11 +53,21 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
                 if (!acc[index]) {
                     acc[index] = {};
                 }
-                
-                acc[index][field] = field === "cantidad" ? parseInt(formData[key], 10) : formData[key];
+
+                let value = formData[key];
+                if (field === "cantidad"){
+                    value = Math.max(0, parseInt(value, 10) || 0);
+                }
+
+                acc[index][field] = value;
                 return acc;
             }, [])
             .filter(item => item.id_item && item.cantidad); 
+
+            if (itemsToSubmit.length === 0) {
+                alert("Debe agregar al menos un artículo con una cantidad válida mayor a 0.");
+                return; 
+            }
 
         const dataToSubmit = {
             ...formData,
