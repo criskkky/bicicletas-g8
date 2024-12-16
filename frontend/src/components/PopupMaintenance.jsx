@@ -96,7 +96,7 @@ export default function PopupMaintenance({ show, setShow, data, action, inventor
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
-                                    disabled: !isAdmin(currentUser?.rol),
+                                    //disabled: !isAdmin(currentUser?.rol),
                                 },
                                 {
                                     label: "Cliente (RUT)",

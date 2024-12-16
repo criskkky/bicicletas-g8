@@ -110,7 +110,7 @@ export default function PopupSales({ show, setShow, data, action, inventory }) {
                                     fieldType: "input",
                                     type: "text",
                                     required: true,
-                                    disabled: !isAdmin(currentUser?.rol),
+                                    //disabled: !isAdmin(currentUser?.rol),
                                 },
                                 {
                                     label: "Cliente (RUT)",
