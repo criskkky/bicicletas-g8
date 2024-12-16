@@ -68,7 +68,7 @@ export default function PopupInventory({ show, setShow, data, action }) {
                                     placeholder: "Descripción del producto",
                                     fieldType: "textarea",
                                     required: false,
-                                    minLength: 10,
+                                    minLength: 5,
                                     maxLength: 255,
                                 },
                                 {
