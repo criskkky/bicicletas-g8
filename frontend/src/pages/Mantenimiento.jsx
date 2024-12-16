@@ -15,7 +15,8 @@ import useInventory from '@hooks/inventario/useGetInventory';
 
 const Maintenance = () => {
   const { maintenances, fetchMaintenances, setMaintenances } = useMaintenances();
-  const [filterId, setFilterId] = useState('');
+  const [filterType, setFilterType] = useState('id_mantenimiento'); // Tipo de filtro por defecto
+  const [filterValue, setFilterValue] = useState(''); // Valor del filtro
   const { inventory } = useInventory();
 
   const {
@@ -29,8 +30,13 @@ const Maintenance = () => {
   const { handleDelete } = useDeleteMaintenance(fetchMaintenances, setDataMaintenance);
   const { handleCreate } = useCreateMaintenance(fetchMaintenances, setMaintenances);
 
-  const handleIdFilterChange = (e) => {
-    setFilterId(e.target.value);
+  const handleFilterTypeChange = (e) => {
+    setFilterType(e.target.value);
+    setFilterValue(''); // Limpiamos el valor cuando cambiamos el filtro
+  };
+
+  const handleFilterValueChange = (e) => {
+    setFilterValue(e.target.value);
   };
 
   const handleSelectionChange = useCallback(
@@ -75,13 +81,40 @@ const Maintenance = () => {
     }
   };
 
+  // Filtro aplicado segun tipo y valor
+  const filteredMaintenances = maintenances.filter(maintenance => {
+    switch (filterType) {
+      case 'rut_trabajador':
+        return maintenance.rut_trabajador.includes(filterValue);
+      case 'rut_cliente':
+        return maintenance.rut_cliente.includes(filterValue);
+      case 'id_mantenimiento':
+        return maintenance.id_mantenimiento.toString().includes(filterValue);
+      case 'fecha_mantenimiento':
+        return maintenance.fecha_mantenimiento.includes(filterValue);
+      default:
+        return true;
+    }
+  });
+
   return (
     <div className="main-container">
       <div className="table-container">
         <div className="top-table">
           <h1 className="title-table">Mantenimientos</h1>
           <div className="filter-actions">
-            <Search value={filterId} onChange={handleIdFilterChange} placeholder={'Filtrar por ID MNT'} />
+            <select onChange={handleFilterTypeChange} value={filterType}>
+              <option value="id_mantenimiento">ID Mantenimiento</option>
+              <option value="rut_trabajador">Técnico (RUT)</option>
+              <option value="rut_cliente">Cliente (RUT)</option>
+              <option value="fecha_mantenimiento">Fecha</option>
+            </select>
+            <input
+              type="text"
+              placeholder={`Filtrar por ${filterType === 'id_mantenimiento' ? 'ID MNT' : filterType === 'rut_trabajador' ? 'RUT Técnico' : filterType === 'rut_cliente' ? 'RUT Cliente' : 'Fecha'}`}
+              value={filterValue}
+              onChange={handleFilterValueChange}
+            />
             <button onClick={handleUpdateClick} disabled={!dataMaintenance.id_mantenimiento}>
               {dataMaintenance.id_mantenimiento ? (
                 <img src={UpdateIcon} alt="edit" />
@@ -102,10 +135,8 @@ const Maintenance = () => {
           </div>
         </div>
         <Table
-          data={maintenances}
+          data={filteredMaintenances} // Usamos los mantenimientos filtrados
           columns={columns}
-          filter={filterId}
-          dataToFilter="id_mantenimiento"
           onSelectionChange={handleSelectionChange}
         />
       </div>
@@ -122,4 +153,3 @@ const Maintenance = () => {
 };
 
 export default Maintenance;
-
