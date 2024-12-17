@@ -138,6 +138,7 @@ export async function updateSaleService(id, data) {
       return { success: false, message: "Venta no encontrada" };
     }
 
+    venta.id_venta = id;
     // Actualizar datos básicos de la venta
     venta.rut_cliente = data.rut_cliente ?? venta.rut_cliente;
     venta.rut_trabajador = data.rut_trabajador ?? venta.rut_trabajador;
@@ -205,7 +206,12 @@ export async function updateSaleService(id, data) {
 
     // Asignar el total recalculado a la venta
     venta.total = total;
-    await ventaRepository.save(venta);
+    await ventaRepository.update({ id_venta: id }, {
+      rut_cliente: data.rut_cliente ?? venta.rut_cliente,
+      rut_trabajador: data.rut_trabajador ?? venta.rut_trabajador,
+      fecha_venta: data.fecha_venta ? new Date(data.fecha_venta) : venta.fecha_venta,
+      total: total,
+    });
 
     // Actualizar factura y orden
     const invoiceRepository = AppDataSource.getRepository(Invoice);

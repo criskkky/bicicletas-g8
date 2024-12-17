@@ -76,32 +76,56 @@ export async function getSale(req, res) {
 
 // Actualizar una venta
 export async function updateSale(req, res) {
+  console.log("antes de try-catch");
   try {
     const { id } = req.params;
     const updateData = req.body;
 
+    console.log("Iniciando proceso de actualización de venta", { id, updateData });
+
     // Validación de campos obligatorios
     if (!updateData.rut_trabajador || !updateData.rut_cliente || !updateData.fecha_venta) {
+      console.warn("Faltan campos obligatorios en la solicitud", { updateData });
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    const [updatedSale, updatedInvoice, updatedOrder, error] = await updateSaleService(id, updateData);
+    if (!updateData.id_venta) {
+      console.warn("El campo id_venta no está definido en la solicitud", { updateData });
+      return res.status(400).json({ error: "El campo id_venta es obligatorio" });
+    }
+
+    console.log("Campos obligatorios validados correctamente");
+
+    console.log("Llamando a updateSaleService con ID:", id, "y datos:", updateData);
+    const result = await updateSaleService(id, updateData);
+    console.log("Resultado de updateSaleService:", result);
+
+    if (!Array.isArray(result) || result.length !== 4) {
+      console.error("Respuesta inesperada de updateSaleService:", result);
+      throw new Error("La respuesta del servicio no tiene el formato esperado");
+    }
+
+    const [updatedSale, updatedInvoice, updatedOrder, error] = result;
 
     if (error) {
-      console.error("Error al actualizar la venta:", error);
+      console.error("Error al actualizar la venta en el servicio", error);
       return res.status(500).json({ error: "Error interno del servidor(update)" });
     }
 
     if (!updatedSale) {
+      console.warn("No se encontró una venta con el ID proporcionado", { id });
       return res.status(404).json({ error: "Venta no encontrada" });
     }
 
+    console.log("Venta actualizada con éxito", { updatedSale, updatedInvoice, updatedOrder });
     res.json({ message: "Venta actualizada con éxito", updatedSale, updatedInvoice, updatedOrder });
   } catch (error) {
-    console.error("Error al actualizar la venta:", error);
+    console.error("Error inesperado al procesar la actualización de la venta", error);
     return res.status(500).json({ error: "Error interno del servidor(update)" });
   }
 }
+
+
 
 // Eliminar una venta
 export async function deleteSale(req, res) {
